@@ -14,7 +14,7 @@
 <meta property="og:description" content="There are cases when recursion can lead to stack overflow. Tail-end recursion can be optimized by the compiler such that the generated machine code looks like iteration. Why regular recursion is not a">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2019-02-12T09:14:07.000Z">
-<meta property="article:modified_time" content="2022-12-10T03:18:55.016Z">
+<meta property="article:modified_time" content="2023-04-16T06:08:57.066Z">
 <meta property="article:author" content="Alexandru Petenchea">
 <meta property="article:tag" content="Programming">
 <meta name="twitter:card" content="summary">
@@ -51,8 +51,7 @@
 	
 <meta name="generator" content="Hexo 5.4.2"></head>
 
-<body class="max-width mx-auto px3 ltr">
-    
+<body class="max-width mx-auto px3 ltr">    
       <div id="header-post">
   <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
   <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
@@ -104,7 +103,7 @@
 
     </div>
     <div id="toc">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-regular-recursion-is-not-always-enough"><span class="toc-number">1.</span> <span class="toc-text">Why regular recursion is not always enough?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Under-the-hood"><span class="toc-number">1.1.</span> <span class="toc-text">Under the hood</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The-problem"><span class="toc-number">1.2.</span> <span class="toc-text">The problem</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-tail-end-recursion-works"><span class="toc-number">2.</span> <span class="toc-text">How tail-end recursion works?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Dissasembly"><span class="toc-number">2.1.</span> <span class="toc-text">Dissasembly</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tail-end-recursion-in-other-languages"><span class="toc-number">3.</span> <span class="toc-text">Tail-end recursion in other languages</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GCC"><span class="toc-number">3.1.</span> <span class="toc-text">GCC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Clang"><span class="toc-number">3.2.</span> <span class="toc-text">Clang</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Proof"><span class="toc-number">3.2.1.</span> <span class="toc-text">Proof</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Thorough-analysis"><span class="toc-number">3.2.2.</span> <span class="toc-text">Thorough analysis</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-regular-recursion-is-not-always-enough"><span class="toc-number">1.</span> <span class="toc-text">Why regular recursion is not always enough?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Under-the-hood"><span class="toc-number">1.1.</span> <span class="toc-text">Under the hood</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The-problem"><span class="toc-number">1.2.</span> <span class="toc-text">The problem</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-tail-end-recursion-works"><span class="toc-number">2.</span> <span class="toc-text">How tail-end recursion works?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Disassembly"><span class="toc-number">2.1.</span> <span class="toc-text">Disassembly</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tail-end-recursion-in-other-languages"><span class="toc-number">3.</span> <span class="toc-text">Tail-end recursion in other languages</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GCC"><span class="toc-number">3.1.</span> <span class="toc-text">GCC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Clang"><span class="toc-number">3.2.</span> <span class="toc-text">Clang</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Proof"><span class="toc-number">3.2.1.</span> <span class="toc-text">Proof</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Thorough-analysis"><span class="toc-number">3.2.2.</span> <span class="toc-text">Thorough analysis</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -164,7 +163,7 @@ OCaml interpreter, it crashes for large values of n. </p>
 approached recursion. The reason why this occurs is because every function call has its own stack frame, so each
 subsequent call to <em>sum</em> eats up some more space on the stack. The stack runs out of space,
 thus resulting in a stack overflow. I used the <code>#trace</code> command to see what happens during execution.
-It prints, in their order of occurence, all the calls and returns of the traced function.</p>
+It prints, in their order of occurrence, all the calls and returns of the traced function.</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># #trace sum;;</span><br><span class="line">sum is now traced.</span><br><span class="line"># sum 4;;</span><br><span class="line">sum &lt;-- 4</span><br><span class="line">sum &lt;-- 3</span><br><span class="line">sum &lt;-- 2</span><br><span class="line">sum &lt;-- 1</span><br><span class="line">sum --&gt; 1</span><br><span class="line">sum --&gt; 3</span><br><span class="line">sum --&gt; 6</span><br><span class="line">sum --&gt; 10</span><br><span class="line">- : int = 10</span><br></pre></td></tr></table></figure>
 
 <p>The depth of recursion is given by the number of consecutive calls to sum, in this case being 4.</p>
@@ -208,7 +207,7 @@ accumulator set to its initial value.</p>
 <p><code>sum</code> doesn’t crash anymore.</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># sum (int_of_float (10.0 ** 6.0));;</span><br><span class="line">- : int = 500000500000</span><br><span class="line"># sum (int_of_float (10.0 ** 7.0));;</span><br><span class="line">- : int = 50000005000000</span><br><span class="line"># sum (int_of_float (10.0 ** 8.0));;</span><br><span class="line">- : int = 5000000050000000</span><br></pre></td></tr></table></figure>
 
-<h3 id="Dissasembly"><a href="#Dissasembly" class="headerlink" title="Dissasembly"></a>Dissasembly</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">00000000004022a0:</span><br><span class="line"> 4022a0: 48 83 fb 03     cmp    rbx,0x3</span><br><span class="line"> 4022a4: 75 06           jne    4022ac</span><br><span class="line"> 4022a6: 48 83 c0 02     add    rax,0x2</span><br><span class="line"> 4022aa: c3              ret</span><br><span class="line"> 4022ab: 90              nop</span><br><span class="line"> 4022ac: 48 89 df        mov    rdi,rbx</span><br><span class="line"> 4022af: 48 83 c7 fe     add    rdi,0xfffffffffffffffe</span><br><span class="line"> 4022b3: 48 8d 44 18 ff  lea    rax,[rax+rbx*1-0x1]</span><br><span class="line"> 4022b8: 48 89 fb        mov    rbx,rdi</span><br><span class="line"> 4022bb: eb e3           jmp    4022a0</span><br><span class="line"> 4022bd: 0f 1f 00        nop    DWORD PTR [rax]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="Disassembly"><a href="#Disassembly" class="headerlink" title="Disassembly"></a>Disassembly</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">00000000004022a0:</span><br><span class="line"> 4022a0: 48 83 fb 03     cmp    rbx,0x3</span><br><span class="line"> 4022a4: 75 06           jne    4022ac</span><br><span class="line"> 4022a6: 48 83 c0 02     add    rax,0x2</span><br><span class="line"> 4022aa: c3              ret</span><br><span class="line"> 4022ab: 90              nop</span><br><span class="line"> 4022ac: 48 89 df        mov    rdi,rbx</span><br><span class="line"> 4022af: 48 83 c7 fe     add    rdi,0xfffffffffffffffe</span><br><span class="line"> 4022b3: 48 8d 44 18 ff  lea    rax,[rax+rbx*1-0x1]</span><br><span class="line"> 4022b8: 48 89 fb        mov    rbx,rdi</span><br><span class="line"> 4022bb: eb e3           jmp    4022a0</span><br><span class="line"> 4022bd: 0f 1f 00        nop    DWORD PTR [rax]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p><code>acc</code> is initially stored in register <code>rax</code> and <code>n</code> is stored in <code>rbx</code>.
 As you can see, there is not a single call instruction, only jumps! This means that the amount
@@ -247,7 +246,7 @@ bellow <code>.L7</code> in a loop. </p>
 \end{split}
 $$</p>
 <p>For details, read about <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Arithmetic_progression">arithmetic progressions</a>.</p>
-<h4 id="Thorough-analysis"><a href="#Thorough-analysis" class="headerlink" title="Thorough analysis"></a>Thorough analysis</h4><p>This may go out the scope of this article, but I believe such an optimization deservers a more detailed explanation.
+<h4 id="Thorough-analysis"><a href="#Thorough-analysis" class="headerlink" title="Thorough analysis"></a>Thorough analysis</h4><p>This may go out the scope of this article, but I believe such an optimization deserves a more detailed explanation.
 I will go through it step by step.</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">push edi</span><br><span class="line">push esi</span><br></pre></td></tr></table></figure>
 
@@ -262,7 +261,7 @@ in register <code>esi</code>. The second one takes the value of <code>acc</code>
 <p>If <code>esi</code> (which now has the value of <code>n</code>) is equal to 1, jump to the location labeled <code>.LBB0_2</code>. </p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lea edi, dword ptr [esi - 1]</span><br><span class="line">lea eax, dword ptr [esi - 2]</span><br></pre></td></tr></table></figure>
 
-<p>The equivallent of the first instruction is <code>edi = n - 1</code>. Second instruction is: <code>eax = n - 2</code>.
+<p>The equivalent of the first instruction is <code>edi = n - 1</code>. Second instruction is: <code>eax = n - 2</code>.
 Note that <code>lea</code> actually comes from “load effective address”, and its original purpose was to handle memory addresses,
 but it is often used for arithmetic operations. </p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">imul edi, eax</span><br></pre></td></tr></table></figure>
@@ -320,7 +319,7 @@ The last one simply adds 1 to <code>ecx</code>.<br>$$ecx = n + (n - 1) * (n - 2)
     </div>
 
     <div id="toc-footer" style="display: none">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-regular-recursion-is-not-always-enough"><span class="toc-number">1.</span> <span class="toc-text">Why regular recursion is not always enough?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Under-the-hood"><span class="toc-number">1.1.</span> <span class="toc-text">Under the hood</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The-problem"><span class="toc-number">1.2.</span> <span class="toc-text">The problem</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-tail-end-recursion-works"><span class="toc-number">2.</span> <span class="toc-text">How tail-end recursion works?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Dissasembly"><span class="toc-number">2.1.</span> <span class="toc-text">Dissasembly</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tail-end-recursion-in-other-languages"><span class="toc-number">3.</span> <span class="toc-text">Tail-end recursion in other languages</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GCC"><span class="toc-number">3.1.</span> <span class="toc-text">GCC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Clang"><span class="toc-number">3.2.</span> <span class="toc-text">Clang</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Proof"><span class="toc-number">3.2.1.</span> <span class="toc-text">Proof</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Thorough-analysis"><span class="toc-number">3.2.2.</span> <span class="toc-text">Thorough analysis</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-regular-recursion-is-not-always-enough"><span class="toc-number">1.</span> <span class="toc-text">Why regular recursion is not always enough?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Under-the-hood"><span class="toc-number">1.1.</span> <span class="toc-text">Under the hood</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The-problem"><span class="toc-number">1.2.</span> <span class="toc-text">The problem</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-tail-end-recursion-works"><span class="toc-number">2.</span> <span class="toc-text">How tail-end recursion works?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Disassembly"><span class="toc-number">2.1.</span> <span class="toc-text">Disassembly</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tail-end-recursion-in-other-languages"><span class="toc-number">3.</span> <span class="toc-text">Tail-end recursion in other languages</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GCC"><span class="toc-number">3.1.</span> <span class="toc-text">GCC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Clang"><span class="toc-number">3.2.</span> <span class="toc-text">Clang</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Proof"><span class="toc-number">3.2.1.</span> <span class="toc-text">Proof</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Thorough-analysis"><span class="toc-number">3.2.2.</span> <span class="toc-text">Thorough analysis</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">
@@ -431,5 +430,20 @@ The last one simply adds 1 to <code>ecx</code>.<br>$$ecx = n + (n - 1) * (n - 2)
 
 <!-- utterances Comments -->
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>
