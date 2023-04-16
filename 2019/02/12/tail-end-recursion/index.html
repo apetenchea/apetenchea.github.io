@@ -14,7 +14,7 @@
 <meta property="og:description" content="There are cases when recursion can lead to stack overflow. Tail-end recursion can be optimized by the compiler such that the generated machine code looks like iteration. Why regular recursion is not a">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2019-02-12T09:14:07.000Z">
-<meta property="article:modified_time" content="2023-04-16T06:08:57.066Z">
+<meta property="article:modified_time" content="2023-04-16T07:29:05.599Z">
 <meta property="article:author" content="Alexandru Petenchea">
 <meta property="article:tag" content="Programming">
 <meta name="twitter:card" content="summary">
@@ -51,7 +51,8 @@
 	
 <meta name="generator" content="Hexo 5.4.2"></head>
 
-<body class="max-width mx-auto px3 ltr">    
+<body class="max-width mx-auto px3 ltr">
+    
       <div id="header-post">
   <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
   <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
@@ -296,7 +297,7 @@ The last one simply adds 1 to <code>ecx</code>.<br>$$ecx = n + (n - 1) * (n - 2)
 <li><a target="_blank" rel="noopener" href="http://greenteapress.com/thinkocaml/">Downey, A. and Monje, N., (2008), <em>Think OCaml: How to Think like a (Functional) Programmer</em></a></li>
 <li><a target="_blank" rel="noopener" href="https://v1.realworldocaml.org/">Minsky, Y., Madhavapeddy, A. and Hickey, J., <em>Real World OCaml</em></a></li>
 </ul>
-
+<script id="MathJax-script" async src="/javascript/mathjax/tex-chtml.js"></script>
   </div>
 </article>
 
@@ -430,20 +431,5 @@ The last one simply adds 1 to <code>ecx</code>.<br>$$ecx = n + (n - 1) * (n - 2)
 
 <!-- utterances Comments -->
 
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

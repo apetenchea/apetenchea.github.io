@@ -6,12 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-    <meta name="description" content="How I built Clang on Ubuntu 18.04.1 LTS, using GCC. RequirementsMake sure you have the required software.Here’s what I used:  GNU Make 4.1 GCC 7.3.0 CMake 3.10.2 Python 3.6.5 (for running tests) zlib">
+    <meta name="description" content="How I built Clang on Ubuntu 18.04.1 LTS, using GCC. RequirementsMake sure you have the required software. Here’s what I used:  GNU Make 4.1 GCC 7.3.0 CMake 3.10.2 Python 3.6.5 (for running tests) zlib">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Notes on Building Clang">
 <meta property="og:url" content="https://apetenchea.github.io/2019/01/30/notes-on-building-clang/index.html">
 <meta property="og:site_name" content="cdroot">
-<meta property="og:description" content="How I built Clang on Ubuntu 18.04.1 LTS, using GCC. RequirementsMake sure you have the required software.Here’s what I used:  GNU Make 4.1 GCC 7.3.0 CMake 3.10.2 Python 3.6.5 (for running tests) zlib">
+<meta property="og:description" content="How I built Clang on Ubuntu 18.04.1 LTS, using GCC. RequirementsMake sure you have the required software. Here’s what I used:  GNU Make 4.1 GCC 7.3.0 CMake 3.10.2 Python 3.6.5 (for running tests) zlib">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2019-01-30T18:25:10.000Z">
 <meta property="article:modified_time" content="2023-04-16T06:09:47.514Z">
@@ -52,7 +52,8 @@
 	
 <meta name="generator" content="Hexo 5.4.2"></head>
 
-<body class="max-width mx-auto px3 ltr">    
+<body class="max-width mx-auto px3 ltr">
+    
       <div id="header-post">
   <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
   <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
@@ -149,7 +150,8 @@
 
   <div class="content" itemprop="articleBody">
     <p>How I built Clang on Ubuntu 18.04.1 LTS, using GCC.</p>
-<h2 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h2><p>Make sure you have the <a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#requirements">required software.</a><br>Here’s what I used:</p>
+<h2 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h2><p>Make sure you have the <a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#requirements">required software.</a>
+Here’s what I used:</p>
 <ul>
 <li>GNU Make 4.1</li>
 <li>GCC 7.3.0</li>
@@ -157,13 +159,44 @@
 <li>Python 3.6.5 (for running tests)</li>
 <li>zlib 1.2.11 (optional)</li>
 </ul>
-<p>Before installing new packages, I usually update &amp; upgrade.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Update the list of available packages and their version</span></span><br><span class="line">sudo apt update</span><br><span class="line"></span><br><span class="line"><span class="comment"># Actually install newer versions of packages</span></span><br><span class="line">sudo apt upgrade</span><br></pre></td></tr></table></figure></p>
-<h2 id="Checkout"><a href="#Checkout" class="headerlink" title="Checkout"></a>Checkout</h2><p><a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#checkout-llvm-from-git">Checkout LLVM from Git</a>.<br>Take a look at their <a target="_blank" rel="noopener" href="https://github.com/llvm/llvm-project/releases">releases</a>. I chose version 7.0.0. That’s on branch<br><em>release/7.x</em>, commit <em>00b161b8971bc6d3cb55f13502288b8fe0dbaa42</em>.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --single-branch --branch release/7.x https://github.com/llvm/llvm-project.git</span><br><span class="line">git checkout 00b161b8971bc6d3cb55f13502288b8fe0dbaa42</span><br></pre></td></tr></table></figure></p>
-<h2 id="Configure-LLVM"><a href="#Configure-LLVM" class="headerlink" title="Configure LLVM"></a>Configure LLVM</h2><p>After the checkout was complete, I created a folder where the object files would be placed.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> llvm-project</span><br><span class="line"><span class="built_in">mkdir</span> release</span><br><span class="line"><span class="built_in">cd</span> release</span><br></pre></td></tr></table></figure><br>CMake generates the build files. <a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#local-llvm-configuration">Build variables</a><br>are used to specify the build configuration.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmake -G <span class="string">&quot;Unix Makefiles&quot;</span> -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD=<span class="string">&quot;X86&quot;</span> -DLLVM_ENABLE_PROJECTS=<span class="string">&quot;clang;compiler-rt&quot;</span> -DCLANG_ENABLE_BOOTSTRAP=On ../llvm</span><br></pre></td></tr></table></figure><br>Check the CMake output and install any missing software. I got a few errors myself:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Could NOT find LibXml2</span><br><span class="line">Could NOT find Doxygen</span><br><span class="line">Could NOT find Curses</span><br><span class="line">Could NOT find SWIG</span><br></pre></td></tr></table></figure><br>Fixed:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install libxml2-dev</span><br><span class="line">sudo apt install doxygen</span><br><span class="line">sudo apt install libncurses5-dev</span><br><span class="line">sudo apt install swig</span><br></pre></td></tr></table></figure></p>
-<h2 id="Compile"><a href="#Compile" class="headerlink" title="Compile"></a>Compile</h2><p><a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#compiling-the-llvm-suite-source-code">Generate binaries</a>.<br>While still in <code>/release</code>, run <code>make -j5</code>. The <code>-j</code> parameter represents the number of workers used to parallelize<br>the build process. Depending on the configuration, your machine and the number of worker threads you assign,<br>this might take a while.</p>
-<h2 id="Bootstrap"><a href="#Bootstrap" class="headerlink" title="Bootstrap"></a>Bootstrap</h2><p><a target="_blank" rel="noopener" href="https://llvm.org/docs/AdvancedBuilds.html#bootstrap-builds">Bootstrapping</a> refers to using the newly built compiler<br>in order to build itself again. It is only possible if makefiles were generated with <code>CLANG_ENABLE_BOOTSTRAP=On</code>.<br>This step is optional and it takes time. If you’ve had enough, consider skipping it.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make stage2</span><br></pre></td></tr></table></figure><br>I didn’t add any more workers this time because during linking the entire process would eat up more than 8GB of RAM.</p>
-<h2 id="Test"><a href="#Test" class="headerlink" title="Test"></a>Test</h2><p>To make sure everything went as planned, run the tests to validate your work.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make check-clang</span><br></pre></td></tr></table></figure><br>Or, to check everything:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make check-all</span><br></pre></td></tr></table></figure></p>
-<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><p>By default, the install location is <code>/usr/local</code>. You probably need root permission to install in there.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make install</span><br></pre></td></tr></table></figure><br>If for some reason you want to undo this step:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xargs rm &lt; install_manifest.txt</span><br></pre></td></tr></table></figure><br>After installing, I removed the <code>/release</code> folder because I don’t plan on doing another build. It occupies quite a lot<br>of disk space, but if you plan on building Clang again, make sure you keep it around.</p>
+<p>Before installing new packages, I usually update &amp; upgrade.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Update the list of available packages and their version</span></span><br><span class="line">sudo apt update</span><br><span class="line"></span><br><span class="line"><span class="comment"># Actually install newer versions of packages</span></span><br><span class="line">sudo apt upgrade</span><br></pre></td></tr></table></figure>
+
+<h2 id="Checkout"><a href="#Checkout" class="headerlink" title="Checkout"></a>Checkout</h2><p><a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#checkout-llvm-from-git">Checkout LLVM from Git</a>.
+Take a look at their <a target="_blank" rel="noopener" href="https://github.com/llvm/llvm-project/releases">releases</a>. I chose version 7.0.0. That’s on branch
+<em>release/7.x</em>, commit <em>00b161b8971bc6d3cb55f13502288b8fe0dbaa42</em>.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --single-branch --branch release/7.x https://github.com/llvm/llvm-project.git</span><br><span class="line">git checkout 00b161b8971bc6d3cb55f13502288b8fe0dbaa42</span><br></pre></td></tr></table></figure>
+
+<h2 id="Configure-LLVM"><a href="#Configure-LLVM" class="headerlink" title="Configure LLVM"></a>Configure LLVM</h2><p>After the checkout was complete, I created a folder where the object files would be placed.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> llvm-project</span><br><span class="line"><span class="built_in">mkdir</span> release</span><br><span class="line"><span class="built_in">cd</span> release</span><br></pre></td></tr></table></figure>
+<p>CMake generates the build files. <a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#local-llvm-configuration">Build variables</a>
+are used to specify the build configuration. </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmake -G <span class="string">&quot;Unix Makefiles&quot;</span> -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD=<span class="string">&quot;X86&quot;</span> -DLLVM_ENABLE_PROJECTS=<span class="string">&quot;clang;compiler-rt&quot;</span> -DCLANG_ENABLE_BOOTSTRAP=On ../llvm</span><br></pre></td></tr></table></figure>
+<p>Check the CMake output and install any missing software. I got a few errors myself:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Could NOT find LibXml2</span><br><span class="line">Could NOT find Doxygen</span><br><span class="line">Could NOT find Curses</span><br><span class="line">Could NOT find SWIG</span><br></pre></td></tr></table></figure>
+<p>Fixed:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install libxml2-dev</span><br><span class="line">sudo apt install doxygen</span><br><span class="line">sudo apt install libncurses5-dev</span><br><span class="line">sudo apt install swig</span><br></pre></td></tr></table></figure>
+
+<h2 id="Compile"><a href="#Compile" class="headerlink" title="Compile"></a>Compile</h2><p><a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#compiling-the-llvm-suite-source-code">Generate binaries</a>.
+While still in <code>/release</code>, run <code>make -j5</code>. The <code>-j</code> parameter represents the number of workers used to parallelize
+the build process. Depending on the configuration, your machine and the number of worker threads you assign,
+this might take a while.</p>
+<h2 id="Bootstrap"><a href="#Bootstrap" class="headerlink" title="Bootstrap"></a>Bootstrap</h2><p><a target="_blank" rel="noopener" href="https://llvm.org/docs/AdvancedBuilds.html#bootstrap-builds">Bootstrapping</a> refers to using the newly built compiler
+in order to build itself again. It is only possible if makefiles were generated with <code>CLANG_ENABLE_BOOTSTRAP=On</code>.
+This step is optional and it takes time. If you’ve had enough, consider skipping it.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make stage2</span><br></pre></td></tr></table></figure>
+<p>I didn’t add any more workers this time because during linking the entire process would eat up more than 8GB of RAM.</p>
+<h2 id="Test"><a href="#Test" class="headerlink" title="Test"></a>Test</h2><p>To make sure everything went as planned, run the tests to validate your work. </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make check-clang</span><br></pre></td></tr></table></figure>
+<p>Or, to check everything:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make check-all</span><br></pre></td></tr></table></figure>
+
+<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><p>By default, the install location is <code>/usr/local</code>. You probably need root permission to install in there.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make install</span><br></pre></td></tr></table></figure>
+<p>If for some reason you want to undo this step:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xargs rm &lt; install_manifest.txt</span><br></pre></td></tr></table></figure>
+<p>After installing, I removed the <code>/release</code> folder because I don’t plan on doing another build. It occupies quite a lot
+of disk space, but if you plan on building Clang again, make sure you keep it around.</p>
 
   </div>
 </article>
@@ -298,20 +331,5 @@
 
 <!-- utterances Comments -->
 
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>
