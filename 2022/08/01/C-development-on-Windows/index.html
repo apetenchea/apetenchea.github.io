@@ -14,7 +14,7 @@
 <meta property="og:description" content="I’ve been writing a lot of C++ code at ArangoDB lately. Most people want their databases to run on top of some Linux distro, which makes perfect sense, but we support Windows as well. Even though that">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-08-01T16:38:05.000Z">
-<meta property="article:modified_time" content="2022-08-04T18:57:53.147Z">
+<meta property="article:modified_time" content="2022-12-10T03:20:44.703Z">
 <meta property="article:author" content="Alexandru Petenchea">
 <meta property="article:tag" content="Windows">
 <meta property="article:tag" content="Programming">
@@ -73,6 +73,8 @@
     <span id="actions">
       <ul>
         
+        <li><a class="icon" aria-label="Previous post" href="/2022/11/22/time-in-distributed-systems/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
         
         <li><a class="icon" aria-label="Next post" href="/2021/10/17/installing-prebuilt-binaries-in-ubuntu/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
         
@@ -102,7 +104,7 @@
 
     </div>
     <div id="toc">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Compilers"><span class="toc-number">1.</span> <span class="toc-text">Compilers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Debuggers"><span class="toc-number">2.</span> <span class="toc-text">Debuggers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Crash-Dumps"><span class="toc-number">3.</span> <span class="toc-text">Crash Dumps</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-number">4.</span> <span class="toc-text">References</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Compilers"><span class="toc-number">1.</span> <span class="toc-text">Compilers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Debuggers"><span class="toc-number">2.</span> <span class="toc-text">Debuggers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Crash-Dumps"><span class="toc-number">3.</span> <span class="toc-text">Crash Dumps</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -212,7 +214,7 @@ Load the executable alongside its core in lldb:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lldb broken.exe -c broken.exe.2940.dmp</span><br></pre></td></tr></table></figure>
 
 <p>If you’re used to GDB, but are new to lldb, check out this <a target="_blank" rel="noopener" href="https://lldb.llvm.org/use/map.html">nice command map</a>.</p>
-<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<h2 id="References-and-Further-Reading"><a href="#References-and-Further-Reading" class="headerlink" title="References and Further Reading"></a>References and Further Reading</h2><ul>
 <li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/53503593/how-to-reduce-visual-studio-build-process-priority-to-prevent-unresponsive-syste">stackoverflow.com</a></li>
 <li><a target="_blank" rel="noopener" href="https://answers.microsoft.com/en-us/windows/forum/all/how-to-permanently-set-priority-processes-using/2f9ec439-5333-4625-9577-69d322cfbc5e">answers.microsoft.com</a></li>
 <li><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/wer/collecting-user-mode-dumps">docs.microsoft.com</a></li>
@@ -241,7 +243,7 @@ Load the executable alongside its core in lldb:</p>
     </div>
 
     <div id="toc-footer" style="display: none">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Compilers"><span class="toc-number">1.</span> <span class="toc-text">Compilers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Debuggers"><span class="toc-number">2.</span> <span class="toc-text">Debuggers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Crash-Dumps"><span class="toc-number">3.</span> <span class="toc-text">Crash Dumps</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-number">4.</span> <span class="toc-text">References</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Compilers"><span class="toc-number">1.</span> <span class="toc-text">Compilers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Debuggers"><span class="toc-number">2.</span> <span class="toc-text">Debuggers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Crash-Dumps"><span class="toc-number">3.</span> <span class="toc-text">Crash Dumps</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">
@@ -277,7 +279,7 @@ Load the executable alongside its core in lldb:</p>
     Copyright &copy;
     
     
-    2016-2022
+    2016-2023
     Alexandru Petenchea
   </div>
   <div class="footer-right">
