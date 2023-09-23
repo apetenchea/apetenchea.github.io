@@ -25,7 +25,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/hlc.svg">
 <meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/hybrid-clock.png">
 <meta property="article:published_time" content="2022-11-22T14:31:54.000Z">
-<meta property="article:modified_time" content="2023-04-22T08:25:00.960Z">
+<meta property="article:modified_time" content="2023-08-17T08:44:57.132Z">
 <meta property="article:author" content="Alexandru Petenchea">
 <meta property="article:tag" content="Distributed Systems">
 <meta name="twitter:card" content="summary">
@@ -482,7 +482,7 @@ in other words, each logical timestamp must be unique. To address this problem, 
 unique identifier and its logical counter value. For example, if we have two events <em>(61, A)</em> and <em>(61, B)</em>, then
 <em>(61, A) &lt; (61, B)</em>.</p>
 <p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/lamport-clock.svg" alt="Lamport Clock"></p>
-<p>As for the implementation, the logical clock leaves in the middleware layer, between the application network layers.
+<p>As for the implementation, the logical clock lives in the middleware layer, between the application network layers.
 The counter on each node is initialized to 0. Then, the algorithm is as follows:</p>
 <ol>
 <li>Before executing an internal event, a node increments its counter by 1.</li>
@@ -611,7 +611,7 @@ When a node wants to broadcast a message, it attaches a copy of its own
 vector clock to that message, adjusting with an increment the counter at its corresponding index, thus ensuring that each message
 broadcast by this node has a causal dependency on the previous message broadcast by the same node. Upon receiving a message,
 the node adds it to a queue, only updating its internal clock when messages are delivered to the application. Keep in mind
-that the vector elements don’t count events, but rather the number of messages that have been delivered from each sender.<br>Suppose <em>V</em> is the vector clock at <em>A</em>. In order for node <em>A</em> to deliver a message <em>m</em> with timestamp <em>t</em>, send by node <em>B</em>,
+that the vector elements don’t count events, but rather the number of messages that have been delivered from each sender.<br>Suppose <em>V</em> is the vector clock at <em>A</em>. In order for node <em>A</em> to deliver a message <em>m</em> with timestamp <em>t</em>, sent by node <em>B</em>,
 the following conditions must be met:</p>
 <ul>
 <li><em>t[B] = V[B] + 1</em>, meaning that <em>m</em> is the next message that <em>A</em> expects from <em>B</em>. This is the same condition as for FIFO total order broadcast.</li>
