@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="kernel32.dll provides access to a significant part of the Windows API. On Windows 10 (and other versions), the 32 bit library is located in C:\Windows\System32, while the 64 bit one in C:\Windows\SysW">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linkage">
+<meta property="og:url" content="https://apetenchea.github.io/2019/01/19/linkage/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="kernel32.dll provides access to a significant part of the Windows API. On Windows 10 (and other versions), the 32 bit library is located in C:\Windows\System32, while the 64 bit one in C:\Windows\SysW">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/linkage/media/BaseThreadInitThunk.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/linkage/media/stack.png">
+<meta property="article:published_time" content="2019-01-19T18:08:34.000Z">
+<meta property="article:modified_time" content="2025-04-28T11:05:16.108Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="Reverse Engineering">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/linkage/media/BaseThreadInitThunk.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Linkage</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2019/01/30/notes-on-building-clang/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2019/01/19/linkage/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2019/01/19/linkage/&text=Linkage"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2019/01/19/linkage/&title=Linkage"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2019/01/19/linkage/&is_video=false&description=Linkage"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linkage&body=Check out this article: https://apetenchea.github.io/2019/01/19/linkage/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2019/01/19/linkage/&title=Linkage"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2019/01/19/linkage/&title=Linkage"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2019/01/19/linkage/&title=Linkage"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2019/01/19/linkage/&title=Linkage"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2019/01/19/linkage/&name=Linkage&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2019/01/19/linkage/&t=Linkage"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Linking"><span class="toc-number">1.</span> <span class="toc-text">Linking</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Static-linking"><span class="toc-number">1.1.</span> <span class="toc-text">Static linking</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Load-time-dynamic-linking"><span class="toc-number">1.2.</span> <span class="toc-text">Load-time dynamic linking</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Example"><span class="toc-number">1.2.1.</span> <span class="toc-text">Example</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Minimal-build"><span class="toc-number">1.2.2.</span> <span class="toc-text">Minimal build</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Examining-the-import-information"><span class="toc-number">1.2.3.</span> <span class="toc-text">Examining the import information</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run-time-dynamic-linking"><span class="toc-number">1.3.</span> <span class="toc-text">Run-time dynamic linking</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Example-1"><span class="toc-number">1.3.1.</span> <span class="toc-text">Example</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Examining-the-import-information-1"><span class="toc-number">1.3.2.</span> <span class="toc-text">Examining the import information</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Non-conventional-ways-of-linking"><span class="toc-number">2.</span> <span class="toc-text">Non-conventional ways of linking</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Looking-up-the-stack"><span class="toc-number">2.1.</span> <span class="toc-text">Looking up the stack</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Searching-the-PEB"><span class="toc-number">2.2.</span> <span class="toc-text">Searching the PEB</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">3.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Linkage
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-01-19T18:08:34.000Z" itemprop="datePublished">19 Jan 2019</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Reverse-Engineering/" rel="tag">Reverse Engineering</a>, <a class="tag-link-link" href="/tags/Windows/" rel="tag">Windows</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p><em>kernel32.dll</em> provides access to a significant part of the <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/desktop/apiindex/windows-api-list">Windows API</a>.
+On <em>Windows 10</em> (and other versions), the 32 bit library is located in <em>C:\Windows\System32</em>, while the 64 bit one in
+<em>C:\Windows\SysWOW64</em>.</p>
+<h2 id="Linking"><a href="#Linking" class="headerlink" title="Linking"></a>Linking</h2><h3 id="Static-linking"><a href="#Static-linking" class="headerlink" title="Static linking"></a>Static linking</h3><p>When a procedure is statically linked, the linker copies data from the library, embedding it into the executable.
+There are some advantages to this, one being portability, since the program can run even on systems that don’t have
+the required library installed. Also, because the linking process no longer takes place at runtime, the program might
+have a slightly faster startup.<br>On the other hand, memory consumption quickly becomes a problem. If <em>kernel32.dll</em> were to be statically linked,
+every running program would end up allocating space for it.</p>
+<h3 id="Load-time-dynamic-linking"><a href="#Load-time-dynamic-linking" class="headerlink" title="Load-time dynamic linking"></a>Load-time dynamic linking</h3><p>This is the most common way to link a library. The executable contains a section named <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/desktop/debug/pe-format#the-idata-section">.idata</a>,
+which has the necessary linking information. Imported libraries are mapped into into the virtual address space of the process. This doesn’t mean that a physical copy
+is made for every library. Instead, their virtual memory pages are mapped to the same physical memory pages already
+used by other processes. Think how common it is for a DLL such as <em>kernel32.dll</em> to be dynamically linked. Most of the
+time its memory is read-only, so a single physical copy is enough for all the running processes. If for some reason
+one tries to overwrite it, a copy of the modified memory page is instantly made for that particular process, keeping
+the read-only one intact. Thus, due to <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/desktop/memory/memory-protection#copy-on-write-protection">copy-on-write</a>,
+a process cannot impact a sheared DLL, while the system can make efficient use of space.<br>The linker looks into these libraries and locates the procedures that need to be imported, writing their virtual
+memory addresses to the <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/desktop/debug/pe-format#import-address-table">Import Address Table</a>.
+This process is called <strong>binding</strong>.  </p>
+<h4 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h4><p>Bellow is all the code it takes to display a standard message, using a procedure imported from <em>user32.dll</em>.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;Windows.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">MessageBox</span>(<span class="literal">NULL</span>, <span class="string">&quot;HIDDEN&quot;</span>, <span class="literal">NULL</span>, MB_OK);</span><br><span class="line">	<span class="built_in">ExitProcess</span>(<span class="number">0</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Minimal-build"><a href="#Minimal-build" class="headerlink" title="Minimal build"></a>Minimal build</h4><p>I used <em>Visual Studio Community Edition 2015</em>. In order to prevent the compiler from adding extra imports I do the following:</p>
+<ul>
+<li>Set <em>Target</em> to <em>Release x86</em>.</li>
+<li>In <em>Project-&gt;Properties-&gt;Linker-&gt;Advanced-&gt;Entry Point</em> I set <em>main</em> as the entry point.</li>
+<li>I disable <em>Safe SEH</em>, <em>Debugging</em>, and <em>DEP</em>. This removes some extra checks and security measures,
+creating an executable that closely resembles the source code.</li>
+</ul>
+<h4 id="Examining-the-import-information"><a href="#Examining-the-import-information" class="headerlink" title="Examining the import information"></a>Examining the import information</h4><p>When I open the generated executable with <a target="_blank" rel="noopener" href="https://www.hex-rays.com/products/ida/">IDA</a>, it shows me the following imports:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">00402000  ExitProcess  KERNEL32</span><br><span class="line">00402008  MessageBoxA  USER32</span><br></pre></td></tr></table></figure>
+<p>The first column is the virtual memory address, the second is the imported procedure’s name and the third is the name
+of the library. Just because it appears to be imported doesn’t mean that a procedure is necessarily called, but there’s
+a pretty good chance. From a reverse engineer’s point of view it is fairly easy to see that this program probably makes
+use of <code>MessageBox</code> and <code>ExitProcess</code>, because this information is openly available inside the executable. </p>
+<h3 id="Run-time-dynamic-linking"><a href="#Run-time-dynamic-linking" class="headerlink" title="Run-time dynamic linking"></a>Run-time dynamic linking</h3><p>It is possible to do the linker’s job at runtime. You can map a DLL module into the virtual address space of a process
+using <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/desktop/api/libloaderapi/nf-libloaderapi-loadlibrarya">LoadLibrary</a>.
+After obtaining a <em>HANDLE</em> to the module, you can pass it to <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/desktop/api/libloaderapi/nf-libloaderapi-getprocaddress">GetProcAddress</a>,
+along with the name of the procedure that you want to locate. On success, this will return a virtual address, which you can be
+treated pretty much like a function pointer.</p>
+<h4 id="Example-1"><a href="#Example-1" class="headerlink" title="Example"></a>Example</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;Windows.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">int</span><span class="params">(*msg_box)</span> <span class="params">(<span class="type">void</span> *, <span class="type">char</span> *, <span class="type">char</span> *, <span class="type">unsigned</span> <span class="type">int</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	HMODULE user32_dll = <span class="built_in">LoadLibrary</span>(<span class="string">&quot;user32.dll&quot;</span>);</span><br><span class="line">	<span class="keyword">if</span> (!user32_dll) &#123;</span><br><span class="line">		<span class="built_in">ExitProcess</span>(<span class="number">-1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	msg_box MsgBox = (msg_box)<span class="built_in">GetProcAddress</span>(user32_dll, <span class="string">&quot;MessageBoxA&quot;</span>);</span><br><span class="line">	<span class="keyword">if</span> (!MsgBox) &#123;</span><br><span class="line">		<span class="built_in">ExitProcess</span>(<span class="number">-1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">MsgBox</span>(<span class="literal">NULL</span>, <span class="string">&quot;HIDDEN&quot;</span>, <span class="literal">NULL</span>, MB_OK);</span><br><span class="line">	<span class="built_in">ExitProcess</span>(<span class="number">0</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Notice that there is no direct call to a procedure named <code>MessageBox</code>. All we have is a pointer to it, named <code>MsgBox</code>.
+In case you are wandering what’s up with the <code>A</code> in <code>MessageBoxA</code>, there are in fact two different procedures in <em>user32.dll</em>, 
+designed to work with different string parameters: <code>MessageBoxW</code> for Unicode and <code>MessageBoxA</code> for ANSI.
+Normally, the compiler takes care of this, but with <code>GetProcAddress</code> you have to be more specific. </p>
+<h4 id="Examining-the-import-information-1"><a href="#Examining-the-import-information-1" class="headerlink" title="Examining the import information"></a>Examining the import information</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">00402000  LoadLibraryA  KERNEL32</span><br><span class="line">00402004  GetProcAddress  KERNEL32</span><br><span class="line">00402008  ExitProcess  KERNEL32</span><br></pre></td></tr></table></figure>
+
+<p><code>MessageBoxA</code> is missing, but <code>LoadLibraryA</code> and <code>GetProcAddress</code> are there.
+Because these two procedures reside in <em>kernel32.dll</em>, the library has to be linked before accessing
+them. How could it be linked at runtime, when the procedures to do that must be imported from it? It’s like trying
+to unlock a suitcase, but you left the key inside it (happened to me once in an airport).</p>
+<h2 id="Non-conventional-ways-of-linking"><a href="#Non-conventional-ways-of-linking" class="headerlink" title="Non-conventional ways of linking"></a>Non-conventional ways of linking</h2><h3 id="Looking-up-the-stack"><a href="#Looking-up-the-stack" class="headerlink" title="Looking up the stack"></a>Looking up the stack</h3><p>When a program is executed, a process is created. When the process is created, the main thread has to be started. How
+does the system start the main tread? The <code>main</code> function is a function like any other, but where is it called from?<br>There is an undocumented procedure inside <em>kernel32.dll</em>, which initializes a thread and calls the entry point.
+Its name is <code>BaseThreadInitThunk</code> and it leaves on the stack a virtual address from within the library,
+by calling your <code>main</code> function. So, there has to be a <code>call</code> instruction somewhere in <code>BaseThreadInitThunk</code>.
+This instruction, besides changing the value of register <code>eip</code>, pushes the address of the next instruction onto the stack.
+This means that right at the beginning of <code>main</code>, if you look up onto the stack, you shall see the virtual address of an instruction
+belonging to <code>BaseThreadInitThunk</code>, and consequently, belonging to <em>kernel32.dll</em>.
+For a quick recap, head <a target="_blank" rel="noopener" href="https://www.cs.virginia.edu/~evans/cs216/guides/x86.html#calling">here</a>.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/linkage/media/BaseThreadInitThunk.png" alt="Debugger illustration"></p>
+<p>Long story short, 0x74958720 is the virtual address of <code>BaseThreadInitThunk</code>. The <code>call esi</code> instruction at 0x74958742 jumps
+to the entry point, while pushing the address of the next instruction, 0x74958744, onto the stack. By knowing this address,
+it is possible to find the base address of <em>kernel32.dll</em>. After finding the base address, one can find the library’s export section
+and import any function from there.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/linkage/media/stack.png" alt="Stack after call"></p>
+<p>How to get this value from the stack? When the function in generated, the compiler automatically adds the <code>push esi</code>
+instruction at the beginning of <code>main</code>, so when the next instruction is being executed, the stack pointer moves down 4 bytes.
+In this case, the thing is to derefence the value at <code>esp + 0x4</code> and store it somewhere.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line">mov eax, [esp + <span class="number">0x4</span>];</span><br><span class="line">mov addr_inside_kernel32, eax;</span><br></pre></td></tr></table></figure>
+
+<p>Getting to the base address requires a few more insights. The simplest one is that we must search towards lower addresses,
+since the first byte of <em>kernel32.dll</em> is before <code>BaseThreadInitThunk</code>. Next, the <code>ImageBase</code> field, found in the
+<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#optional-header-windows-specific-fields-image-only">Optional Header</a>,
+refers to the preferred address of an image when loaded into memory. It must be a multiple of 64K, which can be translated to
+0x10000 in hex. It makes sense then to start from the first multiple of 0x10000 that is lower than the current address,
+so I trim the last 4 zeros of the starting address. Also, I keep subtracting 64K instead of 1, in order to check only relevant
+addresses. On the way to the base address, there might be some pages from which reading is not permitted. An exception handler
+could be used to prevent a possible crash, but in this example I was lucky enough not to need one. </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">unsigned</span> <span class="type">int</span> <span class="title">GetModuleBase</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> addr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> base = addr &amp; <span class="number">0xffff0000</span>;</span><br><span class="line">	<span class="keyword">while</span> (*(<span class="type">short</span> *)base != MZ) &#123;</span><br><span class="line">		base -= <span class="number">0x10000</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> base;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Once the base address is found, the rest of the code becomes pretty straightforward. By following the <a target="_blank" rel="noopener" href="http://www.openrce.org/reference_library/files/reference/PE%20Format.pdf">PE format</a>,
+the <code>GetProcAddress</code> procedure can be located inside <em>kernel32.dll</em>. Using it, one can easily import other procedures.
+In the full example, I wrote the code for locating <code>LoadLibraryA</code>, in order to load <em>user32.dll</em> and import <code>MessageBoxA</code> from it.
+And yet, the executable has no imports section. <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/linkage/code/stack_linkage.cpp">Here</a> is the full POC.</p>
+<h3 id="Searching-the-PEB"><a href="#Searching-the-PEB" class="headerlink" title="Searching the PEB"></a>Searching the PEB</h3><p>Every thread comes with some particularities, such as its own stack base address or thread ID. Information about the currently running thread is stored in a structure called
+<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-teb">TEB</a>, sometimes also referred to as TIB. The Thread Environment Block can be accessed through the <code>fs</code> segment
+register on 32 bit versions on Windows, or through the <code>gs</code> register on 64 bits. For the sake of simplicity, I will further consider only the 32 bit scenario. So, why do we care about the TEB in this context?
+Because it contains the address of <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-peb">PEB</a>, a different structure which holds data about the process to which the current
+thread belongs to. The Process Environment Block holds information such as the path of the process’s image file, the command-line string passed to it,
+whether or not the process is being debugged, and most importantly for us, the list of loaded modules. Needless to say, historically this has been widely abused by malware.
+Before we move on, how exactly does one get the address of PEB?</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><span class="line">mov eax, fs:[<span class="number">0x30</span>];</span><br><span class="line">mov peb, eax;</span><br></pre></td></tr></table></figure>
+
+<p>A pointer to it can be found at offset 0x30, starting from <code>fs</code>. Once you got its address, you can access the
+<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-peb_ldr_data">PEB_LDR_DATA</a>, from which you can get to the head of
+a doubly linked list that holds information about the loaded modules. Every entry in this list contains the fields <code>FullDllName</code> and <code>DllBase</code>.
+The problem now reduces to searching in a linked list: given the module name (as a <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/api/subauth/ns-subauth-unicode_string">UNICODE_STRING</a>),
+find it in the list, and if it exists, return its corresponding DLL base address.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">unsigned</span> <span class="type">int</span> <span class="title">GetModuleBase</span><span class="params">(<span class="type">void</span> *peb, <span class="type">wchar_t</span> *name)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="type">void</span> *Ldr = *(<span class="type">void</span> **)((<span class="type">unsigned</span> <span class="type">char</span> *)peb + <span class="number">0xc</span>);</span><br><span class="line">	<span class="type">void</span> **InMemoryOrderModuleList = *(<span class="type">void</span> ***)((<span class="type">unsigned</span> <span class="type">char</span> *)Ldr + <span class="number">0x14</span>);</span><br><span class="line">	<span class="type">void</span> *Flink = *InMemoryOrderModuleList;</span><br><span class="line">	<span class="keyword">do</span> &#123;</span><br><span class="line">		<span class="type">wchar_t</span> *FullDllName = (<span class="type">wchar_t</span> *)*(<span class="type">void</span> **)((<span class="type">unsigned</span> <span class="type">char</span> *)Flink + <span class="number">0x28</span>);</span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">wstrcmp</span>(FullDllName, name) == <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="comment">/* Retrieve Base Address */</span></span><br><span class="line">			<span class="keyword">return</span> (<span class="type">unsigned</span> <span class="type">int</span>)*(<span class="type">void</span> **)((<span class="type">unsigned</span> <span class="type">char</span> *)Flink + <span class="number">0x10</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		Flink = *(<span class="type">void</span> **)(<span class="type">unsigned</span> <span class="type">char</span> *)Flink;</span><br><span class="line">	&#125; <span class="keyword">while</span> (Flink != InMemoryOrderModuleList);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The difficult thing to do, in my opinion, is to get to the head of the list, namely <code>Flink</code>. Due to differences in Windows
+versions, these structures can differ from the official documentation. Finding the right offsets can be
+<a target="_blank" rel="noopener" href="http://www.rohitab.com/discuss/topic/35251-3-ways-to-get-address-base-kernel32-from-peb/">tricky</a>.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line">kernel32_base = <span class="built_in">GetModuleBase</span>(peb, <span class="string">L&quot;KERNEL32.DLL&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>Once you get the base address of the module, you can parse it as you would do with a regular PE file. If you ever see this approach in “the wild”,
+you can expect the next thing to be a search for the address of <code>GetProcAddress</code>, in the library’s export section.
+<a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/linkage/code/peb_linkage.cpp">Here</a> is the full POC.</p>
+<h2 id="References-and-Further-Reading"><a href="#References-and-Further-Reading" class="headerlink" title="References and Further Reading"></a>References and Further Reading</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://ntopcode.wordpress.com/2018/02/26/anatomy-of-the-process-environment-block-peb-windows-internals/">ntopcode</a></li>
+<li><a target="_blank" rel="noopener" href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms680547(v=vs.85).aspx">microsoft</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.geoffchappell.com/studies/windows/win32/ntdll/structs/teb/index.htm">Geoff Chappell</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Linking"><span class="toc-number">1.</span> <span class="toc-text">Linking</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Static-linking"><span class="toc-number">1.1.</span> <span class="toc-text">Static linking</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Load-time-dynamic-linking"><span class="toc-number">1.2.</span> <span class="toc-text">Load-time dynamic linking</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Example"><span class="toc-number">1.2.1.</span> <span class="toc-text">Example</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Minimal-build"><span class="toc-number">1.2.2.</span> <span class="toc-text">Minimal build</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Examining-the-import-information"><span class="toc-number">1.2.3.</span> <span class="toc-text">Examining the import information</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run-time-dynamic-linking"><span class="toc-number">1.3.</span> <span class="toc-text">Run-time dynamic linking</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Example-1"><span class="toc-number">1.3.1.</span> <span class="toc-text">Example</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Examining-the-import-information-1"><span class="toc-number">1.3.2.</span> <span class="toc-text">Examining the import information</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Non-conventional-ways-of-linking"><span class="toc-number">2.</span> <span class="toc-text">Non-conventional ways of linking</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Looking-up-the-stack"><span class="toc-number">2.1.</span> <span class="toc-text">Looking up the stack</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Searching-the-PEB"><span class="toc-number">2.2.</span> <span class="toc-text">Searching the PEB</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">3.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2019/01/19/linkage/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2019/01/19/linkage/&text=Linkage"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2019/01/19/linkage/&title=Linkage"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2019/01/19/linkage/&is_video=false&description=Linkage"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linkage&body=Check out this article: https://apetenchea.github.io/2019/01/19/linkage/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2019/01/19/linkage/&title=Linkage"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2019/01/19/linkage/&title=Linkage"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2019/01/19/linkage/&title=Linkage"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2019/01/19/linkage/&title=Linkage"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2019/01/19/linkage/&name=Linkage&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2019/01/19/linkage/&t=Linkage"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="On one of my workstations, I use Debian Sid. It is a rolling-release distribution, which means that it’s always up-to-date with the latest software. However, it can be unstable. I don’t mind that, bec">
+<meta property="og:type" content="article">
+<meta property="og:title" content="First Aid Kit for Upgrading Debian">
+<meta property="og:url" content="https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="On one of my workstations, I use Debian Sid. It is a rolling-release distribution, which means that it’s always up-to-date with the latest software. However, it can be unstable. I don’t mind that, bec">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/first-aid-kit-for-upgrading-debian/media/first-aid-penguin.png">
+<meta property="article:published_time" content="2023-04-04T17:06:27.000Z">
+<meta property="article:modified_time" content="2025-04-28T11:05:16.100Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/first-aid-kit-for-upgrading-debian/media/first-aid-penguin.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>First Aid Kit for Upgrading Debian</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/04/22/the-sleeping-barber/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2022/11/22/time-in-distributed-systems/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&text=First Aid Kit for Upgrading Debian"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&title=First Aid Kit for Upgrading Debian"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&is_video=false&description=First Aid Kit for Upgrading Debian"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=First Aid Kit for Upgrading Debian&body=Check out this article: https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&title=First Aid Kit for Upgrading Debian"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&title=First Aid Kit for Upgrading Debian"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&title=First Aid Kit for Upgrading Debian"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&title=First Aid Kit for Upgrading Debian"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&name=First Aid Kit for Upgrading Debian&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&t=First Aid Kit for Upgrading Debian"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Upgrade-procedure"><span class="toc-number">1.</span> <span class="toc-text">Upgrade procedure</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#System-upgrade"><span class="toc-number">1.1.</span> <span class="toc-text">System upgrade</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Kernel-upgrade"><span class="toc-number">2.</span> <span class="toc-text">Kernel upgrade</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Common-problems"><span class="toc-number">3.</span> <span class="toc-text">Common problems</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Broken-packages"><span class="toc-number">3.1.</span> <span class="toc-text">Broken packages</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Missing-display-manager"><span class="toc-number">3.2.</span> <span class="toc-text">Missing display manager</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Missing-desktop-environment"><span class="toc-number">3.3.</span> <span class="toc-text">Missing desktop environment</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Related-problems"><span class="toc-number">3.3.1.</span> <span class="toc-text">Related problems</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#No-internet"><span class="toc-number">3.4.</span> <span class="toc-text">No internet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Missing-firmware"><span class="toc-number">3.5.</span> <span class="toc-text">Missing firmware</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Other-problems"><span class="toc-number">4.</span> <span class="toc-text">Other problems</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Incompatible-modules-when-upgrading-the-kernel"><span class="toc-number">4.1.</span> <span class="toc-text">Incompatible modules when upgrading the kernel</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Closing-thoughts"><span class="toc-number">5.</span> <span class="toc-text">Closing thoughts</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        First Aid Kit for Upgrading Debian
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-04-04T17:06:27.000Z" itemprop="datePublished">04 Apr 2023</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Linux/" rel="tag">Linux</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>On one of my workstations, I use <a target="_blank" rel="noopener" href="https://wiki.debian.org/DebianUnstable">Debian Sid</a>. It is a rolling-release
+distribution, which means that it’s always up-to-date with the latest software. However, it can be unstable.
+I don’t mind that, because I prefer to have the latest compilers around, and I can deal with the occasional breakage.
+I put together a list of recipes that I use to fix the most common problems encountered during an upgrade.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/first-aid-kit-for-upgrading-debian/media/first-aid-penguin.png" alt="Penguin"></p>
+<h2 id="Upgrade-procedure"><a href="#Upgrade-procedure" class="headerlink" title="Upgrade procedure"></a>Upgrade procedure</h2><p>Sometimes I am interested just in upgrading my kernel, but most of the time I want to upgrade the whole system.
+Here’s how I do it:</p>
+<h3 id="System-upgrade"><a href="#System-upgrade" class="headerlink" title="System upgrade"></a>System upgrade</h3><ol>
+<li>Fetch the latest package information from the repositories. Updating should always be performed before upgrading. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure></li>
+<li>Upgrade the packages that can be safely upgraded without removing any other packages. Replacing <code>upgrade</code> with
+<code>full-upgrade</code> may remove some packages or install new ones to satisfy dependency changes. Make sure to review the
+list of changes before proceeding with the upgrade. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt upgrade</span><br></pre></td></tr></table></figure></li>
+<li>Remove packages that are no longer needed. Although an optional step, it is a good idea to keep the system clean. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt autoremove</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="Kernel-upgrade"><a href="#Kernel-upgrade" class="headerlink" title="Kernel upgrade"></a>Kernel upgrade</h2><ol>
+<li>Update package information. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure></li>
+<li>Check the available kernel versions. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-cache search linux-image-amd64</span><br></pre></td></tr></table></figure></li>
+<li>Install the desired kernel version. It’s recommended to install the corresponding kernel headers as well.
+ If you stumble upon a meta-package, feel free to install it instead. A meta-package
+ is a convenient way to bulk-install groups of applications, their libraries and documentation. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install linux-image-&lt;kernel_version&gt;-amd64</span><br><span class="line">sudo apt install linux-headers-&lt;kernel_version&gt;-amd64</span><br></pre></td></tr></table></figure></li>
+<li>Reboot the system to use the new kernel. <strong>Don’t remove the old one until you try it out.</strong> <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo reboot</span><br></pre></td></tr></table></figure></li>
+<li>Check your kernel version. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">uname</span> -r</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="Common-problems"><a href="#Common-problems" class="headerlink" title="Common problems"></a>Common problems</h2><h3 id="Broken-packages"><a href="#Broken-packages" class="headerlink" title="Broken packages"></a>Broken packages</h3><p>When you encounter a broken package, something along the lines of <code>E: Sub-process /usr/bin/dpkg returned an error code</code>,
+it could mean that the package is corrupted, or that it depends on another package that is not installed. Here are two
+of the things I usually try in order to fix the problem.</p>
+<ol>
+<li>Reconfigure the affected package. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo dpkg --configure &lt;package_name&gt;</span><br></pre></td></tr></table></figure></li>
+<li>Fix broken dependencies. This will attempt to fix broken dependencies and finish any interrupted package installation
+or removal. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt --fix-broken install</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="Missing-display-manager"><a href="#Missing-display-manager" class="headerlink" title="Missing display manager"></a>Missing display manager</h3><p>Sometimes, you might end up with a system that starts in TTY mode, unable to get back your graphical interface.</p>
+<ol>
+<li>Check if there are any available display managers installed on your system. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl list-units --<span class="built_in">type</span>=service | grep -E <span class="string">&#x27;gdm|lightdm|sddm&#x27;</span></span><br></pre></td></tr></table></figure></li>
+<li>If there is one, start it. Also, enable it to start at boot. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start &lt;display_manager&gt;</span><br><span class="line">sudo systemctl <span class="built_in">enable</span> &lt;display_manager&gt;</span><br></pre></td></tr></table></figure></li>
+<li>If there is none, install one. I prefer <em>LightDM</em>, but feel free to choose whatever suits you.
+After installation, make sure it is your default display manager. The file <code>/etc/X11/default-display-manager</code>
+should contain the path <code>/usr/sbin/lightdm</code> (or the path of your preferred display manager). <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install lightdm</span><br></pre></td></tr></table></figure></li>
+<li>Reboot the system. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo reboot</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="Missing-desktop-environment"><a href="#Missing-desktop-environment" class="headerlink" title="Missing desktop environment"></a>Missing desktop environment</h3><ol>
+<li>If your desktop environment is gone, install one. I prefer <em>xfce4</em>, but the steps should be very similar, regardless of what you choose to install. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install xfce4</span><br></pre></td></tr></table></figure></li>
+<li>Your display manager should allow you to select the desktop environment you want to use. If it doesn’t, you can set it manually by adding
+the following line to <code>~/.xinitrc</code>. If you use another desktop environment, replace <code>startxfce4</code> with the command that launches it. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">exec</span> startxfce4</span><br></pre></td></tr></table></figure></li>
+<li>Use the following command to launch the desktop environment manually. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">startx</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="Related-problems"><a href="#Related-problems" class="headerlink" title="Related problems"></a>Related problems</h4><ol>
+<li>Sometimes, in order for your desktop environment to work, you have to install missing software. For example,
+ when trying to start Xfce for the first time, I got the following error message: <code>Failed to execute child process “dbus-launch”</code>.
+ To resolve this issue, I had to install the <code>dbus-x11</code> package. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install dbus-x11</span><br></pre></td></tr></table></figure></li>
+<li>The login screen got stuck after entering my username and password. I had to switch to a TTY (<code>Ctrl</code> + <code>Alt</code> + <code>F1</code> … up to <code>F6</code>),
+and remove the <code>Xauthority</code> file, which turned out to have the wrong file permissions. After that, I was able to log in normally. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">rm</span> ~/.Xauthority</span><br></pre></td></tr></table></figure></li>
+<li>If you’re stuck, open a TTY and check the logs. Use <code>less</code> to navigate the log files, as they may be very long.
+<code>:q</code> closes the file, <code>:G</code> takes you to the end of it, and <code>/&lt;pattern&gt;</code> is used for searching.<ul>
+<li><code>/var/log/Xorg.0.log</code> for Xorg related issues</li>
+<li><code>/var/log/syslog</code> for system-related issues</li>
+<li><code>/var/log/auth.log</code> for authentication-related issues</li>
+</ul>
+</li>
+</ol>
+<h3 id="No-internet"><a href="#No-internet" class="headerlink" title="No internet"></a>No internet</h3><ol>
+<li>Check the status of your network interfaces. Look for a network interface that is marked <em>UP</em>. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip addr show</span><br></pre></td></tr></table></figure></li>
+<li>If all interfaces are <em>DOWN</em>, pick the one you want to bring back up. Common names for wired connections start with <code>eth</code> or <code>enp</code>.
+ For wireless, they start with <code>wl</code>. I find ethernet easier to set up in such situations, but for that make sure
+ your ethernet cable is plugged in. Replace <code>&lt;interface&gt;</code> with the name of the chosen network interface. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ip <span class="built_in">link</span> <span class="built_in">set</span> &lt;interface&gt; up</span><br></pre></td></tr></table></figure></li>
+<li>Configure the network interface. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo dhclient &lt;interface&gt;</span><br></pre></td></tr></table></figure></li>
+<li>In order to make changes persistent across reboots, add the following line to <code>/etc/network/interfaces</code>. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">auto &lt;interface&gt;</span><br><span class="line">iface &lt;interface&gt; inet dhcp</span><br></pre></td></tr></table></figure></li>
+<li>Restart networking services. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl restart networking</span><br></pre></td></tr></table></figure></li>
+<li>Test it. <code>8.8.8.8</code> is the primary DNS server for Google DNS. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping 8.8.8.8</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="Missing-firmware"><a href="#Missing-firmware" class="headerlink" title="Missing firmware"></a>Missing firmware</h3><ol>
+<li>Often enough, the system might be unable to find the necessary firmware, especially for Realtek network cards. In this particular case,
+the following fixed it for me. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install firmware-iwlwifi</span><br></pre></td></tr></table></figure></li>
+<li>Be aware that such packages usually come from <em>non-free</em> repositories, which you might have to enable in your <code>/etc/apt/sources.list</code>.</li>
+</ol>
+<h2 id="Other-problems"><a href="#Other-problems" class="headerlink" title="Other problems"></a>Other problems</h2><h3 id="Incompatible-modules-when-upgrading-the-kernel"><a href="#Incompatible-modules-when-upgrading-the-kernel" class="headerlink" title="Incompatible modules when upgrading the kernel"></a>Incompatible modules when upgrading the kernel</h3><p>When upgrading to 6.1.0-7-amd64, I encountered a problem with the <code>aufs</code> module. It was the default
+storage driver used for managing images and layers on Docker. The module included a <code>BUILD_EXCLUSIVE</code> directive which
+did not match my new <code>kernel/arch/config</code>. Docker <a target="_blank" rel="noopener" href="https://docs.docker.com/storage/storagedriver/aufs-driver/">recommends</a>
+migrating to the <code>overlay2</code> storage driver. Here’s how I did it:</p>
+<ol>
+<li>Stop the Docker service. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl stop docker</span><br></pre></td></tr></table></figure></li>
+<li>Make sure the <code>aufs</code> module is not in use. Unload it using the following command:<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo rmmod aufs</span><br></pre></td></tr></table></figure></li>
+<li>Remove related packages. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt remove aufs-dkms aufs-tools</span><br></pre></td></tr></table></figure></li>
+<li>Switch to OverlayFS by editing the <code>/etc/docker/daemon.json</code> file. Add the following line: <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;storage-driver&quot;</span><span class="punctuation">:</span> <span class="string">&quot;overlay2&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></li>
+<li>Start the Docker service. <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start docker</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="Closing-thoughts"><a href="#Closing-thoughts" class="headerlink" title="Closing thoughts"></a>Closing thoughts</h2><p>Never be afraid of upgrading your system. Breakages happen, and they’re not the end of the world. It’s not your fault, and it’s not the fault of the developers.
+It’s just a part of the process. Eventually, as the world moves on, an upgrade is unavoidable. The important thing is to learn from the experience.</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Upgrade-procedure"><span class="toc-number">1.</span> <span class="toc-text">Upgrade procedure</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#System-upgrade"><span class="toc-number">1.1.</span> <span class="toc-text">System upgrade</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Kernel-upgrade"><span class="toc-number">2.</span> <span class="toc-text">Kernel upgrade</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Common-problems"><span class="toc-number">3.</span> <span class="toc-text">Common problems</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Broken-packages"><span class="toc-number">3.1.</span> <span class="toc-text">Broken packages</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Missing-display-manager"><span class="toc-number">3.2.</span> <span class="toc-text">Missing display manager</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Missing-desktop-environment"><span class="toc-number">3.3.</span> <span class="toc-text">Missing desktop environment</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Related-problems"><span class="toc-number">3.3.1.</span> <span class="toc-text">Related problems</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#No-internet"><span class="toc-number">3.4.</span> <span class="toc-text">No internet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Missing-firmware"><span class="toc-number">3.5.</span> <span class="toc-text">Missing firmware</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Other-problems"><span class="toc-number">4.</span> <span class="toc-text">Other problems</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Incompatible-modules-when-upgrading-the-kernel"><span class="toc-number">4.1.</span> <span class="toc-text">Incompatible modules when upgrading the kernel</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Closing-thoughts"><span class="toc-number">5.</span> <span class="toc-text">Closing thoughts</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&text=First Aid Kit for Upgrading Debian"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&title=First Aid Kit for Upgrading Debian"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&is_video=false&description=First Aid Kit for Upgrading Debian"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=First Aid Kit for Upgrading Debian&body=Check out this article: https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&title=First Aid Kit for Upgrading Debian"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&title=First Aid Kit for Upgrading Debian"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&title=First Aid Kit for Upgrading Debian"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&title=First Aid Kit for Upgrading Debian"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&name=First Aid Kit for Upgrading Debian&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2023/04/04/first-aid-kit-for-upgrading-debian/&t=First Aid Kit for Upgrading Debian"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

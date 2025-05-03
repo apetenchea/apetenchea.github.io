@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="The Sleeping Barber is a classic synchronization problem. It was used by Edsger W. Dijkstra as an example in his lecture notes, illustrating the use of semaphores.  Imagine a barbershop that has a wa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The Sleeping Barber">
+<meta property="og:url" content="https://apetenchea.github.io/2023/04/22/the-sleeping-barber/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="The Sleeping Barber is a classic synchronization problem. It was used by Edsger W. Dijkstra as an example in his lecture notes, illustrating the use of semaphores.  Imagine a barbershop that has a wa">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/the-sleeping-barber/media/sleeping-barber.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/the-sleeping-barber/media/barber-shop.svg">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/the-sleeping-barber/media/SlidingDoorIllustration.gif">
+<meta property="article:published_time" content="2023-04-22T18:09:29.000Z">
+<meta property="article:modified_time" content="2025-04-28T11:05:16.184Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Programming">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/the-sleeping-barber/media/sleeping-barber.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>The Sleeping Barber</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/05/01/handy-git-recipes/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/04/04/first-aid-kit-for-upgrading-debian/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&text=The Sleeping Barber"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&title=The Sleeping Barber"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&is_video=false&description=The Sleeping Barber"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=The Sleeping Barber&body=Check out this article: https://apetenchea.github.io/2023/04/22/the-sleeping-barber/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&title=The Sleeping Barber"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&title=The Sleeping Barber"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&title=The Sleeping Barber"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&title=The Sleeping Barber"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&name=The Sleeping Barber&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&t=The Sleeping Barber"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Race-conditions"><span class="toc-number">1.</span> <span class="toc-text">Race conditions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Classic-solution"><span class="toc-number">2.</span> <span class="toc-text">Classic solution</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using-only-atomics"><span class="toc-number">3.</span> <span class="toc-text">Using only atomics</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FIFO-barbershop"><span class="toc-number">4.</span> <span class="toc-text">FIFO barbershop</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Catching-data-races-with-TSan"><span class="toc-number">5.</span> <span class="toc-text">Catching data-races with TSan</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">6.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        The Sleeping Barber
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-04-22T18:09:29.000Z" itemprop="datePublished">22 Apr 2023</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Programming/" rel="tag">Programming</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/the-sleeping-barber/media/sleeping-barber.png" alt="Sleeping barber"></p>
+<p><em>The Sleeping Barber</em> is a classic synchronization problem. It was used by <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Edsger_W._Dijkstra">Edsger W. Dijkstra</a>
+as an example in <a target="_blank" rel="noopener" href="https://www.cs.utexas.edu/users/EWD/ewd01xx/EWD123.PDF">his lecture notes</a>, illustrating the use of semaphores.</p>
+<blockquote>
+<p>Imagine a barbershop that has a waiting room, separated from the room where the barber works.
+The waiting room has an entry and next to it an exit to the room with the barber’s chair.
+When the barber has finished a haircut, he opens the door to the waiting room and inspects it.
+If the waiting room is not empty, he invites the next customer,
+otherwise he goes to sleep in one of the chairs in the waiting room.
+The complementary behaviour of the customers is as follows: when they find zero or more customers in the waiting room,
+they just wait their turn, when they find, however, the sleeping barber — they wake him up.</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/the-sleeping-barber/media/barber-shop.svg" alt="Barber Shop"></p>
+<p>In order to shape the problem further, we are going to assume that the barbershop has a limited number of chairs
+in the waiting room. If a customer enters the shop and all chairs are occupied, he leaves the shop. Furthermore, before
+going to sleep, the barber sets an alarm clock that wakes him up when it’s time to close the shop.</p>
+<h2 id="Race-conditions"><a href="#Race-conditions" class="headerlink" title="Race conditions"></a>Race conditions</h2><p>Although the concept may be familiar, I find it useful to start by giving a brief explanation of what exactly a race condition is,
+as it brings us into a problem-solving mindset. A race condition may occur when two or more processes access and change
+shared data simultaneously. <strong>The outcome of the program depends on the relative timing of these processes,
+which can cause unexpected results.</strong> When the correct functioning of the system relies on a specific order of execution, but the
+order in which the events occur is unpredictable, we have a race condition. In our case, the barber and the customers
+are processes that access and change the same data - the waiting room.<br>While it may not be immediately apparent, the barbershop is affected by two race conditions:</p>
+<ol>
+<li><strong>The barber may fall asleep while there are customers in the waiting room.</strong> Imagine a customer walks in to
+ an empty waiting room - an indication that the barber is currently giving a haircut.
+ The customer proceeds towards one of the chairs. In the meantime, the barber finishes 
+ the haircut and goes to check the waiting room. If the customer is <em>slow</em>, he might not make it to his seat <em>before</em>
+ the barber checks the waiting room. In that case, the barber gets to inspect the waiting chairs <em>first</em>, finds them empty, and comes to the
+ conclusion that nobody is waiting for him. Hence, he falls asleep, leaving the slow customer waiting forever. The
+ customer will sit down waiting indefinitely for the barber to invite him into the working room.</li>
+<li><strong>Two or more customers may enter the waiting room and try to sit down at the same time.</strong> If there’s only one free chair available,
+ they end up bumping into each other indefinitely, like stuck characters in a video game.</li>
+</ol>
+<h2 id="Classic-solution"><a href="#Classic-solution" class="headerlink" title="Classic solution"></a>Classic solution</h2><p>We need to synchronize access to the waiting room, so that only one process can access it at a time. We can achieve this
+with a simple mutex. Whenever a process (a customer or the barber) wants to check and modify the state of the shared resource
+(the waiting room), it has to acquire the mutex first. When it’s done, it releases the mutex, allowing other processes to
+access the resource. That would be the equivalent of a sliding door, which only allows one person in or out at a time.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/the-sleeping-barber/media/SlidingDoorIllustration.gif" alt="Sliding Door"></p>
+<p>As for “waking up the barber” and “waiting for the barber to finish a haircut”, we can use a
+<a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/thread/counting_semaphore">C++20 semaphore</a>.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">constexpr</span> <span class="type">static</span> <span class="keyword">auto</span> CHAIRS = <span class="number">5</span>;      <span class="comment">// number of chairs in the waiting room</span></span><br><span class="line">std::atomic_bool shuttingDown&#123;<span class="literal">false</span>&#125;;  <span class="comment">// true when the barbershop is closing</span></span><br><span class="line"><span class="keyword">auto</span> waiting = <span class="number">0</span>;                      <span class="comment">// number of waiting customers</span></span><br><span class="line">std::mutex mx;                         <span class="comment">// protection for the waiting room</span></span><br><span class="line">std::counting_semaphore&lt;CHAIRS&gt; cs&#123;<span class="number">0</span>&#125;; <span class="comment">// signals when a customer arrives</span></span><br><span class="line">std::binary_semaphore bs&#123;<span class="number">0</span>&#125;;           <span class="comment">// signals when the barber is ready</span></span><br></pre></td></tr></table></figure>
+
+<p>When the barber comes to work, he opens the shop and executes the <code>barber</code> function. Note that we had to use
+<a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/thread/counting_semaphore/try_acquire_for">try_acquire_for</a>, checking periodically
+that the shop is still open. Otherwise, if the barber doesn’t get any customers before closing time, he never wakes up,
+thus leaving the shop open indefinitely. This is how we simulate the “alarm clock”.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">barber</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="function">std::unique_lock <span class="title">lock</span><span class="params">(mx, std::defer_lock)</span></span>;</span><br><span class="line">  <span class="keyword">while</span> (!shuttingDown.<span class="built_in">load</span>()) &#123;</span><br><span class="line">    <span class="comment">// &quot;sleep&quot; until a customer arrives, or until the barbershop is closing</span></span><br><span class="line">    <span class="type">bool</span> arrived = cs.<span class="built_in">try_acquire_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">5</span>));</span><br><span class="line">    <span class="keyword">if</span> (!arrived) &#123;</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    lock.<span class="built_in">lock</span>();   <span class="comment">// protect the waiting room</span></span><br><span class="line">    --waiting;     <span class="comment">// invite a customer</span></span><br><span class="line">    lock.<span class="built_in">unlock</span>(); <span class="comment">// let others use the waiting room</span></span><br><span class="line">    <span class="built_in">haircut</span>();     <span class="comment">// cut hair</span></span><br><span class="line">    bs.<span class="built_in">release</span>();  <span class="comment">// let the customer go</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>When customers arrive, they execute the <code>customer</code> function. The customer does not have to loop, as it only needs to
+get a haircut and leave. Notice that there’s an artificial delay introduced before a customer enters the shop, as
+to randomize the order in which customers arrive.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">customer</span><span class="params">(<span class="type">int</span> id, <span class="type">int</span> delay)</span> </span>&#123;</span><br><span class="line">  std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(delay));</span><br><span class="line">  <span class="function">std::unique_lock <span class="title">lock</span><span class="params">(mx)</span></span>;</span><br><span class="line">  <span class="keyword">if</span> (waiting &lt; CHAIRS) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Customer &quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot; enters the barbershop.\n&quot;</span>;</span><br><span class="line">    ++waiting;     <span class="comment">// enter the waiting room</span></span><br><span class="line">    lock.<span class="built_in">unlock</span>(); <span class="comment">// let others use the waiting room</span></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Customer &quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot; leaves the barbershop.\n&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span>;        <span class="comment">// leave the barbershop</span></span><br><span class="line">  &#125;</span><br><span class="line">  cs.<span class="built_in">release</span>();    <span class="comment">// wake up the barber</span></span><br><span class="line">  bs.<span class="built_in">acquire</span>();    <span class="comment">// wait until the barber finishes the haircut</span></span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;Customer &quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot; got a haircut.\n&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The full code, together with the <code>main</code> function I used for testing, can be found
+<a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/the-sleeping-barber/code/classic-solution.cpp">here</a>.</p>
+<h2 id="Using-only-atomics"><a href="#Using-only-atomics" class="headerlink" title="Using only atomics"></a>Using only atomics</h2><p>Since C++20, it is possible to solve the problem using only <a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/atomic/atomic">atomics</a>.
+We no longer need the mutex nor any of the semaphores. However, the barber will have to rely on his best friend coming in to
+wake him up before the shop closes, instead of using an alarm clock.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">constexpr</span> <span class="type">static</span> <span class="keyword">auto</span> CHAIRS = <span class="number">5</span>;     <span class="comment">// number of chairs in the waiting room</span></span><br><span class="line">std::atomic_bool shuttingDown&#123;<span class="literal">false</span>&#125;; <span class="comment">// true when the barbershop is closing</span></span><br><span class="line">std::atomic_int waiting&#123;<span class="number">0</span>&#125;;           <span class="comment">// number of waiting customers</span></span><br><span class="line">std::atomic_bool bs&#123;<span class="literal">false</span>&#125;;           <span class="comment">// signals when the barber is ready</span></span><br></pre></td></tr></table></figure>
+
+<p>The barber can call <a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/atomic/atomic/wait">wait</a> on the <em>atomic_int</em>, which will block
+until a customer comes in and calls <a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/atomic/atomic/notify_one">notify_one</a> on it. For a comparison, this
+if very similar to the way <a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html">Object</a> can be used in Java
+as a basic synchronization mechanism. It is the root of the class hierarchy, so essentially every object in Java can
+provide this functionality. However, <code>wait</code> and <code>notify_one</code> are not enough to solve the problem. We need the guarantee
+that any modifications to the <code>waiting</code> and <code>bs</code> variables happen atomically.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">barber</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    waiting.<span class="built_in">wait</span>(<span class="number">0</span>); <span class="comment">// &quot;sleep&quot; until a customer arrives</span></span><br><span class="line">    <span class="keyword">if</span> (shuttingDown.<span class="built_in">load</span>()) &#123;</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">haircut</span>();       <span class="comment">// cut hair</span></span><br><span class="line">    bs.<span class="built_in">store</span>(<span class="literal">true</span>);  <span class="comment">// barber is ready</span></span><br><span class="line">    bs.<span class="built_in">notify_one</span>(); <span class="comment">// let the customer go</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>As for the customers, we have to be careful not to end up with more of them than there are waiting chairs, after updating the state
+of the waiting room. Since <code>waiting</code> is no longer protected by a mutex, two or more clients may attempt to modify it
+at the same time. Although the updates themselves would happen atomically, the comparison at line <em>56</em> could evaluate to
+<code>true</code> for all of them. There is no guarantee that between the comparison and the update, other customers won’t
+come in and fill up the waiting room. Hence, we have to use a <a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/atomic/atomic/compare_exchange">compare_exchange</a>
+function, which only updates the value of <code>waiting</code> if it remains unchanged. Note that if the compare-exchange operation succeeds,
+it does not mean that everyone stood still in the waiting room. Other customers are still free to come and go in the meantime,
+it’s just that we’re making sure the waiting room is not full when we try to sit down. However, this
+<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/ABA_problem">ABA problem</a> will not affect the correct functioning of the barbershop.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">customer</span><span class="params">(<span class="type">int</span> id, <span class="type">int</span> delay)</span> </span>&#123;</span><br><span class="line">  std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(delay));</span><br><span class="line">  <span class="keyword">while</span> (!shuttingDown.<span class="built_in">load</span>()) &#123;</span><br><span class="line">    <span class="keyword">auto</span> w = waiting.<span class="built_in">load</span>();</span><br><span class="line">    <span class="keyword">if</span> (w &lt; CHAIRS) &#123;</span><br><span class="line">      <span class="keyword">if</span> (waiting.<span class="built_in">compare_exchange_strong</span>(w, w + <span class="number">1</span>)) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Customer &quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot; enters the barbershop.\n&quot;</span>;</span><br><span class="line">        waiting.<span class="built_in">notify_one</span>(); <span class="comment">// wake up the barber</span></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      std::cout &lt;&lt; <span class="string">&quot;Customer &quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot; leaves the barbershop.\n&quot;</span>;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  bs.<span class="built_in">wait</span>(<span class="literal">false</span>); <span class="comment">// wait until the barber finishes the haircut</span></span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;Customer &quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot; got a haircut.\n&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Find the complete cpp file <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/the-sleeping-barber/code/atomic-solution.cpp">here</a>.</p>
+<h2 id="FIFO-barbershop"><a href="#FIFO-barbershop" class="headerlink" title="FIFO barbershop"></a>FIFO barbershop</h2><p>In the previous solutions, the customers are not necessarily served in the order they arrive. For example, if the barber
+comes to the waiting room and finds it full, he picks a random customer to invite into the working room. However, we
+can easily modify the classic code to make sure the customers are served in a first-in-first-out manner. We need to maintain
+a queue of customers waiting to get their haircuts. Each customer has its own semaphore, which is used to notify it when
+the haircut is done. Access to the queue is synchronized through a mutex, same as we did before with the waiting room.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> std::queue&lt;std::shared_ptr&lt;std::binary_semaphore&gt;&gt; waiting_queue;</span><br><span class="line"></span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">static</span> <span class="keyword">auto</span> CHAIRS = <span class="number">5</span>;      <span class="comment">// number of chairs in the waiting room</span></span><br><span class="line">std::atomic_bool shuttingDown&#123;<span class="literal">false</span>&#125;;  <span class="comment">// true when the barbershop is closing</span></span><br><span class="line">waiting_queue waiting;                 <span class="comment">// customers queue</span></span><br><span class="line">std::mutex mx;                         <span class="comment">// protection for the waiting room</span></span><br><span class="line">std::counting_semaphore&lt;CHAIRS&gt; cs&#123;<span class="number">0</span>&#125;; <span class="comment">// signals when a customer arrives</span></span><br></pre></td></tr></table></figure>
+
+<p>The barber picks the first customer in the queue and invites him into the working room.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">barber</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="function">std::unique_lock <span class="title">lock</span><span class="params">(mx, std::defer_lock)</span></span>;</span><br><span class="line">  <span class="keyword">while</span> (!shuttingDown.<span class="built_in">load</span>()) &#123;</span><br><span class="line">    <span class="comment">// &quot;sleep&quot; until a customer arrives, or until the barbershop is closing</span></span><br><span class="line">    <span class="type">bool</span> arrived = cs.<span class="built_in">try_acquire_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">5</span>));</span><br><span class="line">    <span class="keyword">if</span> (!arrived) &#123;</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    lock.<span class="built_in">lock</span>();                         <span class="comment">// protect the waiting room</span></span><br><span class="line">    <span class="keyword">auto</span> customer_sem = waiting.<span class="built_in">front</span>(); <span class="comment">// invite the first customer in-line</span></span><br><span class="line">    waiting.<span class="built_in">pop</span>();                       <span class="comment">// free the seat</span></span><br><span class="line">    lock.<span class="built_in">unlock</span>();                       <span class="comment">// let others use the waiting room</span></span><br><span class="line">    <span class="built_in">haircut</span>();                           <span class="comment">// cut hair</span></span><br><span class="line">    customer_sem-&gt;<span class="built_in">release</span>();             <span class="comment">// let the customer go</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The customer takes a sit in the waiting queue and waits for the barber to finish the haircut. Both the barber and the customer
+share a pointer to the same semaphore, which is unique to the customer. This way, the barber can use the semaphore to
+signal a particular customer that the haircut is done.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">customer</span><span class="params">(<span class="type">int</span> id, <span class="type">int</span> delay)</span> </span>&#123;</span><br><span class="line">  std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(delay));</span><br><span class="line">  <span class="function">std::unique_lock <span class="title">lock</span><span class="params">(mx)</span></span>;</span><br><span class="line">  <span class="keyword">if</span> (waiting.<span class="built_in">size</span>() &lt; CHAIRS) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Customer &quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot; enters the barbershop.\n&quot;</span>;</span><br><span class="line">    <span class="keyword">auto</span> customer_sem = std::<span class="built_in">make_shared</span>&lt;std::binary_semaphore&gt;(<span class="number">0</span>);</span><br><span class="line">    waiting.<span class="built_in">emplace</span>(customer_sem); <span class="comment">// take a seat</span></span><br><span class="line">    lock.<span class="built_in">unlock</span>();                 <span class="comment">// let others use the waiting room</span></span><br><span class="line">    cs.<span class="built_in">release</span>();                  <span class="comment">// wake up the barber</span></span><br><span class="line">    customer_sem-&gt;<span class="built_in">acquire</span>();       <span class="comment">// wait until the barber finishes the haircut</span></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Customer &quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot; leaves the barbershop.\n&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span>;                        <span class="comment">// leave the barbershop</span></span><br><span class="line">  &#125;</span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;Customer &quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot; got a haircut.\n&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>See the full code <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/the-sleeping-barber/code/fifo-solution.cpp">here</a>.</p>
+<h2 id="Catching-data-races-with-TSan"><a href="#Catching-data-races-with-TSan" class="headerlink" title="Catching data-races with TSan"></a>Catching data-races with TSan</h2><p><a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/ThreadSanitizer.html">Clang’s ThreadSanitizer (TSan)</a> is a tool that detects data races
+and other threading-related issues at runtime. It is quite useful, consisting of a compiler instrumentation
+module and a run-time library. It can help us find bugs that are very hard to detect otherwise. To use ThreadSanitized
+with Clang, you need to enable it by adding the <code>-fsanitize=thread</code> flag during compilation.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Program used to illustrate a data-race.</span></span><br><span class="line"><span class="comment"> * Compile it with ThreadSanitizer enabled:</span></span><br><span class="line"><span class="comment"> * clang++ -Wall -O2 -std=c++20 -fsanitize=thread -o data-race data-race.cpp -pthread</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> shared_data = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100000</span>; ++i) &#123;</span><br><span class="line">    ++shared_data;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="function">std::thread <span class="title">t1</span><span class="params">(increment)</span></span>;</span><br><span class="line">  <span class="function">std::thread <span class="title">t2</span><span class="params">(increment)</span></span>;</span><br><span class="line"></span><br><span class="line">  t1.<span class="built_in">join</span>();</span><br><span class="line">  t2.<span class="built_in">join</span>();</span><br><span class="line"></span><br><span class="line">  std::cout &lt;&lt; <span class="string">&quot;Shared data: &quot;</span> &lt;&lt; shared_data &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>When running it, TSan prints the following warning (I trimmed it a bit for the sake of brevity):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">==================</span><br><span class="line">WARNING: ThreadSanitizer: data race (pid=2206)</span><br><span class="line">  Write of size 4 at 0x5637e35656ac by thread T2:</span><br><span class="line">    #0 increment() &lt;null&gt; (data-race+0xd4421) ...</span><br><span class="line">    #1 std::thread::_State_impl&lt;std::thread::_Invoker&lt;std::tuple&lt;void (*)()&gt; &gt; &gt;::_M_run() &lt;null&gt; (data-race+0xd46a9) ...</span><br><span class="line">    #2 &lt;null&gt; &lt;null&gt; (libstdc++.so.6+0xd44a2) ...</span><br><span class="line"></span><br><span class="line">  Previous write of size 4 at 0x5637e35656ac by thread T1:</span><br><span class="line">    #0 increment() &lt;null&gt; (data-race+0xd4421) ...</span><br><span class="line">    #1 std::thread::_State_impl&lt;std::thread::_Invoker&lt;std::tuple&lt;void (*)()&gt; &gt; &gt;::_M_run() &lt;null&gt; (data-race+0xd46a9) ...</span><br><span class="line">    #2 &lt;null&gt; &lt;null&gt; (libstdc++.so.6+0xd44a2) ...</span><br><span class="line"></span><br><span class="line">  Location is global &#x27;shared_data&#x27; of size 4 at 0x5637e35656ac (data-race+0x14fb6ac)</span><br><span class="line">  ...</span><br><span class="line">==================</span><br><span class="line">Shared data: 200000</span><br><span class="line">ThreadSanitizer: reported 1 warnings</span><br></pre></td></tr></table></figure>
+
+<p>It reports a data-race involving two threads, <em>T1</em> and <em>T2</em>, both trying to modify the same global location, <em>shared_data</em>.
+The essential information is at lines <em>4</em>, <em>9</em> and <em>13</em>. These indicate the places from which the threads are accessing the
+shared data (in this case, both do it from the <code>increment</code> function), and the location of the shared data itself (a
+global variable).<br>Implementing a fix is simple, as we just have to declare <em>shared_data</em> as <code>std::atomic_int</code>, and the warning goes away.
+The point was to illustrate the ease with which one can make use of TSan in order to check for races in multi-threaded
+code. Note that using it may slow down the execution of the program and introduce significant memory overhead.
+Nevertheless, it’s generally worth it during the development and testing phase.</p>
+<h2 id="References-and-Further-Reading"><a href="#References-and-Further-Reading" class="headerlink" title="References and Further Reading"></a>References and Further Reading</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://greenteapress.com/wp/semaphores/">Allen B. Downey - The Little Book of Semaphores</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cs.utexas.edu/users/EWD/ewd01xx/EWD123.PDF">E. W. Dijkstra - EWD123</a></li>
+<li><a target="_blank" rel="noopener" href="http://web.cecs.pdx.edu/~harry/Blitz/OSProject/p3/SleepingBarberProblem.pdf">Tanenbaum - The Sleeping Barber Problem</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Race-conditions"><span class="toc-number">1.</span> <span class="toc-text">Race conditions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Classic-solution"><span class="toc-number">2.</span> <span class="toc-text">Classic solution</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using-only-atomics"><span class="toc-number">3.</span> <span class="toc-text">Using only atomics</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FIFO-barbershop"><span class="toc-number">4.</span> <span class="toc-text">FIFO barbershop</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Catching-data-races-with-TSan"><span class="toc-number">5.</span> <span class="toc-text">Catching data-races with TSan</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">6.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&text=The Sleeping Barber"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&title=The Sleeping Barber"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&is_video=false&description=The Sleeping Barber"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=The Sleeping Barber&body=Check out this article: https://apetenchea.github.io/2023/04/22/the-sleeping-barber/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&title=The Sleeping Barber"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&title=The Sleeping Barber"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&title=The Sleeping Barber"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&title=The Sleeping Barber"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&name=The Sleeping Barber&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2023/04/22/the-sleeping-barber/&t=The Sleeping Barber"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

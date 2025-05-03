@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="2024How I built Clang on Debian Sid, using GCC 14.2.0. See their GettingStarted page (hint: it has become easier). Clone the repository1git clone https:&#x2F;&#x2F;github.com&#x2F;llvm&#x2F;llvm-project.git  The above cl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Notes on Building Clang">
+<meta property="og:url" content="https://apetenchea.github.io/2019/01/30/notes-on-building-clang/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="2024How I built Clang on Debian Sid, using GCC 14.2.0. See their GettingStarted page (hint: it has become easier). Clone the repository1git clone https:&#x2F;&#x2F;github.com&#x2F;llvm&#x2F;llvm-project.git  The above cl">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-01-30T18:25:10.000Z">
+<meta property="article:modified_time" content="2025-05-03T15:41:40.760Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="LLVM">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Notes on Building Clang</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2019/02/12/tail-end-recursion/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2019/01/19/linkage/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&text=Notes on Building Clang"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&title=Notes on Building Clang"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&is_video=false&description=Notes on Building Clang"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Notes on Building Clang&body=Check out this article: https://apetenchea.github.io/2019/01/30/notes-on-building-clang/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&title=Notes on Building Clang"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&title=Notes on Building Clang"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&title=Notes on Building Clang"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&title=Notes on Building Clang"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&name=Notes on Building Clang&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&t=Notes on Building Clang"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#2024"><span class="toc-number">1.</span> <span class="toc-text">2024</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Clone-the-repository"><span class="toc-number">1.1.</span> <span class="toc-text">Clone the repository</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Configure"><span class="toc-number">1.2.</span> <span class="toc-text">Configure</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Build"><span class="toc-number">1.3.</span> <span class="toc-text">Build</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2019"><span class="toc-number">2.</span> <span class="toc-text">2019</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Requirements"><span class="toc-number">2.1.</span> <span class="toc-text">Requirements</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Checkout"><span class="toc-number">2.2.</span> <span class="toc-text">Checkout</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Configure-LLVM"><span class="toc-number">2.3.</span> <span class="toc-text">Configure LLVM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Compile"><span class="toc-number">2.4.</span> <span class="toc-text">Compile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bootstrap"><span class="toc-number">2.5.</span> <span class="toc-text">Bootstrap</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Test"><span class="toc-number">2.6.</span> <span class="toc-text">Test</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Install"><span class="toc-number">2.7.</span> <span class="toc-text">Install</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Notes on Building Clang
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-01-30T18:25:10.000Z" itemprop="datePublished">30 Jan 2019</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/LLVM/" rel="tag">LLVM</a>, <a class="tag-link-link" href="/tags/Linux/" rel="tag">Linux</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="2024"><a href="#2024" class="headerlink" title="2024"></a>2024</h2><p>How I built Clang on Debian Sid, using GCC 14.2.0. See their <a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#getting-the-source-code-and-building-llvm">GettingStarted</a>
+page (hint: it has become easier).</p>
+<h3 id="Clone-the-repository"><a href="#Clone-the-repository" class="headerlink" title="Clone the repository"></a>Clone the repository</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/llvm/llvm-project.git</span><br></pre></td></tr></table></figure>
+
+<p>The above clones the whole repo. Alternatively, if you’re not interested in the commit history,
+you can do a shallow clone. Not only that would suffice for a build, but it would substantially
+reduce the amount of data to be downloaded.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --depth 1 https://github.com/llvm/llvm-project.git  <span class="comment"># shallow clone</span></span><br></pre></td></tr></table></figure>
+
+<p>Or, if you’re looking for something more stable, you can checkout a specific release.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --depth 1 --branch llvmorg-19.1.2 https://github.com/llvm/llvm-project.git</span><br></pre></td></tr></table></figure>
+
+<h3 id="Configure"><a href="#Configure" class="headerlink" title="Configure"></a>Configure</h3><p>Now, from the <code>llvm-project</code> directory you’ve just cloned into, run CMake. I’m using Ninja as generator, but others
+should work as well. The <code>-DLLVM_USE_LINKER=lld</code> flag can really speed up the build process if you already have a version
+of LLD installed on your system, but it is optional. The <code>-DLLVM_ENABLE_PROJECTS</code> flag is used to specify which projects
+you want to build. I’m only interested in Clang, LLD and LLDB. You may also add runtime libraries, such as OpenMP.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmake -S llvm -B build -G <span class="string">&quot;Ninja&quot;</span> -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_LINKER=lld -DLLVM_ENABLE_PROJECTS=<span class="string">&quot;clang;lld;lldb&quot;</span> -DLLVM_ENABLE_RUNTIMES=<span class="string">&quot;openmp&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Build"><a href="#Build" class="headerlink" title="Build"></a>Build</h3><p>Then finally, build the project. The <code>-j</code> flag is used to specify the number of threads to use.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ninja -j30 -C build</span><br></pre></td></tr></table></figure>
+
+<p>You’ll find the binaries in <code>llvm-project/build/bin</code>. Enjoy!</p>
+<h2 id="2019"><a href="#2019" class="headerlink" title="2019"></a>2019</h2><p>How I built Clang on Ubuntu 18.04.1 LTS, using GCC.</p>
+<h3 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h3><p>Make sure you have the <a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#requirements">required software.</a>
+Here’s what I used:</p>
+<ul>
+<li>GNU Make 4.1</li>
+<li>GCC 7.3.0</li>
+<li>CMake 3.10.2</li>
+<li>Python 3.6.5 (for running tests)</li>
+<li>zlib 1.2.11 (optional)</li>
+</ul>
+<p>Before installing new packages, I usually update &amp; upgrade.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Update the list of available packages and their version</span></span><br><span class="line">sudo apt update</span><br><span class="line"></span><br><span class="line"><span class="comment"># Actually install newer versions of packages</span></span><br><span class="line">sudo apt upgrade</span><br></pre></td></tr></table></figure>
+
+<h3 id="Checkout"><a href="#Checkout" class="headerlink" title="Checkout"></a>Checkout</h3><p><a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#checkout-llvm-from-git">Checkout LLVM from Git</a>.
+Take a look at their <a target="_blank" rel="noopener" href="https://github.com/llvm/llvm-project/releases">releases</a>. I chose version 7.0.0. That’s on branch
+<em>release/7.x</em>, commit <em>00b161b8971bc6d3cb55f13502288b8fe0dbaa42</em>.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --single-branch --branch release/7.x https://github.com/llvm/llvm-project.git</span><br><span class="line">git checkout 00b161b8971bc6d3cb55f13502288b8fe0dbaa42</span><br></pre></td></tr></table></figure>
+
+<h3 id="Configure-LLVM"><a href="#Configure-LLVM" class="headerlink" title="Configure LLVM"></a>Configure LLVM</h3><p>After the checkout was complete, I created a folder where the object files would be placed.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> llvm-project</span><br><span class="line"><span class="built_in">mkdir</span> release</span><br><span class="line"><span class="built_in">cd</span> release</span><br></pre></td></tr></table></figure>
+<p>CMake generates the build files. <a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#local-llvm-configuration">Build variables</a>
+are used to specify the build configuration. </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmake -G <span class="string">&quot;Unix Makefiles&quot;</span> -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD=<span class="string">&quot;X86&quot;</span> -DLLVM_ENABLE_PROJECTS=<span class="string">&quot;clang;compiler-rt&quot;</span> -DCLANG_ENABLE_BOOTSTRAP=On ../llvm</span><br></pre></td></tr></table></figure>
+<p>Check the CMake output and install any missing software. I got a few errors myself:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Could NOT find LibXml2</span><br><span class="line">Could NOT find Doxygen</span><br><span class="line">Could NOT find Curses</span><br><span class="line">Could NOT find SWIG</span><br></pre></td></tr></table></figure>
+<p>Fixed:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install libxml2-dev</span><br><span class="line">sudo apt install doxygen</span><br><span class="line">sudo apt install libncurses5-dev</span><br><span class="line">sudo apt install swig</span><br></pre></td></tr></table></figure>
+
+<h3 id="Compile"><a href="#Compile" class="headerlink" title="Compile"></a>Compile</h3><p><a target="_blank" rel="noopener" href="https://llvm.org/docs/GettingStarted.html#compiling-the-llvm-suite-source-code">Generate binaries</a>.
+While still in <code>/release</code>, run <code>make -j5</code>. The <code>-j</code> parameter represents the number of workers used to parallelize
+the build process. Depending on the configuration, your machine and the number of worker threads you assign,
+this might take a while.</p>
+<h3 id="Bootstrap"><a href="#Bootstrap" class="headerlink" title="Bootstrap"></a>Bootstrap</h3><p><a target="_blank" rel="noopener" href="https://llvm.org/docs/AdvancedBuilds.html#bootstrap-builds">Bootstrapping</a> refers to using the newly built compiler
+in order to build itself again. It is only possible if makefiles were generated with <code>CLANG_ENABLE_BOOTSTRAP=On</code>.
+This step is optional and it takes time. If you’ve had enough, consider skipping it.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make stage2</span><br></pre></td></tr></table></figure>
+<p>I didn’t add any more workers this time because during linking the entire process would eat up more than 8GB of RAM.</p>
+<h3 id="Test"><a href="#Test" class="headerlink" title="Test"></a>Test</h3><p>To make sure everything went as planned, run the tests to validate your work. </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make check-clang</span><br></pre></td></tr></table></figure>
+<p>Or, to check everything:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make check-all</span><br></pre></td></tr></table></figure>
+
+<h3 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h3><p>By default, the install location is <code>/usr/local</code>. You probably need root permission to install in there.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make install</span><br></pre></td></tr></table></figure>
+<p>If for some reason you want to undo this step:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xargs rm &lt; install_manifest.txt</span><br></pre></td></tr></table></figure>
+<p>After installing, I removed the <code>/release</code> folder because I don’t plan on doing another build. It occupies quite a lot
+of disk space, but if you plan on building Clang again, make sure you keep it around.</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#2024"><span class="toc-number">1.</span> <span class="toc-text">2024</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Clone-the-repository"><span class="toc-number">1.1.</span> <span class="toc-text">Clone the repository</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Configure"><span class="toc-number">1.2.</span> <span class="toc-text">Configure</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Build"><span class="toc-number">1.3.</span> <span class="toc-text">Build</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2019"><span class="toc-number">2.</span> <span class="toc-text">2019</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Requirements"><span class="toc-number">2.1.</span> <span class="toc-text">Requirements</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Checkout"><span class="toc-number">2.2.</span> <span class="toc-text">Checkout</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Configure-LLVM"><span class="toc-number">2.3.</span> <span class="toc-text">Configure LLVM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Compile"><span class="toc-number">2.4.</span> <span class="toc-text">Compile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bootstrap"><span class="toc-number">2.5.</span> <span class="toc-text">Bootstrap</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Test"><span class="toc-number">2.6.</span> <span class="toc-text">Test</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Install"><span class="toc-number">2.7.</span> <span class="toc-text">Install</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&text=Notes on Building Clang"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&title=Notes on Building Clang"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&is_video=false&description=Notes on Building Clang"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Notes on Building Clang&body=Check out this article: https://apetenchea.github.io/2019/01/30/notes-on-building-clang/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&title=Notes on Building Clang"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&title=Notes on Building Clang"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&title=Notes on Building Clang"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&title=Notes on Building Clang"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&name=Notes on Building Clang&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2019/01/30/notes-on-building-clang/&t=Notes on Building Clang"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

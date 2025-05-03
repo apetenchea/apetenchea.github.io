@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="There are cases when recursion can lead to stack overflow. Tail-end recursion can be optimized by the compiler such that the generated machine code looks like iteration. Why regular recursion is not a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tail-End Recursion">
+<meta property="og:url" content="https://apetenchea.github.io/2019/02/12/tail-end-recursion/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="There are cases when recursion can lead to stack overflow. Tail-end recursion can be optimized by the compiler such that the generated machine code looks like iteration. Why regular recursion is not a">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-02-12T09:14:07.000Z">
+<meta property="article:modified_time" content="2025-04-28T11:05:16.184Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Programming">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Tail-End Recursion</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2021/10/07/coding-standards/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2019/01/30/notes-on-building-clang/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2019/02/12/tail-end-recursion/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&text=Tail-End Recursion"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&title=Tail-End Recursion"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&is_video=false&description=Tail-End Recursion"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Tail-End Recursion&body=Check out this article: https://apetenchea.github.io/2019/02/12/tail-end-recursion/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&title=Tail-End Recursion"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&title=Tail-End Recursion"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&title=Tail-End Recursion"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&title=Tail-End Recursion"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&name=Tail-End Recursion&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&t=Tail-End Recursion"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-regular-recursion-is-not-always-enough"><span class="toc-number">1.</span> <span class="toc-text">Why regular recursion is not always enough?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Under-the-hood"><span class="toc-number">1.1.</span> <span class="toc-text">Under the hood</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The-problem"><span class="toc-number">1.2.</span> <span class="toc-text">The problem</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-tail-end-recursion-works"><span class="toc-number">2.</span> <span class="toc-text">How tail-end recursion works?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Disassembly"><span class="toc-number">2.1.</span> <span class="toc-text">Disassembly</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tail-end-recursion-in-other-languages"><span class="toc-number">3.</span> <span class="toc-text">Tail-end recursion in other languages</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GCC"><span class="toc-number">3.1.</span> <span class="toc-text">GCC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Clang"><span class="toc-number">3.2.</span> <span class="toc-text">Clang</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Proof"><span class="toc-number">3.2.1.</span> <span class="toc-text">Proof</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Thorough-analysis"><span class="toc-number">3.2.2.</span> <span class="toc-text">Thorough analysis</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Tail-End Recursion
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-02-12T09:14:07.000Z" itemprop="datePublished">12 Feb 2019</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Programming/" rel="tag">Programming</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>There are cases when recursion can lead to <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Stack_overflow">stack overflow</a>.
+Tail-end recursion can be optimized by the compiler such that the generated machine code looks like iteration.</p>
+<h2 id="Why-regular-recursion-is-not-always-enough"><a href="#Why-regular-recursion-is-not-always-enough" class="headerlink" title="Why regular recursion is not always enough?"></a>Why regular recursion is not always enough?</h2><p>Recursion is sometimes a natural and elegant way to approach a problem, especially in the case of functional
+programming languages, such as OCaml. The ability of a function to call itself is a powerful concept, but very deep
+recursion can lead to crashes. One can overcome these by the use of tail-end recursion. Consider a function which
+sums up all the integers between 1 and n: </p>
+<figure class="highlight ml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="keyword">rec</span> sum n =</span><br><span class="line">  <span class="keyword">if</span> n = <span class="number">1</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">  <span class="keyword">else</span> n + sum (n - <span class="number">1</span>);;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> n = read_int<span class="literal">()</span> <span class="keyword">in</span></span><br><span class="line">print_int (sum n);</span><br><span class="line">print_newline<span class="literal">()</span>;;</span><br></pre></td></tr></table></figure>
+
+<p>The code looks pretty nice and compact, but unfortunately if you take the <em>sum</em> function and put it into the
+OCaml interpreter, it crashes for large values of n. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># sum (int_of_float (10.0 ** 4.0));;</span><br><span class="line">- : int = 50005000</span><br><span class="line"># sum (int_of_float (10.0 ** 5.0));;</span><br><span class="line">- : int = 5000050000</span><br><span class="line"># sum (int_of_float (10.0 ** 6.0));;</span><br><span class="line">Stack overflow during evaluation (looping recursion?).</span><br></pre></td></tr></table></figure>
+
+<p>The interpreter prints the “Stack overflow” message and suggests that the cause may be the way you
+approached recursion. The reason why this occurs is because every function call has its own stack frame, so each
+subsequent call to <em>sum</em> eats up some more space on the stack. The stack runs out of space,
+thus resulting in a stack overflow. I used the <code>#trace</code> command to see what happens during execution.
+It prints, in their order of occurrence, all the calls and returns of the traced function.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># #trace sum;;</span><br><span class="line">sum is now traced.</span><br><span class="line"># sum 4;;</span><br><span class="line">sum &lt;-- 4</span><br><span class="line">sum &lt;-- 3</span><br><span class="line">sum &lt;-- 2</span><br><span class="line">sum &lt;-- 1</span><br><span class="line">sum --&gt; 1</span><br><span class="line">sum --&gt; 3</span><br><span class="line">sum --&gt; 6</span><br><span class="line">sum --&gt; 10</span><br><span class="line">- : int = 10</span><br></pre></td></tr></table></figure>
+
+<p>The depth of recursion is given by the number of consecutive calls to sum, in this case being 4.</p>
+<h3 id="Under-the-hood"><a href="#Under-the-hood" class="headerlink" title="Under the hood"></a>Under the hood</h3><p>Let’s compile the program and take a look inside the executable. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ocamlopt -o simple-rec simple-rec.ml</span><br><span class="line">objdump -d -M intel simple-rec &gt; simple-rec.dump</span><br></pre></td></tr></table></figure>
+
+<p>Now you can really see what’s behind the <code>sum</code> function. I will explain it bellow.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">00000000004022a0:</span><br><span class="line"> 4022a0: 48 83 ec 08           sub    rsp,0x8</span><br><span class="line"> 4022a4: 48 83 f8 03           cmp    rax,0x3</span><br><span class="line"> 4022a8: 75 0e                 jne    4022b8</span><br><span class="line"> 4022aa: 48 c7 c0 03 00 00 00  mov    rax,0x3</span><br><span class="line"> 4022b1: 48 83 c4 08           add    rsp,0x8</span><br><span class="line"> 4022b5: c3                    ret</span><br><span class="line"> 4022b6: 66 90                 xchg   ax,ax</span><br><span class="line"> 4022b8: 48 89 04 24           mov    QWORD PTR [rsp],rax</span><br><span class="line"> 4022bc: 48 83 c0 fe           add    rax,0xfffffffffffffffe</span><br><span class="line"> 4022c0: e8 db ff ff ff        call   4022a0</span><br><span class="line"> 4022c5: 48 89 c3              mov    rbx,rax</span><br><span class="line"> 4022c8: 48 8b 04 24           mov    rax,QWORD PTR [rsp]</span><br><span class="line"> 4022cc: 48 01 d8              add    rax,rbx</span><br><span class="line"> 4022cf: 48 ff c8              dec    rax</span><br><span class="line"> 4022d2: 48 83 c4 08           add    rsp,0x8</span><br><span class="line"> 4022d6: c3                    ret</span><br><span class="line"> 4022d7: 66 0f 1f 84 00 00 00  nop    WORD PTR [rax+rax*1+0x0]</span><br><span class="line"> 4022de: 00 00</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>The first parameter (integer n) is stored into register <code>rax</code>, but <code>rax</code> is also the register used
+by the function to return a value. This may lead to some confusion.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">00000000004022a0:</span><br><span class="line"> 4022a0: allocate space for a qword on the stack</span><br><span class="line"> 4022a4: compare n to 3</span><br><span class="line"> 4022a8: if n is not equal to 3 then jump to 4022b8</span><br><span class="line"> 4022aa: set return value as 3</span><br><span class="line"> 4022b1: free a qword from the stack</span><br><span class="line"> 4022b5: return</span><br><span class="line"> 4022b6: does nothing, just like a nop, used for alignment</span><br><span class="line"> 4022b8: copy the value of n to the stack</span><br><span class="line"> 4022bc: subtract 2 from n</span><br><span class="line"> 4022c0: call sum (n - 1)</span><br><span class="line"> 4022c5: store in rbx the result of sum (n - 1)</span><br><span class="line"> 4022c8: store in rax the current value of n, saved on the stack</span><br><span class="line"> 4022cc: add the result of sum (n - 1) to n</span><br><span class="line"> 4022cf: subtract 1 from rax</span><br><span class="line"> 4022d2: free a qword from the stack</span><br><span class="line"> 4022d6: return</span><br><span class="line"> 4022d7: </span><br><span class="line"> 4022de: </span><br></pre></td></tr></table></figure>
+
+<p>As a side note, there’s something strange with the way OCaml represents integers in memory. Notice that
+the base case appears to be n equals 3, instead of 1. Also at <em>4022cf</em> the sum is decremented,
+yielding <code>n + sum (n - 1) - 1</code>.  This doesn’t seem to resemble the code, but why?<br>The reason is that in OCaml the least significant bit of an integer is used as a tag bit, in order to make the
+distinction between pointers and integers at runtime. This means that you can obtain the real value of an integer if you
+strip the tag bit, by doing a logical right shift, or more naturally, dividing by 2. So, OCaml will internally
+represent the integer 1 as 3. That’s why it does all these strange additions and subtractions.
+More details can be found <a target="_blank" rel="noopener" href="https://v1.realworldocaml.org/v1/en/html/memory-representation-of-values.html">here</a>.  </p>
+<h3 id="The-problem"><a href="#The-problem" class="headerlink" title="The problem"></a>The problem</h3><p>Every <code>call</code> instruction pushes a return address (qword, 8 bytes) onto the stack. Also, before calling the function,
+the value of <code>n</code> has to be stored on the stack, so there goes another qword. Every time <code>sum</code> is called,
+it eats up 16 bytes from the stack. To compute the total number of bytes, you multiply the depth of the
+recursion with 16. When n equals 1000000 that is approximately 16 MB, thus resulting in a stack overflow.<br>Consider the following snippet of code: <code>n + sum (n - 1)</code>. The expression is dependent on the value returned by
+<code>sum (n - 1)</code>, thus it has to store the current value of <code>n</code> on the stack until the result of <code>sum (n - 1)</code>
+is returned. This happens again inside <code>sum (n - 1)</code>, because it has to store the value of <code>n - 1</code> on the stack until
+<code>sum (n - 2)</code> returns, and so on. This long chain of dependencies is the root cause of the stack overflow.</p>
+<h2 id="How-tail-end-recursion-works"><a href="#How-tail-end-recursion-works" class="headerlink" title="How tail-end recursion works?"></a>How tail-end recursion works?</h2><p>The point of tail-end recursion is to write a function in such a way that the returned value depends only
+on the subsequent calls, eliminating the need to keep local variables around.
+In other words, there is no pending operation on the recursive call
+(such as the addition of <code>n</code> to the computed sum). This way, if the compiler can optimize tail-end recursion,
+it won’t keep the state of every function call on the stack, but rather just the current one, as in a loop.
+If the compiler could speak, it would say: “Ok, I won’t use anything from this functions’s stack frame again,
+so there’s no point in keeping it around. I could just go ahead and return the result of the recursive call
+as the final result”.<br>Usually, a tail-end recursive function requires an extra argument, whose purpose is to accumulate the
+result along the way. To avoid complicating the function’s signature, you can write a tail-end recursive
+function as a helper function and then define your “official function” to call the helper function with the
+accumulator set to its initial value.</p>
+<figure class="highlight ml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="keyword">rec</span> sum_helper acc n =</span><br><span class="line">  <span class="keyword">if</span> n = <span class="number">1</span> <span class="keyword">then</span> acc + <span class="number">1</span></span><br><span class="line">  <span class="keyword">else</span> sum_helper (acc + n) (n - <span class="number">1</span>);;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> sum = sum_helper <span class="number">0</span>;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> n = read_int<span class="literal">()</span> <span class="keyword">in</span></span><br><span class="line">print_int (sum n);</span><br><span class="line">print_newline<span class="literal">()</span>;;</span><br></pre></td></tr></table></figure>
+
+<p><code>sum</code> doesn’t crash anymore.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># sum (int_of_float (10.0 ** 6.0));;</span><br><span class="line">- : int = 500000500000</span><br><span class="line"># sum (int_of_float (10.0 ** 7.0));;</span><br><span class="line">- : int = 50000005000000</span><br><span class="line"># sum (int_of_float (10.0 ** 8.0));;</span><br><span class="line">- : int = 5000000050000000</span><br></pre></td></tr></table></figure>
+
+<h3 id="Disassembly"><a href="#Disassembly" class="headerlink" title="Disassembly"></a>Disassembly</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">00000000004022a0:</span><br><span class="line"> 4022a0: 48 83 fb 03     cmp    rbx,0x3</span><br><span class="line"> 4022a4: 75 06           jne    4022ac</span><br><span class="line"> 4022a6: 48 83 c0 02     add    rax,0x2</span><br><span class="line"> 4022aa: c3              ret</span><br><span class="line"> 4022ab: 90              nop</span><br><span class="line"> 4022ac: 48 89 df        mov    rdi,rbx</span><br><span class="line"> 4022af: 48 83 c7 fe     add    rdi,0xfffffffffffffffe</span><br><span class="line"> 4022b3: 48 8d 44 18 ff  lea    rax,[rax+rbx*1-0x1]</span><br><span class="line"> 4022b8: 48 89 fb        mov    rbx,rdi</span><br><span class="line"> 4022bb: eb e3           jmp    4022a0</span><br><span class="line"> 4022bd: 0f 1f 00        nop    DWORD PTR [rax]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>acc</code> is initially stored in register <code>rax</code> and <code>n</code> is stored in <code>rbx</code>.
+As you can see, there is not a single call instruction, only jumps! This means that the amount
+of stack space needed to compute the sum is constant, no longer proportional to the depth of recursion.
+In fact, this is not even recursion anymore, it’s iteration. Take a look at the trace, you can see there are
+no longer any recursive calls: </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># sum 10;;</span><br><span class="line">sum &lt;-- 10</span><br><span class="line">sum --&gt; 55</span><br><span class="line">- : int = 55</span><br><span class="line"># sum 12345;;</span><br><span class="line">sum &lt;-- 12345</span><br><span class="line">sum --&gt; 76205685</span><br><span class="line">- : int = 76205685</span><br></pre></td></tr></table></figure>
+
+<p>Tail-end recursion is generally a great improvement, but it might reduce readability. A tail-end recursive version
+of a function is not always this obvious, sometimes it may be harder to come up with one, and even harder for
+somebody else to understand it by reading your code. Some compilers and interpreters are able to recognize tail-end
+recursion and optimize it, some are not. Before you think about using it, make sure your programming language knows
+how to deal with these things.</p>
+<h2 id="Tail-end-recursion-in-other-languages"><a href="#Tail-end-recursion-in-other-languages" class="headerlink" title="Tail-end recursion in other languages"></a>Tail-end recursion in other languages</h2><p>Let’s analyze the output of some C compilers, this time on 32 bit programs. </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> sum(n) (sum_helper(0, n))</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sum_helper</span> <span class="params">(<span class="type">int</span> acc, <span class="type">int</span> n)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (n == <span class="number">1</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> acc + <span class="number">1</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> sum_helper(acc + n, n - <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> n;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;n);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, sum(n));</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="GCC"><a href="#GCC" class="headerlink" title="GCC"></a>GCC</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -Wall -O2 -std=c11 -m32 -masm=intel -S tail_end.c</span><br></pre></td></tr></table></figure>
+
+<p>The assembly code of <code>sum_helper</code> is analyzed bellow. As expected, GCC optimizes the function.
+It first does a check for the base case, and if <code>n</code> is equal to 1 it jumps to <code>.L3</code>,
+adding 1 to <code>acc</code>, which becomes 1. Otherwise, while <code>n</code> is not equal to 1, it executes the instructions
+bellow <code>.L7</code> in a loop. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">sum_helper:</span><br><span class="line">.LFB3:</span><br><span class="line"> .cfi_startproc</span><br><span class="line"> mov edx, DWORD PTR [esp+8] ; edx = n</span><br><span class="line"> mov eax, DWORD PTR [esp+4] ; eax = acc</span><br><span class="line"> cmp edx, 1                 ; compare n with 1</span><br><span class="line"> je .L3                     ; if the above comparison is true, jump to .L3</span><br><span class="line"> .p2align 4,,10</span><br><span class="line"> .p2align 3</span><br><span class="line">.L7:</span><br><span class="line"> add eax, edx               ; add n to acc</span><br><span class="line"> sub edx, 1                 ; decrement n</span><br><span class="line"> cmp edx, 1                 ; compare n with 1</span><br><span class="line"> jne .L7                    ; if n is not equal to 1 then jump to .L7</span><br><span class="line">.L3:</span><br><span class="line"> add eax, 1                 ; add 1 to acc</span><br><span class="line"> ret                        ; return</span><br><span class="line"> .cfi_endproc</span><br></pre></td></tr></table></figure>
+
+<h3 id="Clang"><a href="#Clang" class="headerlink" title="Clang"></a>Clang</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clang -Wall -O2 -std=c11 -m32 -masm=intel -S tail\_end.c</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">sum_helper:</span><br><span class="line"> push edi</span><br><span class="line"> push esi</span><br><span class="line"> mov esi, dword ptr [esp + 16]</span><br><span class="line"> mov ecx, dword ptr [esp + 12]</span><br><span class="line"> cmp esi, 1</span><br><span class="line"> je .LBB0_2</span><br><span class="line"> lea edi, dword ptr [esi - 1]</span><br><span class="line"> lea eax, dword ptr [esi - 2]</span><br><span class="line"> imul edi, eax</span><br><span class="line"> lea edx, dword ptr [esi - 3]</span><br><span class="line"> mul edx</span><br><span class="line"> shld edx, eax, 31</span><br><span class="line"> add ecx, esi</span><br><span class="line"> add ecx, edi</span><br><span class="line"> sub ecx, edx</span><br><span class="line">.LBB0_2:</span><br><span class="line"> inc ecx</span><br><span class="line"> mov eax, ecx</span><br><span class="line"> pop esi</span><br><span class="line"> pop edi</span><br><span class="line"> ret</span><br></pre></td></tr></table></figure>
+
+<p>To be honest, I didn’t expect this at all! Clang generated the following formula:<br>$$n + (n - 1) * (n - 2) - (n - 2) * (n - 3) / 2 + 1$$</p>
+<h4 id="Proof"><a href="#Proof" class="headerlink" title="Proof"></a>Proof</h4><p>$$
+\begin{split}
+\frac{1}{2}(n−2)(n−3)+(n−2)(n−1)+n+1\\
+\Leftrightarrow (n - 2)(n-1-\frac{n-3}{2})+n+1\\
+\Leftrightarrow \frac{(n - 2)(2n-2-n+3)}{2}+n+1\\ 
+\Leftrightarrow \frac{(n - 2)(n+1)}{2}+\frac{2(n+1)}{2}\Leftrightarrow \frac{n(n+1)}{2}\\
+\end{split}
+$$</p>
+<p>For details, read about <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Arithmetic_progression">arithmetic progressions</a>.</p>
+<h4 id="Thorough-analysis"><a href="#Thorough-analysis" class="headerlink" title="Thorough analysis"></a>Thorough analysis</h4><p>This may go out the scope of this article, but I believe such an optimization deserves a more detailed explanation.
+I will go through it step by step.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">push edi</span><br><span class="line">push esi</span><br></pre></td></tr></table></figure>
+
+<p><code>edi</code> and <code>esi</code> are <strong>callee saved registers</strong>. This means a function has to keep a copy
+before modifying them, and then restore their values before it returns. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mov esi, dword ptr [esp + 16]</span><br><span class="line">mov ecx, dword ptr [esp + 12]</span><br></pre></td></tr></table></figure>
+
+<p>The function parameters are stored on the stack. The first instruction takes the value of <code>n</code> and stores it
+in register <code>esi</code>. The second one takes the value of <code>acc</code> and stores it into <code>ecx</code>. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cmp esi, 1</span><br><span class="line">je .LBB0_2</span><br></pre></td></tr></table></figure>
+
+<p>If <code>esi</code> (which now has the value of <code>n</code>) is equal to 1, jump to the location labeled <code>.LBB0_2</code>. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lea edi, dword ptr [esi - 1]</span><br><span class="line">lea eax, dword ptr [esi - 2]</span><br></pre></td></tr></table></figure>
+
+<p>The equivalent of the first instruction is <code>edi = n - 1</code>. Second instruction is: <code>eax = n - 2</code>.
+Note that <code>lea</code> actually comes from “load effective address”, and its original purpose was to handle memory addresses,
+but it is often used for arithmetic operations. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">imul edi, eax</span><br></pre></td></tr></table></figure>
+
+<p>This takes the value in <code>eax</code>, multiplies it with <code>edi</code> and stores the result back in <code>edi</code>, whose value becomes
+<em>(n - 1)</em> * <em>(n - 2)</em>. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lea edx, dword ptr [esi - 3]</span><br></pre></td></tr></table></figure>
+
+<p>Store the value <em>n - 3</em> in <code>edx</code>.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mul edx</span><br></pre></td></tr></table></figure>
+
+<p>This instruction multiplies the value stored in register <code>eax</code> with the value stored in register <code>edx</code>,
+producing a 64 bit result, whose least significant 32 bits are in <code>eax</code>, and the other 32 bits in <code>edx</code>. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shld edx, eax, 31</span><br></pre></td></tr></table></figure>
+
+<p>Double precision left shift: shifts <code>edx</code> left 31 times, and fills up uncovered bits from its right
+side with bits copied from <code>eax</code>. Because only 31 bits from <code>eax</code> are spilled into <code>edx</code>, the
+least significant bit of <code>eax</code> gets trimmed away, this operation being equivalent to a right shift, which is in
+fact division by 2. After this instruction gets executed, <code>edx</code> is going to be <em>(n - 2)</em> * <em>(n - 3) / 2</em>.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">add ecx, esi</span><br><span class="line">add ecx, edi</span><br><span class="line">sub ecx, edx</span><br><span class="line">.LBB0\_2:</span><br><span class="line">inc ecx</span><br></pre></td></tr></table></figure>
+
+<p>Let’s follow these instructions and pull out the formula for <code>ecx</code>. First add <em>n</em>.
+Then add <em>(n - 1)</em> * <em>(n - 2)</em>. The third instruction subtracts <em>(n - 2)</em> * <em>(n - 3) / 2</em>.
+The last one simply adds 1 to <code>ecx</code>.<br>$$ecx = n + (n - 1) * (n - 2) - (n - 2) * (n - 3) / 2 + 1$$</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov eax, ecx</span><br></pre></td></tr></table></figure>
+
+<p>The result of the function has to be sored in register <code>eax</code>, so the value in <code>ecx</code> is copied.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pop esi</span><br><span class="line">pop edi</span><br></pre></td></tr></table></figure>
+
+<p>Restore the previous values of <code>esi</code> and <code>edi</code>, then return to the caller.</p>
+<h2 id="References-and-Further-Reading"><a href="#References-and-Further-Reading" class="headerlink" title="References and Further Reading"></a>References and Further Reading</h2><ul>
+<li><a target="_blank" rel="noopener" href="http://greenteapress.com/thinkocaml/">Downey, A. and Monje, N., (2008), <em>Think OCaml: How to Think like a (Functional) Programmer</em></a></li>
+<li><a target="_blank" rel="noopener" href="https://v1.realworldocaml.org/">Minsky, Y., Madhavapeddy, A. and Hickey, J., <em>Real World OCaml</em></a></li>
+</ul>
+<script id="MathJax-script" async src="/javascript/mathjax/tex-chtml.js"></script>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-regular-recursion-is-not-always-enough"><span class="toc-number">1.</span> <span class="toc-text">Why regular recursion is not always enough?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Under-the-hood"><span class="toc-number">1.1.</span> <span class="toc-text">Under the hood</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The-problem"><span class="toc-number">1.2.</span> <span class="toc-text">The problem</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-tail-end-recursion-works"><span class="toc-number">2.</span> <span class="toc-text">How tail-end recursion works?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Disassembly"><span class="toc-number">2.1.</span> <span class="toc-text">Disassembly</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tail-end-recursion-in-other-languages"><span class="toc-number">3.</span> <span class="toc-text">Tail-end recursion in other languages</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GCC"><span class="toc-number">3.1.</span> <span class="toc-text">GCC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Clang"><span class="toc-number">3.2.</span> <span class="toc-text">Clang</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Proof"><span class="toc-number">3.2.1.</span> <span class="toc-text">Proof</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Thorough-analysis"><span class="toc-number">3.2.2.</span> <span class="toc-text">Thorough analysis</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2019/02/12/tail-end-recursion/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&text=Tail-End Recursion"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&title=Tail-End Recursion"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&is_video=false&description=Tail-End Recursion"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Tail-End Recursion&body=Check out this article: https://apetenchea.github.io/2019/02/12/tail-end-recursion/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&title=Tail-End Recursion"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&title=Tail-End Recursion"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&title=Tail-End Recursion"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&title=Tail-End Recursion"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&name=Tail-End Recursion&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2019/02/12/tail-end-recursion/&t=Tail-End Recursion"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

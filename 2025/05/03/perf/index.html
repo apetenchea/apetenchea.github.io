@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Perf is a powerful for profiling and tracing Linux applications. It comes with low overhead and directly uses kernel hooks and performance counters to gather data. It’s part of my toolkit for performa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Perf">
+<meta property="og:url" content="https://apetenchea.github.io/2025/05/03/perf/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="Perf is a powerful for profiling and tracing Linux applications. It comes with low overhead and directly uses kernel hooks and performance counters to gather data. It’s part of my toolkit for performa">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/perf/media/hotspot-summary.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/perf/media/hotspot-flamegraph.svg">
+<meta property="article:published_time" content="2025-05-03T13:56:48.000Z">
+<meta property="article:modified_time" content="2025-05-03T20:36:47.200Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Programming">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/perf/media/hotspot-summary.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Perf</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/03/coredumps/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2025/05/03/perf/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2025/05/03/perf/&text=Perf"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2025/05/03/perf/&title=Perf"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2025/05/03/perf/&is_video=false&description=Perf"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Perf&body=Check out this article: https://apetenchea.github.io/2025/05/03/perf/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2025/05/03/perf/&title=Perf"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2025/05/03/perf/&title=Perf"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2025/05/03/perf/&title=Perf"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2025/05/03/perf/&title=Perf"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2025/05/03/perf/&name=Perf&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2025/05/03/perf/&t=Perf"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Installation"><span class="toc-number">1.</span> <span class="toc-text">Installation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Sample-Program"><span class="toc-number">2.</span> <span class="toc-text">Sample Program</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Profiling"><span class="toc-number">3.</span> <span class="toc-text">Profiling</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hotspot"><span class="toc-number">4.</span> <span class="toc-text">Hotspot</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Installation-1"><span class="toc-number">4.1.</span> <span class="toc-text">Installation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Data-Visualization"><span class="toc-number">4.2.</span> <span class="toc-text">Data Visualization</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Other-tools"><span class="toc-number">5.</span> <span class="toc-text">Other tools</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">6.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Perf
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-03T13:56:48.000Z" itemprop="datePublished">03 May 2025</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Linux/" rel="tag">Linux</a>, <a class="tag-link-link" href="/tags/Programming/" rel="tag">Programming</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>Perf is a powerful for profiling and tracing Linux applications. It comes with low overhead and directly uses kernel
+hooks and performance counters to gather data. It’s part of my toolkit for performance analysis, so I’m going to talk
+a bit about how I use it.</p>
+<h2 id="Installation"><a href="#Installation" class="headerlink" title="Installation"></a>Installation</h2><p>Bear in mind that I am on a Debian Sid and you might need to adapt the installation steps for your distribution.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install linux-perf</span><br></pre></td></tr></table></figure>
+
+<p>You can modify <code>perf</code> setting in <code>/etc/sysctl.d/99-perf.conf</code> (create it if it doesn’t exist). For example, mine looks
+like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 0 = allow user-level + system-wide profiling</span><br><span class="line"># 1 = user-level only (no system-wide)</span><br><span class="line">kernel.perf_event_paranoid = 0</span><br><span class="line"></span><br><span class="line"># 0 = show full kernel symbols in perf data</span><br><span class="line">kernel.kptr_restrict       = 0</span><br></pre></td></tr></table></figure>
+
+<p>The reason to prefix the file with <code>99-</code> is to make sure it is loaded last, so it overrides any other settings that
+might be set by others.</p>
+<p>You can check whether <code>perf</code> works by simply checking it over the <code>ls</code> command:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perf <span class="built_in">stat</span> <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Sample-Program"><a href="#Sample-Program" class="headerlink" title="Sample Program"></a>Sample Program</h2><p>Let’s take a real-world example: <a target="_blank" rel="noopener" href="https://gitlab.com/bzip2/bzip2">bzip2</a>.</p>
+<p>It’s pretty easy to build, however note that I’m not following the official instructions here. The purpose of this is
+rather demonstrating some key points in the profiling process.<br>Adding debug symbols always helps with the analysis, so I add <code>-g</code>. Whenever I profile my code, I always build it to be
+as close as it can get to the production version, and one of the most common flags used is <code>-O2</code>. Unless you have a very
+specific reason for it, please don’t waste your time profiling unoptimized code. You don’t want to work on a problem
+that doesn’t exist in production.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --branch bzip2-1.0.8 --single-branch https://gitlab.com/bzip2/bzip2.git</span><br><span class="line"><span class="built_in">cd</span> bzip2</span><br><span class="line">make CFLAGS=<span class="string">&quot;-O2 -g&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Profiling"><a href="#Profiling" class="headerlink" title="Profiling"></a>Profiling</h2><p>Let’s create a 500MB blob of random data and compress it with <code>bzip2</code>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/urandom of=big.bin bs=1M count=500</span><br></pre></td></tr></table></figure>
+
+<p>Profiling is as simple as running the following command:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perf record --max-size 10G --call-graph dwarf -- ./bzip2 -k big.bin</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>record</code> - Launches the “record” subcommand, which runs the program and collects performance data.</li>
+<li><code>--max-size 10G</code> - Sets the maximum size of the perf.data file to 10GB. It will stop collecting further samples rather
+  than grow out of bound.</li>
+<li><code>--call-graph dwarf</code> - Capture full stack traces (call graphs) for each sample
+  using <a target="_blank" rel="noopener" href="https://inria.hal.science/hal-02297690/file/main.pdf">DWARF-based unwinding</a>. This gives you precise
+  function-call trees in the later perf report or flame-graph, at the cost of a bit more overhead and larger output.</li>
+<li><code>--</code> - Indicates the end of <code>perf</code> options and the beginning of the command to be profiled.</li>
+<li><code>./bzip2 -k big.bin</code> - Runs the <code>bzip2</code> program with input <code>big.bin</code>. The <code>-k</code> argument keeps the original <code>big.bin</code>
+  so you can rerun without re-dd’ing.</li>
+</ul>
+<p>If you want to profile the program only after a specific point, you can use the <code>-p</code> option to attach to a running process:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perf record --max-size 10G --call-graph dwarf -p &lt;PID&gt;</span><br></pre></td></tr></table></figure>
+
+<p>Finally, you can view the results with:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perf report</span><br></pre></td></tr></table></figure>
+
+<h2 id="Hotspot"><a href="#Hotspot" class="headerlink" title="Hotspot"></a>Hotspot</h2><h3 id="Installation-1"><a href="#Installation-1" class="headerlink" title="Installation"></a>Installation</h3><p>If you’re looking for something prettier, you can use <a target="_blank" rel="noopener" href="https://github.com/KDAB/hotspot">hotspot</a>.
+It’s a GUI for <code>perf</code> that allows you to visualize the data in a more user-friendly way. I personally prefer it over the
+default <code>perf report</code>, but it’s a matter of taste. Installing it should be as easy as:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install hotspot</span><br></pre></td></tr></table></figure>
+
+<p>Unfortunately, I experienced some problems lately because of missing dependencies (April 2025). Turns out that one of its
+dependencies is <code>policykit-1</code>, which is no longer available. However, this is just a meta package to install <code>pkexec</code> and
+<code>polkitd</code>, which are the actual programs that do the work. Knowing, we can trick the package manager into thinking we have
+installed <code>policykit-1</code> by creating a dummy package, while we actually install the “real” dependencies. This is a bit of a
+hack, but it works.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install equivs <span class="comment"># install equivs</span></span><br><span class="line"></span><br><span class="line">equivs-control policykit-1 <span class="comment"># generate template</span></span><br></pre></td></tr></table></figure>
+
+<p>Edit the <code>policykit-1</code> template, uncommenting “Version” and “Depends”.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Package: policykit-1</span><br><span class="line">Version: 124-3</span><br><span class="line">Depends: pkexec,polkitd</span><br></pre></td></tr></table></figure>
+
+<p>Then build and install the package:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">equivs-build policykit-1</span><br><span class="line">sudo apt install ./policykit-1_124-3_amd64.deb</span><br></pre></td></tr></table></figure>
+
+<p>Then you should be able to install <code>hotspot</code> as if nothing happened:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install hotspot</span><br></pre></td></tr></table></figure>
+
+<h3 id="Data-Visualization"><a href="#Data-Visualization" class="headerlink" title="Data Visualization"></a>Data Visualization</h3><p>Once you have <code>hotspot</code> installed, you can run it in the same directory where you have the <code>perf.data</code> file.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hotspot</span><br></pre></td></tr></table></figure>
+
+<p>You may start from the summary view, which shows you the most expensive functions in your program.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/perf/media/hotspot-summary.png" alt="Summary View"></p>
+<p>Here we can see the most expensive function is <code>generateMTFValues</code>, where the program spends about half of the time.<br>One of my favourite features of <code>hotspot</code> is the Flame Graph, which shows the call graph in a clear and concise way. You
+can explore it interactively in the application, or export it as an SVG file (View -&gt; Export -&gt; Flame Graph).</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/perf/media/hotspot-flamegraph.svg" alt="Flame Graph"></p>
+<ul>
+<li>BZ2_blockSort - 27.9% cost</li>
+<li>BZ2_compressBlocksendMTFValues - 9.09% cost</li>
+<li>generateMTFValues - 54.3% cost</li>
+</ul>
+<p>If I were to optimize this code, I would start with <code>generateMTFValues</code>, since it has the highest cost.</p>
+<h2 id="Other-tools"><a href="#Other-tools" class="headerlink" title="Other tools"></a>Other tools</h2><p>Generally, <code>perf</code> is all I need, but it only works on Linux. Here are a few alternatives that are available on other
+platforms.</p>
+<ol>
+<li><p><a target="_blank" rel="noopener" href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/vtune-profiler.html">Intel VTune</a></p>
+<p> I used it in the past, and it’s a great alternative to <code>perf</code> on Windows. The disadvantage is that it requires an Intel
+ CPU (sorry AMD users). I especially like the GUI, which I find easy to navigate. However, it’s bulkier than <code>perf</code>, and
+ I don’t see a clear advantage over it on Linux. I would recommend to look into it if you are on Windows and have an
+ Intel CPU.</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.jetbrains.com/help/clion/cpu-profiler.html">Clion Profiler</a></p>
+<p> This is a built-in profiler in Clion, which has the advantage of being integrated into the IDE. On Linux it uses <code>perf</code>
+ under the hood, so I usually prefer to use <code>perf</code> directly. On MacOS it uses <a target="_blank" rel="noopener" href="https://www.brendangregg.com/dtrace.html">DTrace</a>,
+ which is not bad. I have only used it a few times, but if you are a Clion user on MacOS and want a glimpse of what
+ is going on in your code, it’s worth checking out.</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://developer.apple.com/tutorials/instruments">Instruments</a></p>
+<p> Never used it, but it seems like a good alternative on MacOS, especially if you don’t use Clion profiler.</p>
+</li>
+</ol>
+<h2 id="References-and-Further-Reading"><a href="#References-and-Further-Reading" class="headerlink" title="References and Further Reading"></a>References and Further Reading</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.brendangregg.com/perf.html">brendangregg.com</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/waydroid/waydroid/issues/1484">policykit-1</a></li>
+<li><a target="_blank" rel="noopener" href="https://bristot.me/using-perf-probe-to-measure-execution-time-of-user-space-code-on-linux/">Using perf probe to measure execution time of user-space code on Linux</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Installation"><span class="toc-number">1.</span> <span class="toc-text">Installation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Sample-Program"><span class="toc-number">2.</span> <span class="toc-text">Sample Program</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Profiling"><span class="toc-number">3.</span> <span class="toc-text">Profiling</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hotspot"><span class="toc-number">4.</span> <span class="toc-text">Hotspot</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Installation-1"><span class="toc-number">4.1.</span> <span class="toc-text">Installation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Data-Visualization"><span class="toc-number">4.2.</span> <span class="toc-text">Data Visualization</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Other-tools"><span class="toc-number">5.</span> <span class="toc-text">Other tools</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">6.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2025/05/03/perf/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2025/05/03/perf/&text=Perf"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2025/05/03/perf/&title=Perf"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2025/05/03/perf/&is_video=false&description=Perf"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Perf&body=Check out this article: https://apetenchea.github.io/2025/05/03/perf/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2025/05/03/perf/&title=Perf"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2025/05/03/perf/&title=Perf"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2025/05/03/perf/&title=Perf"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2025/05/03/perf/&title=Perf"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2025/05/03/perf/&name=Perf&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2025/05/03/perf/&t=Perf"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

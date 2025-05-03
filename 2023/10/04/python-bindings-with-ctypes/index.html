@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="There’s plenty of ways to write Python bindings for C&#x2F;C++ code. The classic, no-frills approach is to use the ctypes module of the standard library. It provides a convenient way to load dynamic libra">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python Bindings With Ctypes">
+<meta property="og:url" content="https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="There’s plenty of ways to write Python bindings for C&#x2F;C++ code. The classic, no-frills approach is to use the ctypes module of the standard library. It provides a convenient way to load dynamic libra">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/python-bindings-with-ctypes/media/python-c-merged.avif">
+<meta property="article:published_time" content="2023-10-04T15:45:53.000Z">
+<meta property="article:modified_time" content="2025-04-28T11:05:16.108Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Programming">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/python-bindings-with-ctypes/media/python-c-merged.avif">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Python Bindings With Ctypes</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/06/26/tushita-mediation-centre/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/09/20/sivananda-yoga-teachers-training-course/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&text=Python Bindings With Ctypes"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&title=Python Bindings With Ctypes"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&is_video=false&description=Python Bindings With Ctypes"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Python Bindings With Ctypes&body=Check out this article: https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&title=Python Bindings With Ctypes"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&title=Python Bindings With Ctypes"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&title=Python Bindings With Ctypes"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&title=Python Bindings With Ctypes"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&name=Python Bindings With Ctypes&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&t=Python Bindings With Ctypes"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Fnv-Hash"><span class="toc-number">1.</span> <span class="toc-text">Fnv Hash</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Implementation"><span class="toc-number">1.1.</span> <span class="toc-text">Implementation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Basic-usage"><span class="toc-number">1.2.</span> <span class="toc-text">Basic usage</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bindings"><span class="toc-number">2.</span> <span class="toc-text">Bindings</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#How-ctypes-works"><span class="toc-number">2.1.</span> <span class="toc-text">How ctypes works</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-the-library"><span class="toc-number">2.2.</span> <span class="toc-text">Creating the library</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#C-wrapper"><span class="toc-number">2.2.1.</span> <span class="toc-text">C wrapper</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Exporting-functions"><span class="toc-number">2.2.2.</span> <span class="toc-text">Exporting functions</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Building"><span class="toc-number">2.2.3.</span> <span class="toc-text">Building</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Viewing-exported-functions"><span class="toc-number">2.2.4.</span> <span class="toc-text">Viewing exported functions</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-the-Python-module"><span class="toc-number">2.3.</span> <span class="toc-text">Creating the Python module</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Usage"><span class="toc-number">3.</span> <span class="toc-text">Usage</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Python Bindings With Ctypes
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-10-04T15:45:53.000Z" itemprop="datePublished">04 Oct 2023</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Programming/" rel="tag">Programming</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/python-bindings-with-ctypes/media/python-c-merged.avif" alt="Python and C Bindings Cyber Image"></p>
+<p>There’s plenty of ways to write Python bindings for C/C++ code. The classic, no-frills approach is to use the
+<a target="_blank" rel="noopener" href="https://docs.python.org/3/library/ctypes.html">ctypes</a> module of the standard library. It provides a convenient way to
+load dynamic libraries in Python and call functions from them. Other common options are <a target="_blank" rel="noopener" href="https://pybind11.readthedocs.io/en/stable/">pybind11</a>
+and <a target="_blank" rel="noopener" href="https://cython.org/">cython</a>, which are more powerful, but also more complex. They come with a bunch of dependencies and
+require a build step, which is not always desirable. Usually, bindings created using the latter methods have to be targeted at
+specific Python versions, whereas ctypes allows for more portability. The best choice depends on the use case. If the
+library was written with Python bindings in mind (i.e., no unsupported, cutting-edge C++ features), then go for pybind11
+or cython. Otherwise, if you don’t really have a say in the source code of the library you want to bind to, or even worse,
+you don’t have access to the source code at all, then ctypes is a great option. It’s easy to use and comes with no extra
+dependencies. For a small to medium-sized project, it’s probably all you need.</p>
+<h2 id="Fnv-Hash"><a href="#Fnv-Hash" class="headerlink" title="Fnv Hash"></a>Fnv Hash</h2><p>I’ve written a small library that implements the <a target="_blank" rel="noopener" href="http://www.isthe.com/chongo/tech/comp/fnv/">FNV-1a hash function</a>
+in C++. It’s a simple, non-cryptographic hash that’s easy to implement and fast to run. I’m going to demonstrate
+how to bind to it using ctypes, but it’s not important to understand how the function itself works. If you’re curious,
+here’s the pseudocode:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hash = offset_basis</span><br><span class="line">for each octet_of_data to be hashed</span><br><span class="line"> hash = hash xor octet_of_data</span><br><span class="line"> hash = hash * FNV_prime</span><br><span class="line">return hash</span><br></pre></td></tr></table></figure>
+
+<h3 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h3><p>The library can be used to compute the 32-bit version of the hash. The <code>Fnv</code> object may be updated as many times as
+needed, and the hash can be retrieved using the <code>digest</code> method. The default update function is meant to
+work on an array of bytes, but it’s easy to create a templated version that works on any type of data.</p>
+<figure class="highlight h"><table><tr><td class="gutter"><pre><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Fnv1a32</span> &#123;</span></span><br><span class="line">public:</span><br><span class="line">  <span class="keyword">auto</span> <span class="title function_">update</span><span class="params">(<span class="type">const</span> <span class="built_in">std</span>::<span class="type">uint8_t</span>* data, <span class="built_in">std</span>::<span class="type">size_t</span> size)</span> -&gt; <span class="type">void</span>;</span><br><span class="line"></span><br><span class="line">  template&lt;class T&gt;</span><br><span class="line">  <span class="keyword">auto</span> <span class="title function_">update</span><span class="params">(<span class="type">const</span> T&amp; data)</span> -&gt; <span class="type">void</span> &#123;</span><br><span class="line">    update(reinterpret_cast&lt;<span class="type">const</span> <span class="built_in">std</span>::<span class="type">uint8_t</span>*&gt;(&amp;data), <span class="keyword">sizeof</span>(data));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">auto</span> <span class="title function_">digest</span><span class="params">()</span> <span class="type">const</span> -&gt; <span class="built_in">std</span>::<span class="type">uint32_t</span>;</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">  <span class="built_in">std</span>::<span class="type">uint32_t</span> _hash&#123;OFFSET_BIAS_32&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>As for the implementation, it’s pretty simple.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">Fnv1a32::update</span><span class="params">(<span class="type">const</span> std::<span class="type">uint8_t</span>* data, std::<span class="type">size_t</span> size)</span> -&gt; <span class="type">void</span> </span>&#123;</span><br><span class="line"> <span class="keyword">for</span> (<span class="keyword">auto</span> idx = <span class="number">0u</span>; idx &lt; size; ++idx) &#123;</span><br><span class="line">   _hash ^= data[idx];</span><br><span class="line">   _hash *= FNV_PRIME_32;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">Fnv1a32::digest</span><span class="params">()</span> <span class="type">const</span> -&gt; std::<span class="type">uint32_t</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> _hash;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Basic-usage"><a href="#Basic-usage" class="headerlink" title="Basic usage"></a>Basic usage</h3><p>Here’s the complete <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/python-bindings-with-ctypes/code/fnv.h">fnv.h</a>
+and <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/python-bindings-with-ctypes/code/fnv.cpp">fnv.cpp</a> code.
+A basic usage example in C++ would look something like this:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fnv::Fnv1a32 hash;</span><br><span class="line">std::<span class="type">uint8_t</span> x[] = <span class="string">&quot;\x12\x34\x56\x78&quot;</span>;</span><br><span class="line">hash.<span class="built_in">update</span>(x, <span class="number">4</span>);</span><br><span class="line">std::cout &lt;&lt; hash.<span class="built_in">digest</span>();</span><br></pre></td></tr></table></figure>
+
+<h2 id="Bindings"><a href="#Bindings" class="headerlink" title="Bindings"></a>Bindings</h2><h3 id="How-ctypes-works"><a href="#How-ctypes-works" class="headerlink" title="How ctypes works"></a>How ctypes works</h3><p>The best thing about ctypes is that it works out of the box. There’s no need to install anything. Just <code>import ctypes</code>
+and you’re good to go.<br>The first step requires loading the library. This is done by passing the library path to the <a target="_blank" rel="noopener" href="https://docs.python.org/3/library/ctypes.html#ctypes.CDLL">ctypes.CDLL function</a>.
+For example, <code>libc = ctypes.CDLL(&quot;libc.so.6&quot;)</code> would return a handle to the C standard library on Linux. Note that the
+handle can be used to access only the functions exported by the library, not all the functions inside the library.<br>Once the library is loaded, you can access its functions much like accessing functions from a Python module. The most
+important aspect to consider is data marshalling. C and Python have different data types, so ctypes needs to know how
+to convert between them. You must explicitly specify the argument types (<code>argtypes</code>) and the return type (<code>restype</code>) of a function.
+For example, <a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man3/strchr.3.html">strchr</a> from the C standard library has the following signature:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> *<span class="title function_">strchr</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *s, <span class="type">int</span> c)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>It returns a pointer to the first occurrence of the character c in the string s. In order for ctypes to know how to
+use the function, you need to specify the argument types and the return type like this:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">libc = ctypes.CDLL(<span class="string">&quot;libc.so.6&quot;</span>)</span><br><span class="line">strchr = libc.strchr</span><br><span class="line">strchr.restype = ctypes.c_char_p</span><br><span class="line">strchr.argtypes = [ctypes.c_char_p, ctypes.c_int]</span><br></pre></td></tr></table></figure>
+
+<p>After that, you may use the function like this:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strchr(<span class="string">b&quot;hello&quot;</span>, <span class="string">b&quot;l&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>A list of fundamental data types and their corresponding C and Python types can be found <a target="_blank" rel="noopener" href="https://docs.python.org/3/library/ctypes.html#fundamental-data-types">here</a>.</p>
+<h3 id="Creating-the-library"><a href="#Creating-the-library" class="headerlink" title="Creating the library"></a>Creating the library</h3><h4 id="C-wrapper"><a href="#C-wrapper" class="headerlink" title="C wrapper"></a>C wrapper</h4><p>Although it would be really cool to export directly the <code>Fnv1a32</code> class to Python, it’s not possible. We can only export
+and bind to C-style functions. The workaround is to create a function that instantiates the class and explicitly calls its methods.
+We’ll instantiate the object on the heap and return a pointer to it, which is going to be used as a handle in Python. This is easy
+for ctypes to interpret, as a pointer is just an integer representing a memory address.
+Same goes for all the parameters and return types - they’re either fundamental types or pointers to a more sophisticated type.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">new_fnv</span><span class="params">()</span> -&gt; fnv::Fnv1a32* </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> fnv::<span class="built_in">Fnv1a32</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>One very important aspect is memory management. Memory allocated in C must be freed in C, as Python’s garbage collector won’t manage this memory.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">delete_fnv</span><span class="params">(fnv::Fnv1a32* fnv)</span> -&gt; <span class="type">void</span> </span>&#123;</span><br><span class="line">  <span class="keyword">delete</span> fnv;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Using the pointer, we can call the <code>update</code> and <code>digest</code> methods on the object it points to. That looks pretty much like trying
+to mimic object-oriented programming in C. Note how its usage resembles the <code>this</code> pointer from C++.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">fnv_update_bytes</span><span class="params">(fnv::Fnv1a32* fnv, <span class="type">const</span> std::<span class="type">uint8_t</span>* data, std::<span class="type">size_t</span> size)</span> </span>&#123;</span><br><span class="line">  fnv-&gt;<span class="built_in">update</span>(data, size);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fnv_update_uint32</span><span class="params">(fnv::Fnv1a32* fnv, std::<span class="type">uint32_t</span> data)</span> </span>&#123;</span><br><span class="line">  fnv-&gt;<span class="built_in">update</span>(data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fnv_update_uint64</span><span class="params">(fnv::Fnv1a32* fnv, std::<span class="type">uint64_t</span> data)</span> </span>&#123;</span><br><span class="line">  fnv-&gt;<span class="built_in">update</span>(data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fnv_update_float</span><span class="params">(fnv::Fnv1a32* fnv, <span class="type">float</span> data)</span> </span>&#123;</span><br><span class="line">  fnv-&gt;<span class="built_in">update</span>(data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">fnv_digest</span><span class="params">(fnv::Fnv1a32* fnv)</span> -&gt; std::<span class="type">uint32_t</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> fnv-&gt;<span class="built_in">digest</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Exporting-functions"><a href="#Exporting-functions" class="headerlink" title="Exporting functions"></a>Exporting functions</h4><p>Since we’re using C++, exporting functions is not as straightforward as it is in C. C++ supports function overloading,
+meaning you can have multiple functions with the same name but different parameters. This is not possible in C, and more so,
+it would be very confusing for ctypes. Suppose we have two functions called <code>fnv_update</code>, which take different parameters.
+How would ctypes know which one to import from the library?<br>Internally, C++ uses a technique called <a target="_blank" rel="noopener" href="http://web.mit.edu/tibbetts/Public/inside-c/www/mangling.html">name mangling</a>.
+It basically encodes the function name with information about the number and types of its parameters. This makes it impossible
+to export a function with a specific name, because the name is not known until the code gets compiled.<br>Therefore, we have to tell the compiler to use C linkage for the functions we want to export, effectively disabling name mangling
+and using a consistent calling convention. This is done by wrapping the function declarations in an <code>extern &quot;C&quot;</code> block.</p>
+<figure class="highlight h"><table><tr><td class="gutter"><pre><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> &#123;</span><br><span class="line">  EXPORT <span class="keyword">auto</span> <span class="title function_">new_fnv</span><span class="params">()</span> -&gt; fnv::Fnv1a32*;</span><br><span class="line">  EXPORT <span class="type">void</span> <span class="title function_">delete_fnv</span><span class="params">(fnv::Fnv1a32* fnv)</span>;</span><br><span class="line">  EXPORT <span class="type">void</span> <span class="title function_">fnv_update_bytes</span><span class="params">(fnv::Fnv1a32* fnv, <span class="type">const</span> <span class="built_in">std</span>::<span class="type">uint8_t</span>* data, <span class="built_in">std</span>::<span class="type">size_t</span> size)</span>;</span><br><span class="line">  EXPORT <span class="type">void</span> <span class="title function_">fnv_update_uint32</span><span class="params">(fnv::Fnv1a32* fnv, <span class="built_in">std</span>::<span class="type">uint32_t</span> data)</span>;</span><br><span class="line">  EXPORT <span class="type">void</span> <span class="title function_">fnv_update_uint64</span><span class="params">(fnv::Fnv1a32* fnv, <span class="built_in">std</span>::<span class="type">uint64_t</span> data)</span>;</span><br><span class="line">  EXPORT <span class="type">void</span> <span class="title function_">fnv_update_float</span><span class="params">(fnv::Fnv1a32* fnv, <span class="type">float</span> data)</span>;</span><br><span class="line">  EXPORT <span class="keyword">auto</span> <span class="title function_">fnv_digest</span><span class="params">(fnv::Fnv1a32* fnv)</span> -&gt; <span class="built_in">std</span>::<span class="type">uint32_t</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>For example, without the <code>extern &quot;C&quot;</code> block, the <code>fnv_digest</code> exported function would look like this (on my Linux machine, using clang):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_Z10fnv_digestPN3fnv7Fnv1a32E</span><br></pre></td></tr></table></figure>
+
+<p>Wrapping the declaration in an <code>extern &quot;C&quot;</code> block causes it to be exported in a more familiar way:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fnv_digest</span><br></pre></td></tr></table></figure>
+
+<p>Note the <code>EXPORT</code> macro preceding each function declaration.
+I had to use it because, on Windows, exported functions must be decorated with <code>__declspec(dllexport)</code>.
+On Linux, this is not necessary, so the macro expands to nothing.</p>
+<figure class="highlight h"><table><tr><td class="gutter"><pre><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">if</span> defined(_WIN32) || defined(_WIN64)</span></span><br><span class="line">  <span class="meta">#<span class="keyword">define</span> EXPORT __declspec(dllexport)</span></span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">  <span class="meta">#<span class="keyword">define</span> EXPORT</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Building"><a href="#Building" class="headerlink" title="Building"></a>Building</h4><p>There’s a total of two <em>cpp</em> files that need to be compiled: <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/python-bindings-with-ctypes/code/fnv.cpp">fnv.cpp</a>,
+which contains the implementation of the Fnv1a32 class, and <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/python-bindings-with-ctypes/code/bindings.cpp">bindings.cpp</a>
+which contains the wrapper functions. The latter depends on the former, so we need to link them together. For convenience,
+I have created a <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/python-bindings-with-ctypes/code/CMakeLists.txt">CMakeLists.txt</a> file.
+Note the <code>SHARED</code> parameter passed to <code>add_library</code>. This tells CMake to create a shared library, kind of like the <code>-shared</code> flag passed to g++.</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">cmake_minimum_required(VERSION 3.24)</span><br><span class="line"></span><br><span class="line">project(fnv VERSION 1.0)</span><br><span class="line"></span><br><span class="line">set(CMAKE_CXX_STANDARD 20)</span><br><span class="line">set(CMAKE_BUILD_TYPE &quot;Release&quot;)</span><br><span class="line"></span><br><span class="line">if (MSVC)</span><br><span class="line">    add_compile_options(/Wall /W4 /Ox)</span><br><span class="line">else()</span><br><span class="line">    add_compile_options(-Wall -Werror -O3)</span><br><span class="line">endif()</span><br><span class="line"></span><br><span class="line">add_library(fnv SHARED fnv.cpp bindings.cpp)</span><br></pre></td></tr></table></figure>
+
+<p>Building is pretty straightforward.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p build </span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake ..</span><br><span class="line">cmake --build . --config Release</span><br></pre></td></tr></table></figure>
+
+<p>Depending on your platform, the result is going be the either a <em>fnv.dll</em> or a <em>libfnv.so</em> file.
+The whole code directory is available <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/tree/master/source/_posts/python-bindings-with-ctypes/code">here</a>.</p>
+<h4 id="Viewing-exported-functions"><a href="#Viewing-exported-functions" class="headerlink" title="Viewing exported functions"></a>Viewing exported functions</h4><p>What if you don’t have access to the source code of the library you want to bind to?<br>There are various tools that can be used to inspect the exported functions of a shared library. On Linux, you can use
+the <code>nm -D --defined-only libfnv.so</code> command, while on Windows, the <code>dumpbin</code> utility that comes with Visual Studio.
+For example, on Windows, the output of <code>dumpbin /EXPORTS fnv.dll</code> looks like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">Microsoft (R) COFF/PE Dumper Version 14.32.31332.0</span><br><span class="line">Copyright (C) Microsoft Corporation.  All rights reserved.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Dump of file fnv.dll</span><br><span class="line"></span><br><span class="line">File Type: DLL</span><br><span class="line"></span><br><span class="line">  Section contains the following exports for fnv.dll</span><br><span class="line"></span><br><span class="line">    00000000 characteristics</span><br><span class="line">    FFFFFFFF time date stamp</span><br><span class="line">        0.00 version</span><br><span class="line">           1 ordinal base</span><br><span class="line">           7 number of functions</span><br><span class="line">           7 number of names</span><br><span class="line"></span><br><span class="line">    ordinal hint RVA      name</span><br><span class="line"></span><br><span class="line">          1    0 00001070 delete_fnv</span><br><span class="line">          2    1 00001120 fnv_digest</span><br><span class="line">          3    2 00001080 fnv_update_bytes</span><br><span class="line">          4    3 000010F0 fnv_update_float</span><br><span class="line">          5    4 00001090 fnv_update_uint32</span><br><span class="line">          6    5 000010C0 fnv_update_uint64</span><br><span class="line">          7    6 00001040 new_fnv</span><br><span class="line"></span><br><span class="line">  Summary</span><br><span class="line"></span><br><span class="line">        1000 .data</span><br><span class="line">        1000 .pdata</span><br><span class="line">        2000 .rdata</span><br><span class="line">        1000 .reloc</span><br><span class="line">        1000 .rsrc</span><br><span class="line">        1000 .text</span><br></pre></td></tr></table></figure>
+
+<p>As for the function parameters and return types, if you don’t have access to the source code, you may have to resort to
+reverse engineering. There are various tools that can help you with that, but I’m not going to get into it in this article.</p>
+<h3 id="Creating-the-Python-module"><a href="#Creating-the-Python-module" class="headerlink" title="Creating the Python module"></a>Creating the Python module</h3><p>After you got the shared library, creating the Python module is relatively easy. You just need to load the library
+using <code>ctypes.CDLL</code> and specify the argument types and return types of the functions you want to use, sort of like 
+“declaring” them in Python.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Fnv</span>:</span><br><span class="line">    lib = ctypes.CDLL(os.path.abspath(<span class="string">&#x27;fnv.dll&#x27;</span> <span class="keyword">if</span> os.name == <span class="string">&#x27;nt&#x27;</span> <span class="keyword">else</span> <span class="string">&#x27;libfnv.so&#x27;</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># auto new_fnv() -&gt; fnv::Fnv1a32*</span></span><br><span class="line">    lib.new_fnv.restype = ctypes.c_void_p</span><br><span class="line">    lib.new_fnv.argtypes = []</span><br></pre></td></tr></table></figure>
+
+<p>The process can get repetitive, so you might as well let the GitHub Copilot do some of the work for you.</p>
+<video controls>
+  <source src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/python-bindings-with-ctypes/media/copilot-python-bindings.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video> 
+
+<p>As already noted, you have to take care of garbage collection yourself.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">    self._fnv = Fnv.lib.new_fnv()</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">__del__</span>(<span class="params">self</span>):</span><br><span class="line">    Fnv.lib.delete_fnv(self._fnv)</span><br></pre></td></tr></table></figure>
+
+<p>Also, make sure to call the correct function depending on the type of the argument.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">update</span>(<span class="params">self, data: <span class="built_in">bytes</span> | <span class="built_in">int</span> | <span class="built_in">float</span></span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span>(data) <span class="keyword">is</span> <span class="built_in">bytes</span>:</span><br><span class="line">        Fnv.lib.fnv_update_bytes(self._fnv, ctypes.c_char_p(data), ctypes.c_size_t(<span class="built_in">len</span>(data)))</span><br><span class="line">    <span class="keyword">elif</span> <span class="built_in">type</span>(data) <span class="keyword">is</span> <span class="built_in">int</span>:</span><br><span class="line">        <span class="keyword">if</span> data.bit_length() &lt;= <span class="number">32</span>:</span><br><span class="line">            Fnv.lib.fnv_update_uint32(self._fnv, ctypes.c_uint32(data))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            Fnv.lib.fnv_update_uint64(self._fnv, ctypes.c_uint64(data))</span><br><span class="line">    <span class="keyword">elif</span> <span class="built_in">type</span>(data) <span class="keyword">is</span> <span class="built_in">float</span>:</span><br><span class="line">        Fnv.lib.fnv_update_float(self._fnv, ctypes.c_float(data))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">raise</span> TypeError(<span class="string">&#x27;data must be bytes, int or float&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>Here’s the complete <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/python-bindings-with-ctypes/code/fnv.py">fnv.py</a> code,
+along with <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/python-bindings-with-ctypes/code/test_fnv.py">a couple of small unit tests</a>,
+so you can check if everything works as expected.</p>
+<h2 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h2><p>The newly created Python module can be imported and used like any other module.
+Just make sure the shared library is in the same directory as the Python module, so that ctypes can find it. In practice,
+you may also want to add the library to the <code>LD_LIBRARY_PATH</code> environment variable on Linux, or to the <code>PATH</code> environment
+variable on Windows, but that’s not necessary for this example.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> fnv <span class="keyword">import</span> Fnv</span><br><span class="line"></span><br><span class="line">fnv = Fnv()</span><br><span class="line">fnv.update(<span class="string">b&#x27;abcd&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(fnv.digest())</span><br></pre></td></tr></table></figure>
+
+<p>Perhaps now it’s a bit more obvious why ctypes can be a great way to create Python bindings for C/C++ code. May not fit
+all uses cases out there, but works for most of them. I personally believe its simplicity is also its greatest strength.</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Fnv-Hash"><span class="toc-number">1.</span> <span class="toc-text">Fnv Hash</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Implementation"><span class="toc-number">1.1.</span> <span class="toc-text">Implementation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Basic-usage"><span class="toc-number">1.2.</span> <span class="toc-text">Basic usage</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bindings"><span class="toc-number">2.</span> <span class="toc-text">Bindings</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#How-ctypes-works"><span class="toc-number">2.1.</span> <span class="toc-text">How ctypes works</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-the-library"><span class="toc-number">2.2.</span> <span class="toc-text">Creating the library</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#C-wrapper"><span class="toc-number">2.2.1.</span> <span class="toc-text">C wrapper</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Exporting-functions"><span class="toc-number">2.2.2.</span> <span class="toc-text">Exporting functions</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Building"><span class="toc-number">2.2.3.</span> <span class="toc-text">Building</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Viewing-exported-functions"><span class="toc-number">2.2.4.</span> <span class="toc-text">Viewing exported functions</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-the-Python-module"><span class="toc-number">2.3.</span> <span class="toc-text">Creating the Python module</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Usage"><span class="toc-number">3.</span> <span class="toc-text">Usage</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&text=Python Bindings With Ctypes"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&title=Python Bindings With Ctypes"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&is_video=false&description=Python Bindings With Ctypes"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Python Bindings With Ctypes&body=Check out this article: https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&title=Python Bindings With Ctypes"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&title=Python Bindings With Ctypes"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&title=Python Bindings With Ctypes"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&title=Python Bindings With Ctypes"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&name=Python Bindings With Ctypes&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2023/10/04/python-bindings-with-ctypes/&t=Python Bindings With Ctypes"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

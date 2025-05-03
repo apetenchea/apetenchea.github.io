@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="It’s been a while since I delved into Python’s asyncio module. Back in 2018, I became familiar with it, while working on a massive machine learning pipeline for Bitdefender. It was the asyncio featur">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python Asyncio">
+<meta property="og:url" content="https://apetenchea.github.io/2024/07/09/python-asyncio/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="It’s been a while since I delved into Python’s asyncio module. Back in 2018, I became familiar with it, while working on a massive machine learning pipeline for Bitdefender. It was the asyncio featur">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/python-asyncio/media/heading.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/python-asyncio/media/event-loop.png">
+<meta property="article:published_time" content="2024-07-09T16:25:46.000Z">
+<meta property="article:modified_time" content="2025-04-28T11:05:16.108Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Programming">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/python-asyncio/media/heading.jpg">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Python Asyncio</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/03/coredumps/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2024/06/26/tushita-mediation-centre/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2024/07/09/python-asyncio/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&text=Python Asyncio"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&title=Python Asyncio"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&is_video=false&description=Python Asyncio"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Python Asyncio&body=Check out this article: https://apetenchea.github.io/2024/07/09/python-asyncio/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&title=Python Asyncio"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&title=Python Asyncio"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&title=Python Asyncio"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&title=Python Asyncio"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&name=Python Asyncio&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2024/07/09/python-asyncio/&t=Python Asyncio"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Introduction"><span class="toc-number">1.</span> <span class="toc-text">Introduction</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Synchronous-code"><span class="toc-number">1.1.</span> <span class="toc-text">Synchronous code</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Threads"><span class="toc-number">1.2.</span> <span class="toc-text">Threads</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Asyncio"><span class="toc-number">1.3.</span> <span class="toc-text">Asyncio</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#How-it-works"><span class="toc-number">1.3.1.</span> <span class="toc-text">How it works</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#In-practice"><span class="toc-number">2.</span> <span class="toc-text">In practice</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CPU-bound-tasks"><span class="toc-number">2.1.</span> <span class="toc-text">CPU-bound tasks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Blocking-IO"><span class="toc-number">2.2.</span> <span class="toc-text">Blocking IO</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Networking"><span class="toc-number">2.3.</span> <span class="toc-text">Networking</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HTTP-Requests"><span class="toc-number">2.3.1.</span> <span class="toc-text">HTTP Requests</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Sanic"><span class="toc-number">2.3.2.</span> <span class="toc-text">Sanic</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Asynchronous-iterators"><span class="toc-number">2.4.</span> <span class="toc-text">Asynchronous iterators</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Asynchronous-context-managers"><span class="toc-number">2.5.</span> <span class="toc-text">Asynchronous context managers</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tasks"><span class="toc-number">2.6.</span> <span class="toc-text">Tasks</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#asyncio-gather"><span class="toc-number">2.6.1.</span> <span class="toc-text">asyncio.gather</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#asyncio-wait"><span class="toc-number">2.6.2.</span> <span class="toc-text">asyncio.wait</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Locks"><span class="toc-number">2.7.</span> <span class="toc-text">Locks</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Conclusion"><span class="toc-number">3.</span> <span class="toc-text">Conclusion</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Python Asyncio
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-07-09T16:25:46.000Z" itemprop="datePublished">09 Jul 2024</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Programming/" rel="tag">Programming</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/python-asyncio/media/heading.jpg" alt="Python Asyncio Heading Image"></p>
+<p>It’s been a while since I delved into Python’s asyncio module. Back in 2018, I became familiar with it, while working
+on a massive machine learning pipeline for Bitdefender. It was the asyncio feature that allowed us to scale the entire thing without
+needing to grow the number of CPU cores linearly, which as you can imagine, saved quite a bit of money.<br>Fast-forward to 2024, I’m maintaining the <a target="_blank" rel="noopener" href="https://github.com/arangodb/python-arango">python-arango</a> driver, which is
+synchronous by design. I’ve always wanted to write about asyncio, because I think it’s such a game changer for Python developers.
+Now that I started working on the long-awaited <a target="_blank" rel="noopener" href="https://github.com/arangodb/python-arango-async">python-arango-async</a>,
+it’s a great opportunity to synthesize my knowledge here. This article is intended as a quick reference on the topic,
+giving enough context to navigate the asyncio waters with confidence.</p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><h3 id="Synchronous-code"><a href="#Synchronous-code" class="headerlink" title="Synchronous code"></a>Synchronous code</h3><p>Let’s start with a <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/python-asyncio/code/example-sync.py">simple synchronous server</a>
+that converts a decimal number to hexadecimal.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> socket.socket(socket.AF_INET, socket.SOCK_STREAM) <span class="keyword">as</span> s:</span><br><span class="line">    s.bind((<span class="string">&#x27;127.0.0.1&#x27;</span>, <span class="number">65432</span>))</span><br><span class="line">    s.listen()</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        conn, _ = s.accept()</span><br><span class="line">        <span class="keyword">with</span> conn:</span><br><span class="line">            <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">                payload = conn.recv(<span class="number">1024</span>)</span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">not</span> payload:</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">                num = payload.decode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    result = <span class="built_in">hex</span>(<span class="built_in">int</span>(num))</span><br><span class="line">                <span class="keyword">except</span> ValueError:</span><br><span class="line">                    result = <span class="string">&#x27;Request payload must be an integer&#x27;</span></span><br><span class="line">                result += <span class="string">&#x27;\n&#x27;</span></span><br><span class="line">                conn.sendall(result.encode(<span class="string">&#x27;utf-8&#x27;</span>))</span><br></pre></td></tr></table></figure>
+
+<p>This is pretty basic. It’s listening on port 65432, accepts a connection, then reads the data sent by the client,
+parses it as an integer, converts it to hexadecimal, and sends it back.<br>You can interact with it using <code>nc localhost 65432</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">4312</span><br><span class="line">0x10d8</span><br><span class="line">1234</span><br><span class="line">0x4d2</span><br></pre></td></tr></table></figure>
+<p>But, try connecting with two clients at the same time. If we run <code>nc localhost 65432</code> in two separate terminals, the second
+one will hang until the first one closes the connection. The problem is that I/O operations are blocking, which means
+the server blocks every time it reads or writes data.<br>What happens internally, on Linux, is that <code>client.recv(1024)</code> eventually gets into a low-level <code>read(fd, buf, 1024)</code>
+system call. Getting deeper, the instructions for doing a read system call look like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mov rax, 0       ; syscall number for read</span><br><span class="line">mov rdi, fd      ; file descriptor</span><br><span class="line">mov rsi, buffer  ; address of the buffer</span><br><span class="line">mov rdx, 1024    ; number of bytes to read</span><br><span class="line">syscall          ; invoke the system call</span><br></pre></td></tr></table></figure>
+<p>A <code>syscall</code> is just a mechanism used by the kernel to provide services to user-space applications. It used to be <code>int 0x80</code>
+on 32-bit systems, but nowadays, you’ll find <code>syscall</code> in most programs. When the kernel receives a <code>read</code> syscall,
+it will block the calling thread until the data is available.</p>
+<h3 id="Threads"><a href="#Threads" class="headerlink" title="Threads"></a>Threads</h3><p>Using threads is a common way to work around blocking I/O. We can create a thread for each client connection, so that
+the server can handle multiple clients concurrently. As you might know already, threads cannot be used to parallelize CPU-bound
+tasks, because of Python’s <abbr title="Global Interperter Lock">GIL</abbr> . But for I/O-bound tasks, they work just fine.
+Here’s the same example turned into <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/python-asyncio/code/example-sync.py">multithreaded code</a>:</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">handle_client</span>(<span class="params">conn</span>):</span><br><span class="line">    <span class="keyword">with</span> conn:</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            payload = conn.recv(<span class="number">1024</span>)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> payload:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            num = payload.decode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                result = <span class="built_in">hex</span>(<span class="built_in">int</span>(num))</span><br><span class="line">            <span class="keyword">except</span> ValueError:</span><br><span class="line">                result = <span class="string">&#x27;Request payload must be an integer&#x27;</span></span><br><span class="line">            result += <span class="string">&#x27;\n&#x27;</span></span><br><span class="line">            conn.sendall(result.encode(<span class="string">&#x27;utf-8&#x27;</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    <span class="keyword">with</span> socket.socket(socket.AF_INET, socket.SOCK_STREAM) <span class="keyword">as</span> s:</span><br><span class="line">        s.bind((<span class="string">&#x27;127.0.0.1&#x27;</span>, <span class="number">65432</span>))</span><br><span class="line">        s.listen()</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            conn, _ = s.accept()</span><br><span class="line">            client = threading.Thread(target=handle_client, args=(conn,))</span><br><span class="line">            client.start()</span><br></pre></td></tr></table></figure>
+
+<p>The problem is fixed and we can now connect with multiple clients at the same time. You can open as many netcat connections
+as you want and they will all work. So, why bother with asyncio at all if the solution is already there?<br>Well, threads are not without their own problems. For a simple web server, it’s not going to
+make a difference. But for complex applications, threads can be a nightmare to work with. First of all, they have a
+high memory overhead. I’m talking 1000’s of threads here. Each thread allocates its own stack, which is usually between
+1 and 10 MB - that’s an average of 5 GB for 1000 threads. Apart from that, context switching is not free. The kernel
+needs to save the state of the current thread and load the state of the next one. This is a costly operation, especially
+when you have many threads. The thread scheduler is OS dependent, which means you have little to no control over it.
+But, this is not at all a rant against threads. The easiest solution is often the best one. However, when you need to scale to hundreds or even thousands,
+you’ll reach a different kind of problem.<br>You see, when we go down that rabbit hole, we’ll eventually arrive to an <strong>event loop</strong>:
+a single thread that continuously checks for and dispatches events, allowing asynchronous processing of I/O operations.</p>
+<h3 id="Asyncio"><a href="#Asyncio" class="headerlink" title="Asyncio"></a>Asyncio</h3><p>The <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/python-asyncio/code/example-asyncio.py">asyncio example</a>
+doesn’t look too different from the previous ones:</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">handle_client</span>(<span class="params">reader, writer</span>):</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        payload = <span class="keyword">await</span> reader.read(<span class="number">1024</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> payload:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        num = payload.decode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            result = <span class="built_in">hex</span>(<span class="built_in">int</span>(num))</span><br><span class="line">        <span class="keyword">except</span> ValueError:</span><br><span class="line">            result = <span class="string">&#x27;Request payload must be an integer&#x27;</span></span><br><span class="line">        result += <span class="string">&#x27;\n&#x27;</span></span><br><span class="line">        writer.write(result.encode(<span class="string">&#x27;utf-8&#x27;</span>))</span><br><span class="line">        <span class="keyword">await</span> writer.drain()</span><br><span class="line">    writer.close()</span><br><span class="line">    <span class="keyword">await</span> writer.wait_closed()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    server = <span class="keyword">await</span> asyncio.start_server(handle_client, <span class="string">&#x27;127.0.0.1&#x27;</span>, <span class="number">65432</span>)</span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">with</span> server:</span><br><span class="line">        <span class="keyword">await</span> server.serve_forever()</span><br></pre></td></tr></table></figure>
+
+<p>Now there’s only one thread, but the server has the capabilities to handle multiple clients concurrently. More so, the code
+doesn’t contain any callbacks or event listeners. It’s just like a regular synchronous code, but with a few <code>await</code> keywords sprinkled
+here and there.
+The even loop manages the execution of coroutines, scheduling them and switching between them at <code>await</code> points. An <code>async</code> function
+is a coroutine, which means it can pause its execution and resume it at a later point.
+The <code>await</code> keyword <strong>yields</strong> control back to the event loop, which will resume the coroutine after the operation is done.<br>Note that we need the following line in order to run the server:</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">asyncio.run(main())</span><br></pre></td></tr></table></figure>
+
+<p>This is because async functions cannot run on their own. <code>asyncio.run()</code> tells the event loop to schedule the coroutine.</p>
+<h4 id="How-it-works"><a href="#How-it-works" class="headerlink" title="How it works"></a>How it works</h4><p>Turns out, there’s a way to mark a file descriptor as non-blocking.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> flags = fcntl(fd, F_GETFL, <span class="number">0</span>);</span><br><span class="line">fcntl(fd, F_SETFL, flags | O_NONBLOCK);</span><br></pre></td></tr></table></figure>
+
+<p>When reading from such a file descriptor, the kernel returns immediately if there’s no data available, instead of blocking the thread. Using
+system calls such as <a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/poll.2.html">poll</a> or <a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man7/epoll.7.html">epoll</a>
+one can monitor multiple file descriptors to see if I/O is possible on any of them. There have been <a target="_blank" rel="noopener" href="http://scotdoyle.com/python-epoll-howto.html">ways to do achieve this</a>
+in Python before asyncio, although they were not as easy to use. In hindsight, asyncio is the perfect abstraction for this kind of work,
+making in platform-independent. This is the essence of the event loop.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/python-asyncio/media/event-loop.png" alt="Event Loop Diagram"></p>
+<p><code>asyncio.run()</code> simply schedules a new task on the event loop. <code>await</code> tells the event loop that we’re about to do an
+asynchronous operation, so it can switch to other tasks in the meantime. The event loop will resume the coroutine when
+the operation is done. From a high-level perspective, this is actually quite simple, but it begs the question: “How does
+the event loop handle context switching?”. To answer that, let’s see what happens if we call an async function just
+as if it were one of our regular functions:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">foo</span>():</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;bar&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>It actually returns a coroutine object:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; foo()</span><br><span class="line">&lt;coroutine object foo at 0x0000022F077EE500&gt;</span><br></pre></td></tr></table></figure>
+
+<p>What can you do with it? Can you treat it as a generator?</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">foo_generator</span>():</span><br><span class="line">    data = <span class="keyword">yield</span> <span class="string">&quot;bar&quot;</span></span><br><span class="line">    <span class="keyword">while</span> data:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Received: <span class="subst">&#123;data&#125;</span>&quot;</span>)</span><br><span class="line">        data = <span class="keyword">yield</span> <span class="string">f&quot;Echo: <span class="subst">&#123;data&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">gen = foo_generator()</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">next</span>(gen))</span><br><span class="line"><span class="built_in">print</span>(gen.send(<span class="string">&quot;baz&quot;</span>))</span><br><span class="line"><span class="built_in">print</span>(gen.send(<span class="string">&quot;foo-bar-baz&quot;</span>))</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="built_in">print</span>(gen.send(<span class="literal">None</span>))</span><br><span class="line"><span class="keyword">except</span> StopIteration <span class="keyword">as</span> e:</span><br><span class="line">    <span class="built_in">print</span>(e.value)</span><br></pre></td></tr></table></figure>
+
+<p>In the generator’s case, the output looks like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">bar</span><br><span class="line">Received: baz</span><br><span class="line">Echo: baz</span><br><span class="line">Received: foo-bar-baz</span><br><span class="line">Echo: foo-bar-baz</span><br><span class="line">None</span><br></pre></td></tr></table></figure>
+
+<p>Sending <code>None</code> results in a <code>StopIteration</code> exception. See what happens if we do that with our <code>foo</code> coroutine:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">coro = foo()</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    coro.send(<span class="literal">None</span>)</span><br><span class="line"><span class="keyword">except</span> StopIteration <span class="keyword">as</span> e:</span><br><span class="line">    <span class="built_in">print</span>(e.value)</span><br></pre></td></tr></table></figure>
+
+<p>The coroutine prints <code>bar</code> and raises a <code>StopIteration</code> exception, just like the generator:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bar</span><br><span class="line">None</span><br></pre></td></tr></table></figure>
+
+<p>So, we actually managed to run the coroutine as if it were a generator. Generators are the magic behind asyncio. And the
+best part is that you don’t need to know that in order to use them. The abstraction is so good that you can choose between
+multiple event loop implementations, such as <a target="_blank" rel="noopener" href="https://github.com/MagicStack/uvloop">uvloop</a> or <a target="_blank" rel="noopener" href="https://www.tornadoweb.org/en/stable/ioloop.html">tornado</a>
+with minimal changes to your code.</p>
+<h2 id="In-practice"><a href="#In-practice" class="headerlink" title="In practice"></a>In practice</h2><p>There’s plenty of things you can do with asyncio, but I’m going to present here the most common use cases.</p>
+<h3 id="CPU-bound-tasks"><a href="#CPU-bound-tasks" class="headerlink" title="CPU-bound tasks"></a>CPU-bound tasks</h3><p>The most important thing is to make sure you to not block the event loop while running CPU-bound tasks. Remember that <strong>the event loop
+doesn’t run in parallel</strong>, it rather switches between tasks, taking control whenever an <code>await</code> is encountered.
+A long-running task which never awaits will prevent the event loop from scheduling other tasks, effectively blocking the entire application.
+If you need to run a CPU-bound task, you can use the <a target="_blank" rel="noopener" href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.loop.run_in_executor">run_in_executor</a>
+function to execute it in a separate process:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">cpu_bound</span>():</span><br><span class="line">    <span class="comment"># Blocks the event loop</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">sum</span>(i * i <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span> ** <span class="number">7</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> concurrent.futures.ProcessPoolExecutor() <span class="keyword">as</span> pool:</span><br><span class="line">    result = <span class="keyword">await</span> loop.run_in_executor(pool, cpu_bound)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Blocking-IO"><a href="#Blocking-IO" class="headerlink" title="Blocking IO"></a>Blocking IO</h3><p>If say 90% of your code is asynchronous, but you must integrate a library that only provides synchronous IO, you don’t need
+a separate process for that - threads will do just fine. Use <a target="_blank" rel="noopener" href="https://docs.python.org/3/library/asyncio-task.html#running-in-threads">asyncio.to_thread</a>
+to schedule the synchronous function in a separate thread:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">blocking_io</span>():</span><br><span class="line">    time.sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">await</span> asyncio.to_thread(blocking_io)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Networking"><a href="#Networking" class="headerlink" title="Networking"></a>Networking</h3><h4 id="HTTP-Requests"><a href="#HTTP-Requests" class="headerlink" title="HTTP Requests"></a>HTTP Requests</h4><p>For regular networking operations, my two favorite libraries are <a target="_blank" rel="noopener" href="https://www.python-httpx.org/">httpx</a> and
+<a target="_blank" rel="noopener" href="https://docs.aiohttp.org/en/stable/">aiohttp</a>.<br><code>httpx</code> is a bit more high-level, and it also supports synchronous code. It’s very easy to integrate it in your application
+and has great documentation.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">with</span> httpx.AsyncClient() <span class="keyword">as</span> client:</span><br><span class="line">    r = <span class="keyword">await</span> client.get(<span class="string">&#x27;https://www.example.com/&#x27;</span>)</span><br><span class="line">    <span class="built_in">print</span>(r)</span><br></pre></td></tr></table></figure>
+
+<p><code>aiohttp</code> is more powerful, but also more complex. In terms of performance, it is a fast framework, and it offers low-level control
+over its components. It also comes with a fully functional web server. This would be my choice for a heavy-duty application.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">with</span> aiohttp.ClientSession() <span class="keyword">as</span> session:</span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">with</span> session.get(<span class="string">&#x27;https://www.example.com/&#x27;</span>) <span class="keyword">as</span> response:</span><br><span class="line">        r = <span class="keyword">await</span> response.text()</span><br><span class="line">        <span class="built_in">print</span>(r)</span><br></pre></td></tr></table></figure>
+
+<p>If you don’t need any advanced features, I suggest you go with <code>httpx</code>.</p>
+<h4 id="Sanic"><a href="#Sanic" class="headerlink" title="Sanic"></a>Sanic</h4><p>My go-to async web server is <a target="_blank" rel="noopener" href="https://sanic.dev/en/guide/running/running.html">Sanic</a>. It is very popular, fast
+and scales well. Their <a target="_blank" rel="noopener" href="https://sanic.dev/en/guide/running/running.html">documentation</a> is great.
+It’s a mature project and you can find lots of examples online. The API is very similar to <a target="_blank" rel="noopener" href="https://flask.palletsprojects.com/en/3.0.x/">Flask</a>,
+so you’ll feel right at home coming from the synchronous world.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sanic <span class="keyword">import</span> Sanic, Request, json</span><br><span class="line"></span><br><span class="line">app = Sanic(<span class="string">&quot;TestApp&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.get(<span class="params"><span class="string">&quot;/&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">handler</span>(<span class="params">request: Request</span>):</span><br><span class="line">    <span class="keyword">return</span> json(&#123;<span class="string">&quot;foo&quot;</span>: <span class="string">&quot;bar&quot;</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Asynchronous-iterators"><a href="#Asynchronous-iterators" class="headerlink" title="Asynchronous iterators"></a>Asynchronous iterators</h3><p>As a counterpart to synchronous iterators, <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/python-asyncio/code/async-iterator.py">asynchronous iterators</a>
+can implement <code>__aiter__</code> and <code>__anext__</code> methods. Note that <code>__anext__</code> should raise a <code>StopAsyncIteration</code> exception when
+the iterator is exhausted, instead of <code>StopIteration</code>, and <code>__aiter__</code> is not an async method.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">AsyncFibo</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, limit</span>):</span><br><span class="line">        self.a, self.b = <span class="number">0</span>, <span class="number">1</span></span><br><span class="line">        self.counter = <span class="number">0</span></span><br><span class="line">        self.limit = limit</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__aiter__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> self</span><br><span class="line"></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">__anext__</span>(<span class="params">self</span>):</span><br><span class="line">        self.counter += <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> self.counter &gt; self.limit:</span><br><span class="line">            <span class="keyword">raise</span> StopAsyncIteration</span><br><span class="line">        self.a, self.b = self.b, self.a + self.b</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(<span class="number">1</span>)  <span class="comment"># Simulate a delay</span></span><br><span class="line">        <span class="keyword">return</span> self.a</span><br></pre></td></tr></table></figure>
+
+<p>You would have to use <code>async for</code> to iterate over the items:</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">for</span> num <span class="keyword">in</span> AsyncFibo(<span class="number">7</span>):</span><br><span class="line">    <span class="built_in">print</span>(num)</span><br></pre></td></tr></table></figure>
+
+<p>An async generator can be used in a similar manner:</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">async_fibo</span>(<span class="params">limit</span>):</span><br><span class="line">    a, b = <span class="number">0</span>, <span class="number">1</span></span><br><span class="line">    counter = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> counter &lt; limit:</span><br><span class="line">        counter += <span class="number">1</span></span><br><span class="line">        a, b = b, a + b</span><br><span class="line">        <span class="keyword">yield</span> a</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(<span class="number">1</span>)  <span class="comment"># Simulate a delay</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">for</span> num <span class="keyword">in</span> async_fibo(<span class="number">7</span>):</span><br><span class="line">        <span class="built_in">print</span>(num)</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="Asynchronous-context-managers"><a href="#Asynchronous-context-managers" class="headerlink" title="Asynchronous context managers"></a>Asynchronous context managers</h3><p>Context managers can also be asynchronous, by implementing <code>__aenter__</code> and <code>__aexit__</code> methods.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">AsyncResource</span>:</span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">__aenter__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(<span class="number">1</span>)  <span class="comment"># Simulate async setup</span></span><br><span class="line">        <span class="keyword">return</span> self</span><br><span class="line"></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">__aexit__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(<span class="number">1</span>)  <span class="comment"># Simulate async cleanup</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">do_work</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(<span class="number">1</span>)  <span class="comment"># Simulate async work</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">with</span> AsyncResource() <span class="keyword">as</span> resource:</span><br><span class="line">        <span class="keyword">await</span> resource.do_work()</span><br></pre></td></tr></table></figure>
+
+<p>Here’s how to read from a file asynchronously:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">with</span> aiofiles.<span class="built_in">open</span>(<span class="string">&#x27;file.txt&#x27;</span>, mode=<span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">        <span class="built_in">print</span>(line)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Tasks"><a href="#Tasks" class="headerlink" title="Tasks"></a>Tasks</h3><p>A <a target="_blank" rel="noopener" href="https://docs.python.org/3/library/asyncio-task.html#creating-tasks">Task</a> is a convenient wrapper around a coroutine.
+It can be awaited, cancelled, or have callbacks attached to it. You can wrap a coroutine using the <code>create_task</code> function:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">task = asyncio.create_task(my_coroutine())</span><br><span class="line">result = <span class="keyword">await</span> task</span><br></pre></td></tr></table></figure>
+
+<p>Not to be confused with a <code>Future</code>, which is a low-level object that represents the result of an asynchronous operation.
+There’s many things you can do with tasks, out of which the most common is waiting for multiple tasks to complete.</p>
+<h4 id="asyncio-gather"><a href="#asyncio-gather" class="headerlink" title="asyncio.gather"></a>asyncio.gather</h4><p>Returns a single future aggregating the results of all provided coroutines. The results are returned in the order the
+coroutines were provided.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">await</span> asyncio.gather(coro1(), coro2())</span><br><span class="line"><span class="built_in">print</span>(results)</span><br></pre></td></tr></table></figure>
+
+<h4 id="asyncio-wait"><a href="#asyncio-wait" class="headerlink" title="asyncio.wait"></a>asyncio.wait</h4><p>It does not aggregate results but allows more control over task completion. It returns two sets of tasks: those that are
+completed and those that are still pending. You can specify different waiting conditions such as waiting for all tasks to
+complete or waiting for the first one to complete.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tasks = [asyncio.create_task(fetch_data(url)) <span class="keyword">for</span> url <span class="keyword">in</span> urls]</span><br><span class="line">done, pending = <span class="keyword">await</span> asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> task <span class="keyword">in</span> done:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&#x27;Completed: <span class="subst">&#123;task.result()&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> task <span class="keyword">in</span> pending:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&#x27;Still pending: <span class="subst">&#123;task.get_name()&#125;</span>&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Locks"><a href="#Locks" class="headerlink" title="Locks"></a>Locks</h3><p>Although we’re working with a single-threaded model, there are still cases where you need to synchronize access to shared
+resources. For example, you might want to synchronize access to a database. Suppose you have the following code which
+overwrites the value of a key if it is not already set:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">lock = asyncio.Lock()</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">overwrite_a</span>(<span class="params">key, value</span>):</span><br><span class="line">    <span class="comment"># Do something in collection &quot;a&quot;</span></span><br><span class="line">    <span class="keyword">await</span> collection_a.do_something()</span><br><span class="line">    <span class="comment"># Insert a key-value pair in collection &quot;c&quot; if it doesn&#x27;t exist</span></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">with</span> lock:</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">await</span> collection_c.get(key) <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">await</span> collection_c.<span class="built_in">set</span>(key, value)</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">overwrite_b</span>(<span class="params">key, value</span>):</span><br><span class="line">    <span class="comment"># Do something in collection &quot;b&quot;</span></span><br><span class="line">    <span class="keyword">await</span> collection_b.do_something()</span><br><span class="line">    <span class="comment"># Insert a key-value pair in collection &quot;c&quot; if it doesn&#x27;t exist</span></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">with</span> lock:</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">await</span> collection_c.get(key) <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">await</span> collection_c.<span class="built_in">set</span>(key, value)</span><br><span class="line"></span><br><span class="line">asyncio.gather(overwrite_a(<span class="string">&#x27;foo&#x27;</span>, <span class="string">&#x27;bar&#x27;</span>), overwrite_b(<span class="string">&#x27;foo&#x27;</span>, <span class="string">&#x27;bar&#x27;</span>))</span><br></pre></td></tr></table></figure>
+
+<p>When we execute both functions concurrently, we have no way of knowing which will run first. Recall that <code>await</code> yields control
+back to the event loop, which might continue with other tasks before resuming the current one. This means that the execution
+of both functions is segmented by <code>await</code> points. Therefore, is possible that both functions will check if the key exists
+one after the other, find out there’s no key, and then and both will insert the key-value pair. This is where locks come in.
+Only one coroutine can acquire the lock at a time, so the second one will have to wait until the first one releases it.</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p><code>asyncio</code> is Python’s way of implementing cooperative multitasking. Things are continuously improving, with Python 3.11
+making significant improvements that directly benefit asyncio. It is already a major part of the ecosystem.<br>There’s lots of things you can use it for, but it is not a silver bullet. You should be aware of its limitations and
+use it where it makes sense. Keep in mind that a simple solution is often the best choice.</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Introduction"><span class="toc-number">1.</span> <span class="toc-text">Introduction</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Synchronous-code"><span class="toc-number">1.1.</span> <span class="toc-text">Synchronous code</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Threads"><span class="toc-number">1.2.</span> <span class="toc-text">Threads</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Asyncio"><span class="toc-number">1.3.</span> <span class="toc-text">Asyncio</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#How-it-works"><span class="toc-number">1.3.1.</span> <span class="toc-text">How it works</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#In-practice"><span class="toc-number">2.</span> <span class="toc-text">In practice</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CPU-bound-tasks"><span class="toc-number">2.1.</span> <span class="toc-text">CPU-bound tasks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Blocking-IO"><span class="toc-number">2.2.</span> <span class="toc-text">Blocking IO</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Networking"><span class="toc-number">2.3.</span> <span class="toc-text">Networking</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HTTP-Requests"><span class="toc-number">2.3.1.</span> <span class="toc-text">HTTP Requests</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Sanic"><span class="toc-number">2.3.2.</span> <span class="toc-text">Sanic</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Asynchronous-iterators"><span class="toc-number">2.4.</span> <span class="toc-text">Asynchronous iterators</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Asynchronous-context-managers"><span class="toc-number">2.5.</span> <span class="toc-text">Asynchronous context managers</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tasks"><span class="toc-number">2.6.</span> <span class="toc-text">Tasks</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#asyncio-gather"><span class="toc-number">2.6.1.</span> <span class="toc-text">asyncio.gather</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#asyncio-wait"><span class="toc-number">2.6.2.</span> <span class="toc-text">asyncio.wait</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Locks"><span class="toc-number">2.7.</span> <span class="toc-text">Locks</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Conclusion"><span class="toc-number">3.</span> <span class="toc-text">Conclusion</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2024/07/09/python-asyncio/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&text=Python Asyncio"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&title=Python Asyncio"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&is_video=false&description=Python Asyncio"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Python Asyncio&body=Check out this article: https://apetenchea.github.io/2024/07/09/python-asyncio/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&title=Python Asyncio"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&title=Python Asyncio"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&title=Python Asyncio"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&title=Python Asyncio"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2024/07/09/python-asyncio/&name=Python Asyncio&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2024/07/09/python-asyncio/&t=Python Asyncio"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

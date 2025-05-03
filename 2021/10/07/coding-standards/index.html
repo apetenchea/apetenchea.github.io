@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="A coding standard is a set of rules used to maintain a certain level of quality within a software project. Put otherwise, it’s just a convention between programmers, regarding the way they should writ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Coding Standards">
+<meta property="og:url" content="https://apetenchea.github.io/2021/10/07/coding-standards/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="A coding standard is a set of rules used to maintain a certain level of quality within a software project. Put otherwise, it’s just a convention between programmers, regarding the way they should writ">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-10-07T17:47:53.000Z">
+<meta property="article:modified_time" content="2025-04-28T11:05:16.100Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Programming">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Coding Standards</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2021/10/17/installing-prebuilt-binaries-in-ubuntu/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2019/02/12/tail-end-recursion/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2021/10/07/coding-standards/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2021/10/07/coding-standards/&text=Coding Standards"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2021/10/07/coding-standards/&title=Coding Standards"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2021/10/07/coding-standards/&is_video=false&description=Coding Standards"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Coding Standards&body=Check out this article: https://apetenchea.github.io/2021/10/07/coding-standards/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2021/10/07/coding-standards/&title=Coding Standards"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2021/10/07/coding-standards/&title=Coding Standards"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2021/10/07/coding-standards/&title=Coding Standards"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2021/10/07/coding-standards/&title=Coding Standards"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2021/10/07/coding-standards/&name=Coding Standards&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2021/10/07/coding-standards/&t=Coding Standards"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-is-it-important"><span class="toc-number">1.</span> <span class="toc-text">Why is it important?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Consistency"><span class="toc-number">1.1.</span> <span class="toc-text">Consistency</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Readability"><span class="toc-number">1.2.</span> <span class="toc-text">Readability</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Limiting-side-effects"><span class="toc-number">1.3.</span> <span class="toc-text">Limiting side effects</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#In-practice"><span class="toc-number">2.</span> <span class="toc-text">In practice</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Python"><span class="toc-number">2.1.</span> <span class="toc-text">Python</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#C"><span class="toc-number">2.2.</span> <span class="toc-text">C++</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Editor-configuration"><span class="toc-number">2.3.</span> <span class="toc-text">Editor configuration</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bottom-line"><span class="toc-number">3.</span> <span class="toc-text">Bottom line</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Coding Standards
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-10-07T17:47:53.000Z" itemprop="datePublished">07 Oct 2021</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Programming/" rel="tag">Programming</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>A coding standard is a set of rules used to maintain a certain level of quality within a software project.
+Put otherwise, it’s just a convention between programmers, regarding the way they should write code.</p>
+<h2 id="Why-is-it-important"><a href="#Why-is-it-important" class="headerlink" title="Why is it important?"></a>Why is it important?</h2><h3 id="Consistency"><a href="#Consistency" class="headerlink" title="Consistency"></a>Consistency</h3><p>As with all standards, coding standards (or guidelines), exist to ensure some kind of consistency between
+software components. Two or more developers might work on totally separate parts of a codebase, but in the end
+everything must come together as a whole. A common guideline could indicate whether is it ok to use the <code>asm</code> statement
+in order to mix assembly instructions with C code, or whether is it ok to use exceptions. Whereas for the former, the general
+answer is no, the latter is sometimes quite a debated topic within the C++ community, so let’s take it as a practical example.<br>While exceptions provide an elegant way of handling failures, they can distort the natural control flow of a
+program, making it hard to debug and maintain. But if you aren’t going to use exceptions, you need another way of recovering
+when things flop, so you’ll probably be looking at error codes. This approach has worked fine for huge projects, such as
+the <a target="_blank" rel="noopener" href="https://github.com/torvalds/linux">Linux Kernel</a>, but it requires lots of <a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man3/errno.3.html">bookkeeping</a>.
+Without proper documentation, error codes can quickly become just some random integers that no one understands.
+Clearly, both approaches have their pros and cons, while the worst possible scenario happens when you combine them.<br>Say two teams work on different data structures: one writes the <em>set</em> module, while the other maintains the <em>list</em> module.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;set&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;list&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Set</span> &#123;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">    std::set&lt;<span class="type">int</span>&gt; set;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">insert</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (set.<span class="built_in">size</span>() &gt;= <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="string">&quot;insertion failed: size limit exceeded&quot;</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      set.<span class="built_in">insert</span>(n);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">List</span> &#123;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">    std::list&lt;<span class="type">int</span>&gt; list;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">insert</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (list.<span class="built_in">size</span>() &gt;= <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">12</span>; <span class="comment">// indicates size limit exceeded</span></span><br><span class="line">      &#125;</span><br><span class="line">      list.<span class="built_in">push_back</span>(n);</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  Set a;</span><br><span class="line">  List b;</span><br><span class="line">  b.<span class="built_in">insert</span>(<span class="number">1</span>); <span class="comment">// inserts 1 into the list</span></span><br><span class="line">  b.<span class="built_in">insert</span>(<span class="number">2</span>); <span class="comment">// returns error code</span></span><br><span class="line">  a.<span class="built_in">insert</span>(<span class="number">1</span>); <span class="comment">// inserts 1 into the set</span></span><br><span class="line">  a.<span class="built_in">insert</span>(<span class="number">2</span>); <span class="comment">// throws an exception and crashes</span></span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Using these classes together becomes an error prone task. Especially for a newcomer on the codebase, it is not at all clear
+whether a function call might cause the program to crash with an exception or return an error code. Now imagine having a few
+thousand lines of code written like that. With some specifiers and a bit of extra care, the code would look something like this:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;set&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;list&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Set</span> &#123;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">    std::set&lt;<span class="type">int</span>&gt; set;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">insert</span><span class="params">(<span class="type">int</span> n)</span> <span class="title">noexcept</span><span class="params">(<span class="literal">false</span>)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (set.<span class="built_in">size</span>() &gt;= <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="string">&quot;Set insertion failed: size limit exceeded!&quot;</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      set.<span class="built_in">insert</span>(n);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">List</span> &#123;</span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">    std::list&lt;<span class="type">int</span>&gt; list;</span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">insert</span><span class="params">(<span class="type">int</span> n)</span> <span class="keyword">noexcept</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (list.<span class="built_in">size</span>() &gt;= <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">12</span>; <span class="comment">// indicates size limit exceeded</span></span><br><span class="line">      &#125;</span><br><span class="line">      list.<span class="built_in">push_back</span>(n);</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  Set a;</span><br><span class="line">  List b;</span><br><span class="line">  b.<span class="built_in">insert</span>(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">if</span> (b.<span class="built_in">insert</span>(<span class="number">2</span>) == <span class="number">12</span>) &#123;</span><br><span class="line">    std::cerr &lt;&lt; <span class="string">&quot;List insertion failed: size limit exceeded!&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    a.<span class="built_in">insert</span>(<span class="number">1</span>);</span><br><span class="line">    a.<span class="built_in">insert</span>(<span class="number">2</span>);</span><br><span class="line">  &#125; <span class="built_in">catch</span> (<span class="type">char</span> <span class="type">const</span>* e) &#123;</span><br><span class="line">    std::cerr &lt;&lt; e; </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>That would still be hard to read, which takes us to another important reason for using a coding standard: readability.</p>
+<h3 id="Readability"><a href="#Readability" class="headerlink" title="Readability"></a>Readability</h3><p>Unless you’re competing in the <a target="_blank" rel="noopener" href="https://www.ioccc.org/">IOCCC</a>, having a clean codebase can make a day’s work more enjoyable.
+Most software is built on existing software. Far more time is spent maintaining, upgrading and debugging existing code than is
+ever spent on creating new work. Take a look at the following code:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">char</span> *c;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">F</span><span class="params">(<span class="type">int</span> x)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> R;</span><br><span class="line">    <span class="type">char</span> o;</span><br><span class="line">    <span class="keyword">if</span>(!x) &#123;</span><br><span class="line">        <span class="keyword">for</span>(R=<span class="built_in">F</span>(<span class="number">1</span>),o=*c;o==<span class="string">&#x27;+&#x27;</span>||o==<span class="string">&#x27;-&#x27;</span>;o=*c)</span><br><span class="line">            ++c,R=o==<span class="string">&#x27;+&#x27;</span>?R+<span class="built_in">F</span>(<span class="number">1</span>):R-<span class="built_in">F</span>(<span class="number">1</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span>(x==<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span>(R=<span class="built_in">F</span>(<span class="number">2</span>),o=*c;o==<span class="string">&#x27;*&#x27;</span>||o==<span class="string">&#x27;/&#x27;</span>;o=*c)</span><br><span class="line">            ++c,R=o==<span class="string">&#x27;*&#x27;</span>?R*<span class="built_in">F</span>(<span class="number">2</span>):R/<span class="built_in">F</span>(<span class="number">2</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span>(*c==<span class="string">&#x27;(&#x27;</span>)</span><br><span class="line">        ++c,R=<span class="built_in">F</span>(<span class="number">0</span>),++c;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">for</span>(R=<span class="number">0</span>;<span class="built_in">isdigit</span>(*c);c++)</span><br><span class="line">            R=<span class="number">10</span>*R+*c-<span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">    <span class="keyword">return</span> R;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    c=<span class="keyword">new</span> <span class="type">char</span>[<span class="number">100002</span>],cin&gt;&gt;c,cout&lt;&lt;<span class="built_in">F</span>(<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>It evaluates an arithmetic expression, such as <code>1+2*3</code>. Although it works, it would be quite difficult to figure that out in the
+first place, and secondly, integrate it with another piece of code or add new functionality to it. Because readability can have
+such a great impact on the efficiency of developers, spacing, variable naming and comments are regulated by pretty much
+every coding standard out there. As these grew in size to almost mini-textbooks, it became harder to know all the rules. For this reason,
+most coding standards come with a formatter or a linter. The former checks for stuff like tabs vs spaces or or variable naming using camelCase vs snake_case,
+while the latter can perform static analysis and even find bugs. Such tools are used to automatically fix formatting mistakes.
+A great example is the <a target="_blank" rel="noopener" href="https://golang.org/">Go</a> programming language, which comes with its out-of-the-box formatter, <a target="_blank" rel="noopener" href="https://go.dev/blog/gofmt">gofmt</a>.</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"><span class="keyword">import</span>(<span class="string">&quot;fmt&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;fmt.Println(<span class="string">&quot;First message&quot;</span>)</span><br><span class="line">fmt.Println(<span class="string">&quot;Second message&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Running <code>gofmt</code> on this code produces a much more readable version of itself.</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;First message&quot;</span>)</span><br><span class="line">	fmt.Println(<span class="string">&quot;Second message&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The programming community has developed a variety of coding styles, and we can’t really say that one is better than the other.
+Each has its own advantages and disadvantages, but they all preach one common thing: <em>Be consistent!</em>. And I’ll quote
+<a target="_blank" rel="noopener" href="https://www.python.org/dev/peps/pep-0008/">PEP8</a> here:</p>
+<blockquote>
+<p>A style guide is about consistency. Consistency with this style guide is important. Consistency within a project is more important.
+Consistency within one module or function is the most important.</p>
+</blockquote>
+<p>As it turns out, style guide recommendations are not always applicable, and in such cases you should not break backwards compatibility
+with the existing code. Sometimes even the language might not be particularly helpful with your coding standard. For example,
+in C++ the <code>new</code> operator is designed to throw exceptions on failure. If you’re following a <em>do not use exceptions</em> policy,
+you’ll have to handling this, maybe by using <code>nothrow</code>:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> *array = <span class="built_in">new</span> (std::nothrow) <span class="type">int</span> [lengh];</span><br></pre></td></tr></table></figure>
+<p>This is not such a big problem in itself, but it’s an example of how sometimes things just don’t work out of the box.
+Imagine having to integrate your code with a third-party library that uses exceptions, what would you do then?</p>
+<h3 id="Limiting-side-effects"><a href="#Limiting-side-effects" class="headerlink" title="Limiting side effects"></a>Limiting side effects</h3><p>This topic can be directly linked to readability, but I think it deserves its own paragraph. A side effect is an operation that
+is performed in addition to the main operation executed by the statement. It’s a common source of bugs and, unfortunately,
+C++ allows the use of side effects.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> num = <span class="number">3</span>;</span><br><span class="line">num += --num - num--;</span><br></pre></td></tr></table></figure>
+<p>This is a confusing way of writing <code>num = num + num - 1 - num - 1;</code>. Coding standards are there to prevent such use of
+side effects. It is true that some programmers highly value compact code. This is from the early days of computing,
+when storage was very limited and expensive. Nowadays, that is no longer the case, hence clarity and maintainability
+are more valuable.
+Sometimes a statement can prove to be confusing even for the compiler.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> num = <span class="number">3</span>;</span><br><span class="line"><span class="type">int</span> result = (num++ * <span class="number">2</span>) + (num++ * <span class="number">4</span>); </span><br></pre></td></tr></table></figure>
+<p>Here’s the warning displayed by g++: <em>operation on ‘num’ may be undefined</em>.<br>
+This is because the expression can be divided in two branches of equal priority, <code>(num++ * 2)</code> and <code>(num++ * 4)</code>. The compiler
+may decide to execute <code>num++ * 2</code> first, ending up with 22, but it may also execute <code>num++ * 4</code> first, in which
+case <code>result</code> would be 20. You don’t even need a coding guideline to tell you how wrong this is, the compiler
+does it for you.<br>To prevent such scenarios from happening, some languages, such as Python, deliberately do not define the <code>++</code> and <code>--</code> operators.
+However, there’s nothing wrong with using them in C or C++, just make sure you keep side effects to a minimum.</p>
+<h2 id="In-practice"><a href="#In-practice" class="headerlink" title="In practice"></a>In practice</h2><h3 id="Python"><a href="#Python" class="headerlink" title="Python"></a>Python</h3><p><a target="_blank" rel="noopener" href="https://www.python.org/dev/peps/pep-0008/">PEP8</a> is a broadly accepted coding standard among Python developers. Their entire
+standard library is written according to this guideline. The format checker is called
+<a target="_blank" rel="noopener" href="https://pypi.org/project/pycodestyle/">pycodestyle</a> (previously known as pep8). Also, there are various tools
+for auto-formatting, such as <a target="_blank" rel="noopener" href="https://pypi.org/project/autopep8/">autopep8</a>, which can be used to automatically make your
+code PEP8 compliant. Please note that there other popular Python coding standards out there,
+such as the <a target="_blank" rel="noopener" href="https://google.github.io/styleguide/pyguide.html">Google Python Style Guide</a>. Google uses <a target="_blank" rel="noopener" href="https://github.com/google/yapf">yapf</a> to “end
+all holy wars about formatting”.</p>
+<h3 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h3><p><a target="_blank" rel="noopener" href="https://google.github.io/styleguide/cppguide.html">Google C++ Style Guide</a> is quite a popular one. You can use
+<a target="_blank" rel="noopener" href="https://github.com/cpplint/cpplint">cpplint</a> to check for style issues. For auto-formatting,
+<a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/ClangFormat.html">clang-format</a> is a great tool. It has good integration with many editors and
+can be used to apply not only Google’s style, but a bunch of other styles as well.
+You can also create your custom style by editing the <code>.clang-format</code> file.</p>
+<h3 id="Editor-configuration"><a href="#Editor-configuration" class="headerlink" title="Editor configuration"></a>Editor configuration</h3><p>Projects may be written in more than one language, therefore different coding styles are applied depending on the file type.
+Developers may use different editors, each with different settings. Thus, it would be nice to have everything in a single
+configuration file that could be parsed by all editors and applied on the whole project. By using
+<a target="_blank" rel="noopener" href="https://editorconfig.org/">EditorConfig</a>, you can place all of your project’s configuration into a single file named <code>.editorconfig</code>,
+located at the root of the project directory. This tool is pretty flexible, allowing for custom configurations
+in subdirectories. Although convenient for configuring your editor, note that it is quite simple and only able to take care of the most common
+aspects, such as indentation and charset.</p>
+<h2 id="Bottom-line"><a href="#Bottom-line" class="headerlink" title="Bottom line"></a>Bottom line</h2><p>Following a coding guideline is a great thing to do, just don’t go over the board with it. Beautiful code is a very subjective
+matter, thus perfection is not what you should strive for, but maintaining a good balance between productivity
+and beauty is what really counts. <em>Use auto-formatters whenever you can.</em> As a matter of fact, many projects are including them in their testing
+pipelines so that style is kept consistent in an automated manner. If you find yourself spending ridiculous amounts of time and
+energy over making code look pretty, there’s a change you might be dealing with <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Obsessive%E2%80%93compulsive_disorder">OCD</a>.
+I know it can feel very frustrating, but don’t worry, it is more common than you think. Try <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Cognitive_behavioral_therapy">CBT</a>,
+<a target="_blank" rel="noopener" href="https://tergar.org/meditation/">meditation</a> or a self help guide and try to let the auto-formatter do its work.<br>Being proud of your code is a great feeling indeed, but getting things done feels a lot better on the long run.</p>
+<h2 id="References-and-Further-Reading"><a href="#References-and-Further-Reading" class="headerlink" title="References and Further Reading"></a>References and Further Reading</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.oreilly.com/library/view/practical-c-programming/0596004192/">Oualline, Steve, <em>Practical C++ Programming, 2nd Edition</em></a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-is-it-important"><span class="toc-number">1.</span> <span class="toc-text">Why is it important?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Consistency"><span class="toc-number">1.1.</span> <span class="toc-text">Consistency</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Readability"><span class="toc-number">1.2.</span> <span class="toc-text">Readability</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Limiting-side-effects"><span class="toc-number">1.3.</span> <span class="toc-text">Limiting side effects</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#In-practice"><span class="toc-number">2.</span> <span class="toc-text">In practice</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Python"><span class="toc-number">2.1.</span> <span class="toc-text">Python</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#C"><span class="toc-number">2.2.</span> <span class="toc-text">C++</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Editor-configuration"><span class="toc-number">2.3.</span> <span class="toc-text">Editor configuration</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bottom-line"><span class="toc-number">3.</span> <span class="toc-text">Bottom line</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2021/10/07/coding-standards/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2021/10/07/coding-standards/&text=Coding Standards"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2021/10/07/coding-standards/&title=Coding Standards"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2021/10/07/coding-standards/&is_video=false&description=Coding Standards"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Coding Standards&body=Check out this article: https://apetenchea.github.io/2021/10/07/coding-standards/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2021/10/07/coding-standards/&title=Coding Standards"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2021/10/07/coding-standards/&title=Coding Standards"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2021/10/07/coding-standards/&title=Coding Standards"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2021/10/07/coding-standards/&title=Coding Standards"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2021/10/07/coding-standards/&name=Coding Standards&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2021/10/07/coding-standards/&t=Coding Standards"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

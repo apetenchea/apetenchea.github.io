@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Git is one of these things I use on a daily basis, yet I’ve never felt like I truly mastered it. There’s so many things you can do with it, and so many ways to do them, that it’s easy to get lost in t">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Handy Git Recipes">
+<meta property="og:url" content="https://apetenchea.github.io/2023/05/01/handy-git-recipes/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="Git is one of these things I use on a daily basis, yet I’ve never felt like I truly mastered it. There’s so many things you can do with it, and so many ways to do them, that it’s easy to get lost in t">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/commits.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/branching.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/merging.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/rebasing.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/cherry-pick.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/reset.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/revert.gif">
+<meta property="article:published_time" content="2023-05-01T16:28:52.000Z">
+<meta property="article:modified_time" content="2025-04-28T11:05:16.100Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Programming">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/commits.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Handy Git Recipes</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/09/20/sivananda-yoga-teachers-training-course/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/04/22/the-sleeping-barber/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2023/05/01/handy-git-recipes/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&text=Handy Git Recipes"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&title=Handy Git Recipes"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&is_video=false&description=Handy Git Recipes"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Handy Git Recipes&body=Check out this article: https://apetenchea.github.io/2023/05/01/handy-git-recipes/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&title=Handy Git Recipes"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&title=Handy Git Recipes"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&title=Handy Git Recipes"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&title=Handy Git Recipes"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&name=Handy Git Recipes&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&t=Handy Git Recipes"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Basics"><span class="toc-number">1.</span> <span class="toc-text">Basics</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Commits"><span class="toc-number">1.1.</span> <span class="toc-text">Commits</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Branches"><span class="toc-number">1.2.</span> <span class="toc-text">Branches</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Remotes"><span class="toc-number">1.3.</span> <span class="toc-text">Remotes</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#pull"><span class="toc-number">1.3.1.</span> <span class="toc-text">pull</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#fetch"><span class="toc-number">1.3.2.</span> <span class="toc-text">fetch</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#push"><span class="toc-number">1.3.3.</span> <span class="toc-text">push</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Merging"><span class="toc-number">1.4.</span> <span class="toc-text">Merging</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Rebasing"><span class="toc-number">1.5.</span> <span class="toc-text">Rebasing</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Moving-around"><span class="toc-number">1.6.</span> <span class="toc-text">Moving around</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HEAD"><span class="toc-number">1.6.1.</span> <span class="toc-text">HEAD</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#caret"><span class="toc-number">1.6.1.1.</span> <span class="toc-text">caret (^)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#tilde"><span class="toc-number">1.6.1.2.</span> <span class="toc-text">tilde (~)</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#cherry-pick"><span class="toc-number">1.6.2.</span> <span class="toc-text">cherry-pick</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Undoing-changes"><span class="toc-number">1.7.</span> <span class="toc-text">Undoing changes</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#reset"><span class="toc-number">1.7.1.</span> <span class="toc-text">reset</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E2%80%93soft"><span class="toc-number">1.7.1.1.</span> <span class="toc-text">–soft</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E2%80%93mixed"><span class="toc-number">1.7.1.2.</span> <span class="toc-text">–mixed</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E2%80%93hard"><span class="toc-number">1.7.1.3.</span> <span class="toc-text">–hard</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#revert"><span class="toc-number">1.7.2.</span> <span class="toc-text">revert</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tagging"><span class="toc-number">1.8.</span> <span class="toc-text">Tagging</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Recipes"><span class="toc-number">2.</span> <span class="toc-text">Recipes</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Shallow-cloning"><span class="toc-number">2.1.</span> <span class="toc-text">Shallow cloning</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Backports"><span class="toc-number">2.2.</span> <span class="toc-text">Backports</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Interactive-rebase"><span class="toc-number">2.3.</span> <span class="toc-text">Interactive rebase</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Ignoring-files"><span class="toc-number">2.4.</span> <span class="toc-text">Ignoring files</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Multiple-configs"><span class="toc-number">2.5.</span> <span class="toc-text">Multiple configs</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-number">3.</span> <span class="toc-text">References</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Handy Git Recipes
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-05-01T16:28:52.000Z" itemprop="datePublished">01 May 2023</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Programming/" rel="tag">Programming</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p><a target="_blank" rel="noopener" href="https://git-scm.com/">Git</a> is one of these things I use on a daily basis, yet I’ve never felt like I truly mastered it.
+There’s so many things you can do with it, and so many ways to do them, that it’s easy to get lost in the sea of commands and options.
+Truth be told, just a couple of them are enough to leverage 90% of the power of git repositories and cover the main
+needs of developers. That remaining 10% can be quite useful during complex workflows.<br>I’ve put together some explanations of the most commonly used terminology and commands, as well as some recipes which
+I often find myself using at work. I hope you’ll find them useful too. For the record, at the time of this writing
+I was using git version 2.37.0.</p>
+<h2 id="Basics"><a href="#Basics" class="headerlink" title="Basics"></a>Basics</h2><h3 id="Commits"><a href="#Commits" class="headerlink" title="Commits"></a>Commits</h3><p><strong>A commit is a snapshot of all the tracked files in your project.</strong> It contains the changes made since the previous commit,
+along with metadata such as the commit author, timestamp, and a message describing the changes. Commits are organized sequentially,
+each commit pointing to its parent commit. This is how git records the history of a repository. Think about it
+in terms of inheritance, instead of time: a commit inherits the changes of its parent commit, and adds its own changes
+on top of them. Everything in git is relative to something prior. More formally, commits are organized as a
+<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">directed acyclic graph</a>. This way, it is easy to traverse the history
+of a repository and do all kinds of useful operations on it.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/commits.png" alt="Git commits"></p>
+<p>Every commit is identified by a unique hash (SHA-1), which is a 40-character hexadecimal string. When working with commits, it’s rarely necessary to
+reference them by their full identifier. You can pass in only a prefix (first 7 characters should be enough) and
+git is smart enough to figure out the rest (as long as there exists only one commit with the given prefix). For example, let’s consider
+commit <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/commit/dc2727cdfe357e4caf40f9c79c35d5232195ca45">dc2727cdfe357e4caf40f9c79c35d5232195ca45</a>
+from this blog’s <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot">repository</a>. You can check the metadata associated with it
+by running <code>git --no-replace-objects cat-file commit dc2727c</code>. The output is:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">tree 2f3a693e39a75ae5e393c226c17895e6136d2d72</span><br><span class="line">parent b200f511526c750833abf07dd5749aad7be1132b</span><br><span class="line">author Alex Petenchea &lt;email@gmail.com&gt; 1682878857 +0300</span><br><span class="line">committer Alex Petenchea &lt;email@gmail.com&gt; 1682878857 +0300</span><br><span class="line">gpgsig -----BEGIN PGP SIGNATURE-----</span><br><span class="line"></span><br><span class="line"> iQIzBAABCAAdFiEE9yeY4Rbw/gqLPsLv9wg11DTo7E8FAmROsYkACgkQ9wg11DTo</span><br><span class="line"> 7E83CBAAxqwUzVdxOlMKxV5rsEs0Mx1/mh4O3dY4onjC7FZ5R/WFmNiMEGN9gDMP</span><br><span class="line"> u9V72rj0kIvr4i+TERciueR5hgEZBcpo8fO2knZPXJMe3JrOZx1cF5Fe5dGQLgi2</span><br><span class="line"> cIC8MwH3GUacRqpezFrFJWVbKtTY/mQ6a5UVOjZyg9kqJwE/otp7FgaR2Y0rC1kP</span><br><span class="line"> hGU0N4lkWnlkaUxc9K4tNYfZgahKTQGug961T5wSxFLh6qlRj27shZQ7N9JKUCIn</span><br><span class="line"> L+70hTJaLruisnqqgBse93OcCgFLOWuBkR5oxRe5vx5ZiLkXVZT9xusVpLpRxFEz</span><br><span class="line"> CvlBTQpgJ9wlWujFJdw76015UMctEjnO+M3oGC5vAfYTmYxgyDQ9suWQDdbuULpV</span><br><span class="line"> /ndA9LvZ72+BBgpIhTGOSSHcyg/Rd3A/trGgmZVkn4GAGCZJGzADKePANcPgs+iD</span><br><span class="line"> AjdehqPwwwH/82Il2shojNMJ4mPt80gWE2W0DZypvneIrbZvQ59gDnXkjhF20tCr</span><br><span class="line"> /xTRnfDVTq0pPfoeQ5Ks9f4Box+nIDdiB5FRdaddx1JDSiIWOu7dWCnfMCQDl2Ml</span><br><span class="line"> aZgD6P+8SADCo/9NWqn/vSenzxFHtmXILrTasj58ed0hOVIPNvcCBRS2d/tbs/lx</span><br><span class="line"> ozn2PNOUQvYUTfjt7SfR2Rjl3EvUFdrADdcDRb0G+Ox7yd0/JL4=</span><br><span class="line"> =Q1hH</span><br><span class="line"> -----END PGP SIGNATURE-----</span><br><span class="line"></span><br><span class="line">Minor fixes</span><br></pre></td></tr></table></figure>
+
+<p>That is:</p>
+<ul>
+<li>The source tree: SHA-1 hash of the tree object representing the repository’s file structure at the time of the commit.</li>
+<li>Commit parent(s): The SHA-1 hash(es) of the commit parent(s). A commit can have multiple parents in the case of a merge commit (more on this later).</li>
+<li>Author: the name and email address of the person who authored the changes, along with the commit timestamp.</li>
+<li>Committer: the name and email address of the person who made the commit, along with the commit timestamp. This might be 
+different from the author if the changes were committed by another person, see <a target="_blank" rel="noopener" href="https://github.com/ArangoDB-Community/python-arango/commit/d7a0b560f62df370c162dbea08724c30a993c60c">this commit for example</a>.</li>
+<li>GPG signature: this is optional, and can be used to verify the authenticity of the commit. It is generated using the author’s
+private key, and can be verified using their public key.</li>
+<li>Commit message: the text of the commit message.</li>
+</ul>
+<p>All that information is combined and hashed using the SHA-1 algorithm to produce a unique commit identifier. Just for fun, here’s
+how you can generate it yourself:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(printf &quot;commit %s\0&quot; $(git --no-replace-objects cat-file commit dc2727c | wc -c); git cat-file commit dc2727c) | sha1sum</span><br></pre></td></tr></table></figure>
+
+<p>For an explanation of the command above, check out <a target="_blank" rel="noopener" href="https://gist.github.com/masak/2415865">Carl Mäsak’s gist</a>. And finally,
+to inspect the changes introduced with this commit, you can run <code>git show dc2727c</code>.<br>Before committing, the usual workflow is to add your changes to the staging area.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m &quot;explaining git&quot;</span><br></pre></td></tr></table></figure>
+<p>The above was used to generate commit <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/commit/a56132941d13867937334abc3de47765b49a36c8">a561329</a>.
+You may also use the shorthand <code>git commit -am &quot;explaining git&quot;</code>, which will automatically stage all changes before committing them.
+However, note that this command will add and commit all the modified files, but not the <em>newly</em> created ones. Eventually,
+you’ll want to run <code>git push</code> to publish your changes to the remote repository.</p>
+<h3 id="Branches"><a href="#Branches" class="headerlink" title="Branches"></a>Branches</h3><p><strong>A branch is a pointer to a commit.</strong> When a new branch is created, it points to the same commit as the branch
+it was created from. In other words, it is a “copy” of the current branch.
+When you commit to a branch, the branch pointer is updated to point to the new commit. 
+The default branch of a repository is usually called <code>main</code> or <code>master</code>.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/branching.gif" alt="Git commits"></p>
+<p>Creating a new branch is done by running <code>git branch &lt;branch-name&gt;</code>. To switch branches, run <code>git checkout &lt;branch-name&gt;</code>.
+These two steps are usually done together, so there’s a shorthand for it: <code>git checkout -b &lt;branch-name&gt;</code>. Alternatively, you can
+use <code>git switch &lt;branch-name&gt;</code> to switch to an existing branch, or <code>git switch -c &lt;branch-name&gt;</code> to create a new branch and
+switch to it. <code>git checkout</code> is a versatile command with multiple use cases, while <code>git switch</code> was introduced only
+to facilitate branch operations. The recommended way is to go with <code>git switch</code>, as it has a more intuitive syntax. In the
+example above, I create a new branch called <code>bug-fix</code> and switch to it. After making some changes, I commit them:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git switch -c bug-fix</span><br><span class="line">git commit -am &quot;fixing a bug&quot;</span><br></pre></td></tr></table></figure>
+
+<p>If I change my mind and decide to delete the branch, I have to switch back to <code>main</code> first and then run <code>git branch -d bug-fix</code>.
+Note that, as a safety precaution, this will only work if the branch has been merged into another branch.
+If you want to delete a branch that hasn’t been merged yet, you can use <code>git branch -D &lt;branch-name&gt;</code>.
+Also, deleting a remote branch is done by running <code>git push origin --delete &lt;branch-name&gt;</code>. Always be cautious when deleting branches,
+as you may lose work that hasn’t been merged yet. One other thing, renaming a branch is easy: switch to it and run <code>git branch -m &lt;new_branch_name&gt;</code>.  </p>
+<h3 id="Remotes"><a href="#Remotes" class="headerlink" title="Remotes"></a>Remotes</h3><p>While working with git, you’ll notice the term <em>remote</em> being used everywhere. <strong>A remote is a copy of the repository that is hosted elsewhere (on <a target="_blank" rel="noopener" href="https://github.com/">Github</a>, for example)</strong>.
+You can have multiple remotes, and you can push and pull changes to and from them. The default remote is called <code>origin</code>, and it’s
+essentially a shorthand name for the remote repository’s URL:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github.com:apetenchea/cdroot.git</span><br></pre></td></tr></table></figure>
+
+<p>In this particular case, <code>origin</code> will point to <code>git@github.com:apetenchea/cdroot.git</code>. You can check what the remotes of
+your repository point to by running <code>git remote -v</code>.<br>You can always inspect the current state of your <em>local</em> branch by running <code>git status</code>. If it’s synchronized with the <em>remote</em>, you’ll see
+a message like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">On branch bug-fix/issue-18919</span><br><span class="line">Your branch is up to date with &#x27;origin/bug-fix/issue-18919&#x27;.</span><br><span class="line"></span><br><span class="line">nothing to commit, working tree clean</span><br></pre></td></tr></table></figure>
+
+<p>In the example above, <code>bug-fix/issue-18919</code> is the name of the <em>local branch</em>, and <code>origin/bug-fix/issue-18919</code> is the name of the
+<em>remote branch</em>. Remote branches always reflect the state of the branch on the remote repository.
+The naming convention is <code>&lt;remote-name&gt;/&lt;branch-name&gt;</code>.</p>
+<h4 id="pull"><a href="#pull" class="headerlink" title="pull"></a>pull</h4><p>You can’t work on remote branches directly, as they can just be updated from the remote.
+However, you can <em>pull</em> changes from them into your local branch. This is done by running <code>git pull &lt;remote&gt; &lt;branch-name&gt;</code>, or simply
+<code>git pull</code> if you’re already on the branch you want to pull changes into. This will fetch the changes from the remote branch and merge
+them into your local branch.  </p>
+<h4 id="fetch"><a href="#fetch" class="headerlink" title="fetch"></a>fetch</h4><p>If you want to fetch the changes without switching to that branch, you can run <code>git fetch &lt;remote&gt; &lt;branch-name&gt;:&lt;branch-name&gt;</code>. This 
+will bring the local representation of the remote branch into synchronization with the actual remote. Note that <code>git pull</code> is just a
+shorthand for a fetch followed by an additional merge step.<br>When using fetch, one could, for example, create a new local copy of the remote branch by running <code>git fetch origin bug-fix/issue-18919:bug-fix/copy-of-issue-18919</code>.
+Simply running <code>git fetch</code> without any additional arguments will fetch all the changes from all the remote branches. Adding
+<code>--prune</code> will also remove any remote tracking branches that no longer exist on the remote (stale branches that have probably
+been merged long ago and deleted): <code>git fetch --prune</code>.<br>If you’re behind a slow network connection, this may take a while.  </p>
+<h4 id="push"><a href="#push" class="headerlink" title="push"></a>push</h4><p>Finally, <code>git push</code> is used to publish your local changes to the remote repository. If you’re pushing a new branch, you’ll have to
+specify the remote branch name as well:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin &lt;local-branch-name&gt;:&lt;remote-branch-name&gt;</span><br></pre></td></tr></table></figure>
+<p>Note that git forces you to incorporate the latest changes before pushing. This is to ensure that your push won’t
+overwrite any commits on the remote branch that aren’t present in your local branch, which could lead to loss of work.
+However, there may be times when you intentionally want to overwrite the remote branch, as for example, you may have
+rewritten the commit history of your local branch. This is where <code>git push -f</code> comes into play, telling git to forcefully
+push your commits, even if this means overwriting commits on the remote branch that aren’t in your local branch.</p>
+<p>As a side note, <code>push</code> does not necessarily imply that new commits will be added to the remote branch, but rather that
+the remote branch will be updated. For example, <code>git push origin :bug-fix/issue-18919</code> will delete the branch from the
+remote.</p>
+<h3 id="Merging"><a href="#Merging" class="headerlink" title="Merging"></a>Merging</h3><p><strong>Merging is the process of combining two branches into one.</strong> In git terms, the branch that receives the changes is called
+the <em>target branch</em>, while the branch that is merged into it is called the <em>source branch</em>. Merging creates a special
+commit called a <em>merge commit</em>. The special thing about it is that it has two parents:
+the last commit of the target branch and the last commit of the source branch. The target branch is updated to point to the
+merge commit, while the source branch remains unchanged.<br>In the example below, we branch off <em>main</em> to create a new branch called <em>bug-fix</em>. Then, each branch diverges, as we make
+new commits: <em>c7b</em> on <em>bug-fix</em> and <em>037</em> on <em>main</em>. Finally, we merge <em>bug-fix</em> into <em>main</em>, which introduces a new commit
+(<em>aaa</em>) that has both <em>c7b</em> and <em>037</em> as parents. Assuming <em>main</em> is the current branch, this is the equivalent of running
+<code>git merge bug-fix</code>.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/merging.gif" alt="Git merge"></p>
+<h3 id="Rebasing"><a href="#Rebasing" class="headerlink" title="Rebasing"></a>Rebasing</h3><p><strong>Rebasing is the process of moving a branch to a new base commit.</strong> It essentially takes a set of commits and copies them
+somewhere else. The new base commit is usually the tip of another branch. Rebasing is a powerful tool that can be used to
+rewrite history, but it’s also a dangerous tool, as it can easily lead to conflicts. Nevertheless, it makes your commit history
+appear cleaner and more linear, which is why it’s incorporated in the merging process by a lot of software projects.
+Personally, I don’t have a strong preference, as long as a consistent workflow is followed for the entire team.<br>In the example below, we branch off <em>main</em> and create a new branch called <em>bug-fix</em>. Similar to the merging example, each branch
+diverges, but this time, before merging, we are going to rebase <em>bug-fix</em> onto <em>main</em>. This means that we are going to copy the commits from <em>bug-fix</em>
+and place them on top of <em>main</em>, which moves the point at which <em>bug-fix</em> was branched to the last commit from <em>main</em>. After rebasing,
+we can switch back to <em>main</em> and merge <em>bug-fix</em> into it. This will result in a fast-forward merge, as <em>bug-fix</em> is now a direct descendant.
+The resulting history is linear, appearing as if we were working on <em>main</em> all along. Assuming that <em>bug-fix</em> is the current branch, this is the equivalent
+of running:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rebase main</span><br><span class="line">git switch main</span><br><span class="line">git merge bug-fix</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/rebasing.gif" alt="Git rebase"></p>
+<h3 id="Moving-around"><a href="#Moving-around" class="headerlink" title="Moving around"></a>Moving around</h3><p>By moving around in git, I mean the ability to traverse up and down the commit tree that represents your project.</p>
+<h4 id="HEAD"><a href="#HEAD" class="headerlink" title="HEAD"></a>HEAD</h4><p>You can think of <code>HEAD</code> as a pointer to the current commit. It’s a symbolic name for the commit you’re working on top of.
+Normally, it points to the tip of the current branch, but it can also point to a commit, in case you have
+checked out a specific commit instead of a branch. When <code>HEAD</code> refers to a commit, as opposed to a branch name,
+it’s said to be in a <em>detached state</em>.<br>You can check what <code>HEAD</code> points to by inspecting the <code>.git/HEAD</code> file - it will either contain a reference to a
+branch name or a commit hash.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git checkout main</span><br><span class="line">cat .git/HEAD</span><br><span class="line">ref: refs/heads/main</span><br><span class="line"></span><br><span class="line">git checkout 7cc99c4</span><br><span class="line">cat .git/HEAD</span><br><span class="line">7cc99c460f1df70ba2a46bf120781ebc70a94cdd</span><br></pre></td></tr></table></figure>
+
+<p>If you just want to get the hash of the currently checked commit, regardless of the HEAD’s state,
+you can run <code>git rev-parse HEAD</code>. Nevertheless, the whole point of using <code>HEAD</code> is to avoid having to deal with
+commit hashes. For example, let’s take a look at the recent commit history of the
+<a target="_blank" rel="noopener" href="https://github.com/ArangoDB-Community/python-arango">python-arango</a> project:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git log -5 | grep commit</span><br><span class="line"></span><br><span class="line">commit a2f856af4851622156bac009a43506a7d756ab80</span><br><span class="line">commit 0dc641e2ae296141bbf2e373b71a03e07a3ef87e</span><br><span class="line">commit b82de8c4d525e08db4abe4ba9f804164123fa54c</span><br><span class="line">commit f3307748337efa1c8a636e680a5a199be37e7be3</span><br><span class="line">commit 8b09e077ea2155e5cd7a9cccb539b9ca57349155</span><br></pre></td></tr></table></figure>
+<p>As I’m writing this, <code>HEAD</code> points to the default branch, <code>main</code>, whose tip is the first commit in the list above.
+Luckily, git provides relative refs, which are a very powerful way of referring to commits relative to another point
+of reference, such as <code>HEAD</code> or a branch name (remember that a branch is just a pointer to a commit).</p>
+<h5 id="caret"><a href="#caret" class="headerlink" title="caret (^)"></a>caret (^)</h5><p>Each time you append a caret to a ref, you’re telling git to traverse one commit up the commit tree. For example,
+<code>HEAD^</code> is the parent of <code>HEAD</code>, <code>HEAD^^</code> is the grandparent of <code>HEAD</code>, and so on.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">git rev-parse HEAD</span><br><span class="line">a2f856af4851622156bac009a43506a7d756ab80</span><br><span class="line"></span><br><span class="line">git rev-parse HEAD^</span><br><span class="line">0dc641e2ae296141bbf2e373b71a03e07a3ef87e</span><br><span class="line"></span><br><span class="line">git rev-parse HEAD^^</span><br><span class="line">b82de8c4d525e08db4abe4ba9f804164123fa54c</span><br></pre></td></tr></table></figure>
+
+<p>You might be wondering what happens when you append a caret to a commit that has multiple parents. In this case,
+you can specify which parent you want to traverse to. For example, <code>HEAD^2</code> is the second parent of <code>HEAD</code>. The default
+is the first parent, so <code>HEAD^</code> is equivalent to <code>HEAD^1</code>.<br>To wrap it up, you can use the caret to refer to any commit in the commit tree, as long as you know its position relative
+to another commit or branch. This is very useful when you want to check out a specific commit. The following commands
+are all equivalent and will check out the commit with hash <code>0dc641e</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git checkout HEAD^</span><br><span class="line">git checkout main^</span><br><span class="line">git checkout a2f856a^</span><br></pre></td></tr></table></figure>
+
+<h5 id="tilde"><a href="#tilde" class="headerlink" title="tilde (~)"></a>tilde (~)</h5><p>You might have noticed that the caret is useful to refer to commits in the immediate vicinity of another commit or branch.
+However, it might look awkward to use it when referring to commits that are further away. For example, if you want to refer to
+the 5th parent of <code>HEAD</code>, you would have to write <code>HEAD^^^^^</code>. This is where the tilde comes in handy. It’s similar to
+the caret, but it’s used to refer to the <em>nth</em> ancestor of a commit. For example, <code>HEAD~5</code> is the 5th parent of <code>HEAD</code>.
+The following examples all refer to the same commit:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">git rev-parse HEAD^^^</span><br><span class="line">f3307748337efa1c8a636e680a5a199be37e7be3</span><br><span class="line"></span><br><span class="line">git rev-parse HEAD~3</span><br><span class="line">f3307748337efa1c8a636e680a5a199be37e7be3</span><br><span class="line"></span><br><span class="line">git rev-parse main~3</span><br><span class="line">f3307748337efa1c8a636e680a5a199be37e7be3</span><br><span class="line"></span><br><span class="line">git rev-parse a2f856a~3</span><br><span class="line">f3307748337efa1c8a636e680a5a199be37e7be3</span><br></pre></td></tr></table></figure>
+
+<h4 id="cherry-pick"><a href="#cherry-pick" class="headerlink" title="cherry-pick"></a>cherry-pick</h4><p>I think this little command is one of the most underrated features of git. It allows you to pick any commits from anywhere
+in the commit tree and apply them below your current location (HEAD). This is very useful when you want to apply just a
+couple of commits from a branch to another. For example, let’s say you have a branch called <code>feature</code> that contains
+3 commits: <code>C2</code>, <code>C3</code> and <code>C4</code>. You want to apply <code>C3</code> and <code>C4</code> to your current branch, but not <code>C2</code>. You can do this
+by running <code>git cherry-pick C3 C4</code>.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/cherry-pick.gif" alt="Git cherry-pick"></p>
+<p>Two popular use cases for <code>git cherry-pick</code> are:</p>
+<ul>
+<li>applying a hotfix to a release branch</li>
+<li>doing backports to older versions of your software</li>
+</ul>
+<h3 id="Undoing-changes"><a href="#Undoing-changes" class="headerlink" title="Undoing changes"></a>Undoing changes</h3><p>What if you realized that you made a mistake in your last commit? Or, you might have simply changed your mind about it.
+As with most things in git, there are multiple ways to go about this.</p>
+<h4 id="reset"><a href="#reset" class="headerlink" title="reset"></a>reset</h4><p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/reset.gif" alt="Git rebase"></p>
+<p><code>git reset</code> is used to move the <code>HEAD</code> pointer to a specific commit. Assume you’ve made a mistake in your last commit,
+and you want to go back to the previous commit. You can do this by running <code>git reset HEAD^</code>. This will move <code>HEAD</code> back one commit,
+while keeping the working directory untouched, allowing you to make the necessary adjustments and commit them again.
+This is equivalent to running <code>git reset --mixed HEAD^</code>, as it will un-stage the changes from the last commit,
+but keep them in the working directory.
+If you just want to move <code>HEAD</code> without affecting the staging area or the working directory,
+you can run <code>git reset --soft HEAD^</code>.
+The most destructive form is <code>git reset --hard HEAD^</code>, which will move <code>HEAD</code> to the parent of the current commit and
+discard all changes from the current commit. This is useful when you want to completely get rid of a commit, but you
+should be careful when using it, as it permanently deletes your modifications.  </p>
+<p>As a general rule, it’s ok to use <code>git reset</code> on branches that only you have seen or used, but it’s not a good idea on
+public branches where others may be collaborating with you. This is because <code>git reset</code> can rewrite the commit history,
+which may cause conflicts and confusion for other collaborators.</p>
+<p>To better illustrate the differences between the three forms of <code>git reset</code>, let’s assume we have the following commit history
+of the same <a target="_blank" rel="noopener" href="https://github.com/ArangoDB-Community/python-arango">python-arango</a> repository:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git log -2 | grep commit</span><br><span class="line"></span><br><span class="line">commit a2f856af4851622156bac009a43506a7d756ab80</span><br><span class="line">commit 0dc641e2ae296141bbf2e373b71a03e07a3ef87e</span><br></pre></td></tr></table></figure>
+
+<p>Suppose I modify <code>tester.sh</code> and stage it. Then, I modify <code>setup.py</code>, without staging it. This is what <code>git status</code> shows:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br><span class="line"></span><br><span class="line">On branch main</span><br><span class="line">Your branch is up to date with &#x27;origin/main&#x27;.</span><br><span class="line"></span><br><span class="line">Changes to be committed:</span><br><span class="line">  (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)</span><br><span class="line">        modified:   tester.sh</span><br><span class="line"></span><br><span class="line">Changes not staged for commit:</span><br><span class="line">  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)</span><br><span class="line">  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)</span><br><span class="line">        modified:   setup.py</span><br></pre></td></tr></table></figure>
+
+<p>Finally, I commit my changes (note that only <code>tester.sh</code> will be included in the commit), <code>git commit -m &quot;test&quot;</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[main da589a1] test</span><br><span class="line"> 1 file changed, 1 insertion(+), 1 deletion(-)</span><br></pre></td></tr></table></figure>
+
+<p>Then, <code>git status</code> shows the following:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">On branch main</span><br><span class="line">Your branch is ahead of &#x27;origin/main&#x27; by 1 commit.</span><br><span class="line">  (use &quot;git push&quot; to publish your local commits)</span><br><span class="line"></span><br><span class="line">Changes not staged for commit:</span><br><span class="line">  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)</span><br><span class="line">  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)</span><br><span class="line">        modified:   setup.py</span><br><span class="line"></span><br><span class="line">no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)</span><br></pre></td></tr></table></figure>
+
+<h5 id="–soft"><a href="#–soft" class="headerlink" title="–soft"></a>–soft</h5><p>Now, running <code>git reset --soft HEAD^</code> leaves the project in the same state as before I committed - <code>tester.sh</code>
+staged and <code>setup.py</code> modified. See <code>git status</code> below:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">On branch main</span><br><span class="line">Your branch is up to date with &#x27;origin/main&#x27;.</span><br><span class="line"></span><br><span class="line">Changes to be committed:</span><br><span class="line">  (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)</span><br><span class="line">        modified:   tester.sh</span><br><span class="line"></span><br><span class="line">Changes not staged for commit:</span><br><span class="line">  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)</span><br><span class="line">  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)</span><br><span class="line">        modified:   setup.py</span><br></pre></td></tr></table></figure>
+
+<h5 id="–mixed"><a href="#–mixed" class="headerlink" title="–mixed"></a>–mixed</h5><p><code>git reset --mixed HEAD^</code> leaves the repo in the same state as before I staged <code>tester.sh</code> - two modified files and nothing staged.
+See <code>git status</code> below:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">On branch main</span><br><span class="line">Your branch is up to date with &#x27;origin/main&#x27;.</span><br><span class="line"></span><br><span class="line">Changes not staged for commit:</span><br><span class="line">  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)</span><br><span class="line">  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)</span><br><span class="line">        modified:   setup.py</span><br><span class="line">        modified:   tester.sh</span><br><span class="line"></span><br><span class="line">no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)</span><br></pre></td></tr></table></figure>
+
+<h5 id="–hard"><a href="#–hard" class="headerlink" title="–hard"></a>–hard</h5><p>Finally, <code>git reset --hard HEAD^</code> leaves the repo in the exact same state as before I made any changes -
+no staged files and no modified files, therefore erasing all my work.
+See <code>git status</code> below:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">On branch main</span><br><span class="line">Your branch is up to date with &#x27;origin/main&#x27;.</span><br><span class="line"></span><br><span class="line">nothing to commit, working tree clean</span><br></pre></td></tr></table></figure>
+
+<h4 id="revert"><a href="#revert" class="headerlink" title="revert"></a>revert</h4><p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/handy-git-recipes/media/revert.gif" alt="Git rebase"></p>
+<p><code>git revert</code> provides a safer way to undo changes on public branches, without rewriting the commit history. Instead,
+it undoes the changes of the specified commit, by creating a new commit. Therefore, it appends to the
+commit history another commit which essentially cancels the diff introduced by the specified commit.
+This is useful when you want to undo a commit that has already been pushed to a remote repository. By default,
+it reverts the last commit, but you can specify any commit you want to revert using refs, just like with <code>git reset</code>.<br>After committing something with the message “test”, this is how the commit history looks after a <code>git revert</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">commit 7e3b51649987e13b294c84a561684c3c06a06387 (HEAD -&gt; main)</span><br><span class="line">Author: Alex Petenchea &lt;email@gmail.com&gt;</span><br><span class="line">Date:   Wed Jul 12 21:45:33 2023 +0300</span><br><span class="line"></span><br><span class="line">    Revert &quot;test&quot;</span><br><span class="line"></span><br><span class="line">    This reverts commit 44859808807ef97d2d1f987acaf87d38dea6c28b.</span><br><span class="line"></span><br><span class="line">commit 44859808807ef97d2d1f987acaf87d38dea6c28b</span><br><span class="line">Author: Alex Petenchea &lt;email@gmail.com&gt;</span><br><span class="line">Date:   Wed Jul 12 21:45:18 2023 +0300</span><br><span class="line"></span><br><span class="line">    test</span><br></pre></td></tr></table></figure>
+
+<h3 id="Tagging"><a href="#Tagging" class="headerlink" title="Tagging"></a>Tagging</h3><p>Branches are easily mutated. You can delete them, rename them, or move them around. This is why they are not a good
+way to keep track of releases. Tags, on the other hand, are immutable. They’re like snapshots of your project
+at key moments in its history.<br>To create a tag, you can use <code>git tag &lt;tag_name&gt;</code>, for example: <code>git tag v1.0.0</code>. By default,
+it will create a tag for the current commit, but you can specify any commit you want using refs: <code>git tag v1.0.0 feature~2</code>.
+There’s mainly two reasons for why I find tags useful:</p>
+<ul>
+<li>it’s easier to remember a tag name (such as <code>v1.0.0</code>) than a commit hash</li>
+<li>lots of release automation tools are based on tags</li>
+</ul>
+<p>You can list all existing tags in your repository by running <code>git tag</code>. To push tags to the remote,
+you can use <code>git push --tags</code>.</p>
+<h2 id="Recipes"><a href="#Recipes" class="headerlink" title="Recipes"></a>Recipes</h2><h3 id="Shallow-cloning"><a href="#Shallow-cloning" class="headerlink" title="Shallow cloning"></a>Shallow cloning</h3><p>Some repositories are huge, and you may not need the entire history of the project. For example, if you only plan to
+compile <a target="_blank" rel="noopener" href="https://github.com/arangodb/arangodb">ArangoDB</a>, you don’t have to download the entire commit history.
+You can speed up cloning substantially and use less disk space by using the <code>--single-branch</code> and <code>--depth</code>
+parameters for the clone command as follows:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone --single-branch --depth 1 git@github.com:arangodb/arangodb.git</span><br></pre></td></tr></table></figure>
+<p>This is what’s called a shallow clone. The <code>--single-branch</code> parameter tells git to only clone the default branch (in their case <code>devel</code>), and the
+<code>--depth</code> parameter tells git how many commits to clone (in this example, only the last commit).</p>
+<h3 id="Backports"><a href="#Backports" class="headerlink" title="Backports"></a>Backports</h3><p>ArangoDB (and many other software projects) continuously work towards new releases, while also maintaining older
+versions. This means that bug fixes and new features are continuously being added to the <code>devel</code> branch, while
+some (especially bug-fixes) also need to be back-ported to older versions.<br>For example, take a look at this <a target="_blank" rel="noopener" href="https://github.com/arangodb/arangodb/pull/18958">pull request</a> which fixes a bug in
+the <code>devel</code> branch. I had to backport this to 3 other branches: <code>3.11</code>, <code>3.10</code> and <code>3.9</code>.<br>Once I completed my work on the <code>devel</code> branch, I have simply switched to the other branches and cherry-picked the
+necessary commits, like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git switch 3.11</span><br><span class="line">git cherry-pick e3de0d4fd2e2dd94ea0097939d1a918680536f6c  2b0b6166314b0482e43234d55d9917f5e8d3088c</span><br></pre></td></tr></table></figure>
+<p>For older branches, such as <code>3.9</code>, I had do some manual work to resolve conflicts, but it was still much faster than
+having to re-implement the same fix 4 times.</p>
+<h3 id="Interactive-rebase"><a href="#Interactive-rebase" class="headerlink" title="Interactive rebase"></a>Interactive rebase</h3><p>This is a really cool feature of git, which allows you to rewrite history in a very simple way. It’s typically used
+to clean up the mess before pushing to a remote repository: squashing commits, reordering commits, removing commits,
+changing commit messages, etc. The “interactive” part means that git will open an interface for you to decide what to do.<br>For example, you might have a couple of commits that you used for debugging, and you don’t want to push them to the
+remote repository. Or, you might have a couple of commits that are related to the same feature, and you want to squash
+them into a single commit. I usually use it to squash <em>Work in progress</em> commits.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rebase -i HEAD~3</span><br></pre></td></tr></table></figure>
+<p>This will open an interface that looks like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pick b82de8c [DE-544] Retriable batch reads (#254)</span><br><span class="line">pick 0dc641e [DE-544] Adjusting allowRetry implementation (#255)</span><br><span class="line">pick a2f856a Adding ArangoSearch view creation test (#256)</span><br></pre></td></tr></table></figure>
+<p>The first commit is the oldest, and the last commit is the newest. You can reorder them by simply moving the lines
+around. The first word on each line is the action that will be performed on that commit. The actions that I most
+commonly use are: <code>pick</code>, <code>drop</code>, <code>squash</code> and <code>fixup</code>.<br>For details, <a target="_blank" rel="noopener" href="https://about.gitlab.com/blog/2020/11/23/keep-git-history-clean-with-interactive-rebase/">checkout GitLab’s tutorial</a>
+on how to use interactive rebase.</p>
+<h3 id="Ignoring-files"><a href="#Ignoring-files" class="headerlink" title="Ignoring files"></a>Ignoring files</h3><p>Of course, there’s the <a target="_blank" rel="noopener" href="https://git-scm.com/docs/gitignore">.gitignore</a> file for that. You can specify intentionally
+untracked files or patterns that you want git to ignore. For example, you might want to ignore all files with the
+<code>.log</code> extension, or all files in the <code>build</code> directory.<br>However, sometimes you might want to ignore files without adding them to the <code>.gitignore</code> file. For example, you might
+have a file that you want to ignore only on your machine, but not on other machines. In my case, I have some
+build artifacts that I want to ignore, but I don’t want to add them to the <code>.gitignore</code> file, because these are very
+specific to my machine. I’ve added them to the <code>.git/info/exclude</code> file, inside hidden <code>.git</code> folder in my repository.
+This file is similar to <code>.gitignore</code>, but it’s not versioned. This means that it’s not shared with other developers,
+and it’s not pushed to the remote repository.</p>
+<h3 id="Multiple-configs"><a href="#Multiple-configs" class="headerlink" title="Multiple configs"></a>Multiple configs</h3><p>Sometimes, you might want to use different email addresses for different projects. For example, use
+your personal email address for hobby projects, and your work email address for work projects. You can
+do this by setting the <code>user.email</code> and <code>user.name</code> at the repository level.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /path/to/personal/project</span><br><span class="line">git config user.email <span class="string">&quot;my.email@example.com&quot;</span></span><br><span class="line">git config user.name <span class="string">&quot;John Doe&quot;</span> </span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /path/to/work/project</span><br><span class="line">git config user.email <span class="string">&quot;work.email@example.com&quot;</span></span><br><span class="line">git config user.name <span class="string">&quot;John Doe&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>You may also want to set global defaults for your user name and email address, which will be used for all repositories
+where you haven’t set them explicitly. You can do this by running:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.email <span class="string">&quot;my.email@example.com&quot;</span></span><br><span class="line">git config --global user.name <span class="string">&quot;John Doe&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://learngitbranching.js.org/">learngitbranching.js</a></li>
+<li><a target="_blank" rel="noopener" href="https://git-scm.com/">git-scm.com</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Basics"><span class="toc-number">1.</span> <span class="toc-text">Basics</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Commits"><span class="toc-number">1.1.</span> <span class="toc-text">Commits</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Branches"><span class="toc-number">1.2.</span> <span class="toc-text">Branches</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Remotes"><span class="toc-number">1.3.</span> <span class="toc-text">Remotes</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#pull"><span class="toc-number">1.3.1.</span> <span class="toc-text">pull</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#fetch"><span class="toc-number">1.3.2.</span> <span class="toc-text">fetch</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#push"><span class="toc-number">1.3.3.</span> <span class="toc-text">push</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Merging"><span class="toc-number">1.4.</span> <span class="toc-text">Merging</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Rebasing"><span class="toc-number">1.5.</span> <span class="toc-text">Rebasing</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Moving-around"><span class="toc-number">1.6.</span> <span class="toc-text">Moving around</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HEAD"><span class="toc-number">1.6.1.</span> <span class="toc-text">HEAD</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#caret"><span class="toc-number">1.6.1.1.</span> <span class="toc-text">caret (^)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#tilde"><span class="toc-number">1.6.1.2.</span> <span class="toc-text">tilde (~)</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#cherry-pick"><span class="toc-number">1.6.2.</span> <span class="toc-text">cherry-pick</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Undoing-changes"><span class="toc-number">1.7.</span> <span class="toc-text">Undoing changes</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#reset"><span class="toc-number">1.7.1.</span> <span class="toc-text">reset</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E2%80%93soft"><span class="toc-number">1.7.1.1.</span> <span class="toc-text">–soft</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E2%80%93mixed"><span class="toc-number">1.7.1.2.</span> <span class="toc-text">–mixed</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E2%80%93hard"><span class="toc-number">1.7.1.3.</span> <span class="toc-text">–hard</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#revert"><span class="toc-number">1.7.2.</span> <span class="toc-text">revert</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tagging"><span class="toc-number">1.8.</span> <span class="toc-text">Tagging</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Recipes"><span class="toc-number">2.</span> <span class="toc-text">Recipes</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Shallow-cloning"><span class="toc-number">2.1.</span> <span class="toc-text">Shallow cloning</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Backports"><span class="toc-number">2.2.</span> <span class="toc-text">Backports</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Interactive-rebase"><span class="toc-number">2.3.</span> <span class="toc-text">Interactive rebase</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Ignoring-files"><span class="toc-number">2.4.</span> <span class="toc-text">Ignoring files</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Multiple-configs"><span class="toc-number">2.5.</span> <span class="toc-text">Multiple configs</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-number">3.</span> <span class="toc-text">References</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2023/05/01/handy-git-recipes/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&text=Handy Git Recipes"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&title=Handy Git Recipes"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&is_video=false&description=Handy Git Recipes"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Handy Git Recipes&body=Check out this article: https://apetenchea.github.io/2023/05/01/handy-git-recipes/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&title=Handy Git Recipes"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&title=Handy Git Recipes"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&title=Handy Git Recipes"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&title=Handy Git Recipes"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&name=Handy Git Recipes&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2023/05/01/handy-git-recipes/&t=Handy Git Recipes"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="I’ve been writing a lot of C++ code at ArangoDB lately. Most people want their databases to run on top of some Linux distro, which makes perfect sense, but ArangoDB supports Windows as well (at least">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Notes for C++ Development on Windows">
+<meta property="og:url" content="https://apetenchea.github.io/2022/08/01/C-development-on-Windows/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="I’ve been writing a lot of C++ code at ArangoDB lately. Most people want their databases to run on top of some Linux distro, which makes perfect sense, but ArangoDB supports Windows as well (at least">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-08-01T16:38:05.000Z">
+<meta property="article:modified_time" content="2025-04-28T11:05:16.100Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="Programming">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Notes for C++ Development on Windows</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2022/11/22/time-in-distributed-systems/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2021/10/17/installing-prebuilt-binaries-in-ubuntu/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&text=Notes for C++ Development on Windows"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&title=Notes for C++ Development on Windows"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&is_video=false&description=Notes for C++ Development on Windows"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Notes for C++ Development on Windows&body=Check out this article: https://apetenchea.github.io/2022/08/01/C-development-on-Windows/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&title=Notes for C++ Development on Windows"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&title=Notes for C++ Development on Windows"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&title=Notes for C++ Development on Windows"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&title=Notes for C++ Development on Windows"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&name=Notes for C++ Development on Windows&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&t=Notes for C++ Development on Windows"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Compilers"><span class="toc-number">1.</span> <span class="toc-text">Compilers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Debuggers"><span class="toc-number">2.</span> <span class="toc-text">Debuggers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Crash-Dumps"><span class="toc-number">3.</span> <span class="toc-text">Crash Dumps</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Notes for C++ Development on Windows
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-08-01T16:38:05.000Z" itemprop="datePublished">01 Aug 2022</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Programming/" rel="tag">Programming</a>, <a class="tag-link-link" href="/tags/Windows/" rel="tag">Windows</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>I’ve been writing a lot of C++ code at <a target="_blank" rel="noopener" href="https://github.com/arangodb/arangodb">ArangoDB</a> lately. Most people want their
+databases to run on top of some Linux distro, which makes perfect sense, but ArangoDB supports Windows as well (at least
+they did, until version 3.12).
+Even though that comes with extra maintenance costs, I think it’s a good idea. By building your project with
+different compilers, you’re making sure the code stays portable and uses only standard features.
+Clearly, multiple compilers can point out more potential issues together. By testing our project on different operating
+systems, we see how it behaves under various circumstances, thus making sure it doesn’t rely on platform
+specific behavior. I once stumbled across a stack overflow that was mostly reproduced when running the tests on Windows,
+because the stack size is by default smaller (1MB compared to 10MB on Linux). Even concurrency issues are often
+uncovered this way, because different operating systems use different <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Scheduling_(computing)">schedulers</a>.</p>
+<h2 id="Compilers"><a href="#Compilers" class="headerlink" title="Compilers"></a>Compilers</h2><p>The staple compiler on Windows is <a target="_blank" rel="noopener" href="https://visualstudio.microsoft.com/vs/features/cplusplus/">MSVC</a>. A good alternative is
+<a target="_blank" rel="noopener" href="https://clang.llvm.org/">clang</a>. If you care about MSVC compatibility, check out
+<a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/MSVCCompatibility.html">clang-cl</a>, a driver program for clang that attempts to be compatible
+with MSVC’s <em>cl.exe</em>.
+There’s also a way to get GCC on Windows, but I never tried it, one can check out <a target="_blank" rel="noopener" href="https://www.mingw-w64.org/">MinGW</a> if
+he’s so inclined.<br>I find compiling on Windows slower compared to Linux, probably due to <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/NTFS">NTFS</a>
+and <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Ext4">ext4</a> differences. More so, I sometimes experienced lag when using the computer during
+longer builds, so I decreased the CPU and IO priority of the compiler and linker processes.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Windows Registry Editor Version 5.00</span><br><span class="line"></span><br><span class="line">[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\cl.exe\PerfOptions]</span><br><span class="line">&quot;CpuPriorityClass&quot;=dword:00000005</span><br><span class="line">&quot;IoPriority&quot;=dword:00000005</span><br><span class="line"></span><br><span class="line">[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\link.exe\PerfOptions]</span><br><span class="line">&quot;CpuPriorityClass&quot;=dword:00000005</span><br><span class="line">&quot;IoPriority&quot;=dword:00000005</span><br></pre></td></tr></table></figure>
+
+<p>In the example above, I am setting the priority to <em>below normal</em>, which works great for me. Here’s a list of hex values,
+so you can customize it:</p>
+<ul>
+<li>Low: 00000001</li>
+<li>Below Normal: 00000005</li>
+<li>Normal: 00000002</li>
+<li>Above Normal: 00000006</li>
+<li>High: 00000003</li>
+</ul>
+<p>In case that’s not enough, you could limit the number of <em>cl.exe</em>
+processes (to 8, for example) by passing the <code>/p:CL_MPCount=8</code> argument to <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild">MSBuild</a>.
+If you’re using an IDE, most probably there’s a setting for that.</p>
+<h2 id="Debuggers"><a href="#Debuggers" class="headerlink" title="Debuggers"></a>Debuggers</h2><p>On Windows, I usually go for <a target="_blank" rel="noopener" href="https://lldb.llvm.org/">lldb</a>. You need <a target="_blank" rel="noopener" href="https://llvm.org/">LLVM</a> for Windows, which is
+available on their <a target="_blank" rel="noopener" href="https://github.com/llvm/llvm-project/releases">GitHub releases page</a>. You can also get
+<a target="_blank" rel="noopener" href="https://sourceware.org/gdb/">GDB</a>, but it has the disadvantage of not being able to load Windows crash dumps.
+Sometimes, during debugging, I have to observe the assembly instructions. In case of <em>x86-64</em> programs,
+I prefer the Intel syntax, which can be configured from the <code>.lldbinit</code> file, placed in the user directory:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">settings set target.x86-disassembly-flavor intel</span><br></pre></td></tr></table></figure>
+
+<p>These two debuggers are great for most use cases, but for debugging Windows drivers I had to use
+<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools">WinDbg</a>. Although WinDbg
+can be used to debug any program, not just drivers, I used it solely for that.</p>
+<h2 id="Crash-Dumps"><a href="#Crash-Dumps" class="headerlink" title="Crash Dumps"></a>Crash Dumps</h2><p>Crash Dumps are the Windows counterpart of Linux Core Dumps. When a program crashes, a dump file (.dmp) is written
+to disk. This can be later used to debug and analyze the program (memory content, registers), at the moment of the crash.
+By default, crash dump generation is disabled, but it can be enabled through the <code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps</code>
+registry key.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Windows Registry Editor Version 5.00</span><br><span class="line"></span><br><span class="line">[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps]</span><br><span class="line">&quot;DumpFolder&quot;=hex(2):25,00,4c,00,4f,00,43,00,41,00,4c,00,41,00,50,00,50,00,44,00,41,00,54,00,41,00,25,00,5c,00,54,00,65,00,6d,00,70,00</span><br><span class="line">&quot;DumpCount&quot;=dword:00000040</span><br><span class="line">&quot;DumpType&quot;=dword:00000002</span><br><span class="line">&quot;CustomDumpFlags&quot;=dword:00000000</span><br></pre></td></tr></table></figure>
+
+<p>How to configure it:</p>
+<ul>
+<li>DumpFolder - where the dump files are to be stored (<code>%LOCALAPPDATA%\Temp</code>)</li>
+<li>DumpCount - maximum number of dump files in the folder (64)</li>
+<li>DumpType - Custom/Mini/Full (Full)</li>
+<li>CustomDumpFlags - only used when <em>DumpType</em> is set to 0</li>
+</ul>
+<p>Here’s a Python one-liner to generate a <em>DumpFolder</em> REG_EXPAND_SZ from a custom string:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;,00,&#x27;</span>.join([<span class="built_in">hex</span>(<span class="built_in">ord</span>(c))[<span class="number">2</span>:] <span class="keyword">for</span> c <span class="keyword">in</span> <span class="string">&#x27;%LOCALAPPDATA%\Temp&#x27;</span>]) + <span class="string">&#x27;,00&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>To test the settings, compile and run any broken C++ program.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">void</span>)</span> </span>&#123;</span><br><span class="line">  <span class="type">int</span> *x = <span class="literal">nullptr</span>;</span><br><span class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    ++*x++;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Running this program will generate a crash dump in the folder pointed by <em>DumpFolder</em>. The dump will be named <em>executable.pid.dmp</em>.
+In my case, that was <em>broken.exe.2940.dmp</em>, because I called the executable <code>broken.exe</code> and the process ID was <code>2940</code>.
+Load the executable alongside its core in lldb:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lldb broken.exe -c broken.exe.2940.dmp</span><br></pre></td></tr></table></figure>
+
+<p>If you’re used to GDB, but are new to lldb, check out this <a target="_blank" rel="noopener" href="https://lldb.llvm.org/use/map.html">nice command map</a>.</p>
+<h2 id="References-and-Further-Reading"><a href="#References-and-Further-Reading" class="headerlink" title="References and Further Reading"></a>References and Further Reading</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/53503593/how-to-reduce-visual-studio-build-process-priority-to-prevent-unresponsive-syste">stackoverflow.com</a></li>
+<li><a target="_blank" rel="noopener" href="https://answers.microsoft.com/en-us/windows/forum/all/how-to-permanently-set-priority-processes-using/2f9ec439-5333-4625-9577-69d322cfbc5e">answers.microsoft.com</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/wer/collecting-user-mode-dumps">docs.microsoft.com</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/20237201/best-way-to-have-crash-dumps-generated-when-processes-crash">stackoverflow.com</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Compilers"><span class="toc-number">1.</span> <span class="toc-text">Compilers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Debuggers"><span class="toc-number">2.</span> <span class="toc-text">Debuggers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Crash-Dumps"><span class="toc-number">3.</span> <span class="toc-text">Crash Dumps</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&text=Notes for C++ Development on Windows"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&title=Notes for C++ Development on Windows"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&is_video=false&description=Notes for C++ Development on Windows"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Notes for C++ Development on Windows&body=Check out this article: https://apetenchea.github.io/2022/08/01/C-development-on-Windows/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&title=Notes for C++ Development on Windows"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&title=Notes for C++ Development on Windows"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&title=Notes for C++ Development on Windows"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&title=Notes for C++ Development on Windows"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&name=Notes for C++ Development on Windows&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2022/08/01/C-development-on-Windows/&t=Notes for C++ Development on Windows"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

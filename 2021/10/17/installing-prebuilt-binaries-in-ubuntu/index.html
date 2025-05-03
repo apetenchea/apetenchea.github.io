@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="The primary way of installing software in Ubuntu and other Debian-based distros is through apt-get. It downloads packages from repositories and installs them locally. However, sometimes you might have">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Installing Prebuilt Binaries in Ubuntu">
+<meta property="og:url" content="https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="The primary way of installing software in Ubuntu and other Debian-based distros is through apt-get. It downloads packages from repositories and installs them locally. However, sometimes you might have">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-10-17T16:18:32.000Z">
+<meta property="article:modified_time" content="2025-04-28T11:05:16.108Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Installing Prebuilt Binaries in Ubuntu</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2022/08/01/C-development-on-Windows/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2021/10/07/coding-standards/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&text=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&title=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&is_video=false&description=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Installing Prebuilt Binaries in Ubuntu&body=Check out this article: https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&title=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&title=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&title=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&title=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&name=Installing Prebuilt Binaries in Ubuntu&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&t=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#How-does-apt-get-work"><span class="toc-number">1.</span> <span class="toc-text">How does apt-get work?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prebuilt-packages"><span class="toc-number">2.</span> <span class="toc-text">Prebuilt packages</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Real-examples"><span class="toc-number">3.</span> <span class="toc-text">Real examples</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Go"><span class="toc-number">3.1.</span> <span class="toc-text">Go</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ArangoDB"><span class="toc-number">3.2.</span> <span class="toc-text">ArangoDB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Clang-LLVM"><span class="toc-number">3.3.</span> <span class="toc-text">Clang + LLVM</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Installing Prebuilt Binaries in Ubuntu
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-10-17T16:18:32.000Z" itemprop="datePublished">17 Oct 2021</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Linux/" rel="tag">Linux</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>The primary way of installing software in Ubuntu and other Debian-based distros is through
+<a target="_blank" rel="noopener" href="https://linux.die.net/man/8/apt-get">apt-get</a>. It downloads packages from repositories and
+installs them locally. However, sometimes you might have to install packages that come
+as prebuilt binaries.</p>
+<h2 id="How-does-apt-get-work"><a href="#How-does-apt-get-work" class="headerlink" title="How does apt-get work?"></a>How does apt-get work?</h2><p><code>apt-get</code> locates packages on the software repositories listed in <em>/etc/apt/sources.list</em> or <em>/etc/apt/sources.list.d</em>.
+It uses <a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man1/dpkg.1.html">dpkg</a> as backend to perform the installation on your system.
+In order to locate where a package has been installed, run <code>dpkg -L package_name</code>.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">dpkg -L vim</span><br><span class="line">/.</span><br><span class="line">/usr</span><br><span class="line">/usr/bin</span><br><span class="line">/usr/bin/vim.basic</span><br><span class="line">/usr/share</span><br><span class="line">/usr/share/bug</span><br><span class="line">/usr/share/bug/vim</span><br><span class="line">/usr/share/bug/vim/presubj</span><br><span class="line">/usr/share/bug/vim/script</span><br><span class="line">/usr/share/doc</span><br><span class="line">/usr/share/doc/vim</span><br><span class="line">/usr/share/doc/vim/NEWS.Debian.gz</span><br><span class="line">/usr/share/doc/vim/changelog.Debian.gz</span><br><span class="line">/usr/share/doc/vim/copyright</span><br><span class="line">/usr/share/lintian</span><br><span class="line">/usr/share/lintian/overrides</span><br><span class="line">/usr/share/lintian/overrides/vim</span><br></pre></td></tr></table></figure>
+<p>The example above displays all the files that come with the <a target="_blank" rel="noopener" href="https://www.vim.org/">vim</a> package. Run <code>apt show vim</code> to get more details.</p>
+<h2 id="Prebuilt-packages"><a href="#Prebuilt-packages" class="headerlink" title="Prebuilt packages"></a>Prebuilt packages</h2><p>Things can be really smooth with <code>apt</code> or <code>apt-get</code>, but when dealing with prebuilt packages, some manual intervention is required.
+These packages generally come as <code>.tar.gz</code> archives containing compiled binaries for a specific platform. You have to extract them and
+move the contents to <em>/usr/local</em> or <em>/opt</em> for a system-wide installation. <a target="_blank" rel="noopener" href="https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s09.html">/usr/local</a>
+is for use by the system administrator when installing software locally, while <a target="_blank" rel="noopener" href="https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch03s13.html">/opt</a>
+if for installing packages that are not part of the operating system. It’s up to you which one you choose, in my experience either
+works fine. Let’s say you want to install a prebuilt package named <em>example.tar.gz</em>. Note that any of the steps described bellow may require root privileges.</p>
+<ol>
+<li>Make sure the package is not already installed in <em>/usr/local</em> or <em>/opt</em>. If that’s the case, remove all files from the previous
+installation: <code>rm -rf /opt/example</code>.</li>
+<li>Extract the contents of the archive into the desired location. <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -C /opt -xzf example.tar.gz </span><br></pre></td></tr></table></figure>
+<ul>
+<li>-C is used to change the target directory</li>
+<li>x is used to extract files from the archive</li>
+<li>z is used to filter the archive through <a target="_blank" rel="noopener" href="https://www.gnu.org/software/gzip/">gzip</a>. For <em>.tar.xz</em> archives use J instead of z, and for <em>.tar.bz2</em> use j.</li>
+<li>f indicates the archive to be processed</li>
+</ul>
+</li>
+<li>Add the newly installed binaries to the <code>PATH</code> environment variable. The executables are typically stored in the <em>/bin</em> folder of the package, so in this case we
+are looking for <em>/opt/example/bin</em>. To modify the <code>PATH</code> variable only for the current user, edit your <em>~/.bashrc</em> file (assuming you’re using bash) or your <code>~/.profile</code> and add the <em>bin</em> folder
+to <code>PATH</code>. To make the binaries available system-wide, edit <em>/etc/profile</em>. You may need to restart your shell for the changes to take effect.<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;<span class="variable">$PATH</span>:/opt/example/bin&quot;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="Real-examples"><a href="#Real-examples" class="headerlink" title="Real examples"></a>Real examples</h2><h3 id="Go"><a href="#Go" class="headerlink" title="Go"></a>Go</h3><p>You can find the official tutorial on <a target="_blank" rel="noopener" href="https://golang.org/doc/install">golang.org</a>.</p>
+<ol>
+<li>Download the archive. Make sure to choose a recent version. <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://golang.org/dl/go1.17.2.linux-amd64.tar.gz</span><br></pre></td></tr></table></figure></li>
+<li>Remove files from the previous installation, if any. <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo rm -rf /opt/go</span><br></pre></td></tr></table></figure></li>
+<li>Extract the archive. <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tar -C /opt -xzf go1.17.2.linux-amd64.tar.gz</span><br></pre></td></tr></table></figure></li>
+<li>Edit the <code>PATH</code> variable into your <em>~/.bashrc</em> and then reload bash config by running <code>source ~/.bashrc</code>, or simply restart the shell. <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># This line should be in your .bashrc file.</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;<span class="variable">$PATH</span>:/opt/go/bin&quot;</span></span><br></pre></td></tr></table></figure></li>
+<li>Check it out. <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go version</span><br><span class="line">go version go1.17.2 linux/amd64</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="ArangoDB"><a href="#ArangoDB" class="headerlink" title="ArangoDB"></a>ArangoDB</h3><p>Note that this may also be installed using <code>apt-get</code>. You can find details on <a target="_blank" rel="noopener" href="https://www.arangodb.com/download-major/ubuntu/">arangodb.com</a>.</p>
+<ol>
+<li>Choose your version and download the server archive. <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://download.arangodb.com/arangodb38/Community/Linux/arangodb3-linux-3.8.1.tar.gz</span><br></pre></td></tr></table></figure></li>
+<li>Remove files from the previous installation, if any. <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo rm -rf /opt/arangodb3-linux-3.8.1</span><br></pre></td></tr></table></figure></li>
+<li>Extract the archive. <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tar -C /opt -xzf arangodb3-linux-3.8.1.tar.gz </span><br></pre></td></tr></table></figure></li>
+<li>Edit the <code>PATH</code> variable into your <em>~/.bashrc</em> and then <code>source ~/.bashrc</code> or restart the shell. <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># This line should be in your .bashrc file.</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;<span class="variable">$PATH</span>:/opt/arangodb3-linux-3.8.1/bin&quot;</span></span><br></pre></td></tr></table></figure></li>
+<li>Check it out. <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">arangod --version</span><br><span class="line">3.8.1</span><br><span class="line"></span><br><span class="line">architecture: 64bit</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"><span class="comment"># long output cropped</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="Clang-LLVM"><a href="#Clang-LLVM" class="headerlink" title="Clang + LLVM"></a>Clang + LLVM</h3><p>Make sure the release is compatible with your OS version. Official releases available on <a target="_blank" rel="noopener" href="https://github.com/llvm/llvm-project/releases">github</a>.</p>
+<ol>
+<li>Download the archive. <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz</span><br></pre></td></tr></table></figure></li>
+<li>Remove files from the previous installation, if any. <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo rm -rf /opt/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04</span><br></pre></td></tr></table></figure></li>
+<li>Extract the archive. Be mindful of the file extension. <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tar -C /opt -xJf clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz</span><br></pre></td></tr></table></figure></li>
+<li>Edit the <code>PATH</code> variable into your <em>~/.bashrc</em> and then <code>source ~/.bashrc</code>, or restart the shell. <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># This line should be in your .bashrc file.</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;<span class="variable">$PATH</span>:/opt/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04/bin&quot;</span></span><br></pre></td></tr></table></figure></li>
+<li>Check it out. <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">clang --version</span><br><span class="line">clang version 10.0.0 </span><br><span class="line">Target: x86_64-unknown-linux-gnu</span><br><span class="line">Thread model: posix</span><br><span class="line">InstalledDir: /opt/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04/bin</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="References-and-Further-Reading"><a href="#References-and-Further-Reading" class="headerlink" title="References and Further Reading"></a>References and Further Reading</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://linuxhint.com/apt-get-install-packages-to/">linuxhint</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#How-does-apt-get-work"><span class="toc-number">1.</span> <span class="toc-text">How does apt-get work?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prebuilt-packages"><span class="toc-number">2.</span> <span class="toc-text">Prebuilt packages</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Real-examples"><span class="toc-number">3.</span> <span class="toc-text">Real examples</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Go"><span class="toc-number">3.1.</span> <span class="toc-text">Go</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ArangoDB"><span class="toc-number">3.2.</span> <span class="toc-text">ArangoDB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Clang-LLVM"><span class="toc-number">3.3.</span> <span class="toc-text">Clang + LLVM</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&text=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&title=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&is_video=false&description=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Installing Prebuilt Binaries in Ubuntu&body=Check out this article: https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&title=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&title=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&title=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&title=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&name=Installing Prebuilt Binaries in Ubuntu&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2021/10/17/installing-prebuilt-binaries-in-ubuntu/&t=Installing Prebuilt Binaries in Ubuntu"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

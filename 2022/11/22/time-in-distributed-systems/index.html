@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Operating Systems do a pretty good job at keeping track of time. When on the same machine, all running processes have a single source of truth: the system clock (also known as the “kernel clock”). Thi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Time in Distributed Systems">
+<meta property="og:url" content="https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="Operating Systems do a pretty good job at keeping track of time. When on the same machine, all running processes have a single source of truth: the system clock (also known as the “kernel clock”). Thi">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/physical-clock.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/quartz-crystal-oscillator-circuit.svg">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/atom.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/orbit.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/ntp.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/replicas.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/PreconditionFalseIllustration.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/lamport-clock.svg">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/CausalBroadcastIllustration.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/hlc.svg">
+<meta property="og:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/hybrid-clock.png">
+<meta property="article:published_time" content="2022-11-22T14:31:54.000Z">
+<meta property="article:modified_time" content="2025-04-28T11:05:16.184Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Distributed Systems">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/physical-clock.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Time in Distributed Systems</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/04/04/first-aid-kit-for-upgrading-debian/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2022/08/01/C-development-on-Windows/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&text=Time in Distributed Systems"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&title=Time in Distributed Systems"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&is_video=false&description=Time in Distributed Systems"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Time in Distributed Systems&body=Check out this article: https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&title=Time in Distributed Systems"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&title=Time in Distributed Systems"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&title=Time in Distributed Systems"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&title=Time in Distributed Systems"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&name=Time in Distributed Systems&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&t=Time in Distributed Systems"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Physical-Clocks"><span class="toc-number">1.</span> <span class="toc-text">Physical Clocks</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Network-Time-Protocol"><span class="toc-number">1.1.</span> <span class="toc-text">Network Time Protocol</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Inner-workings"><span class="toc-number">1.1.1.</span> <span class="toc-text">Inner workings</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Layers"><span class="toc-number">1.1.2.</span> <span class="toc-text">Layers</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#In-practice"><span class="toc-number">1.1.3.</span> <span class="toc-text">In practice</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The-Berkeley-algorithm"><span class="toc-number">1.2.</span> <span class="toc-text">The Berkeley algorithm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Monotonic-clocks"><span class="toc-number">1.3.</span> <span class="toc-text">Monotonic clocks</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Stating-the-problem"><span class="toc-number">2.</span> <span class="toc-text">Stating the problem</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Preconditions"><span class="toc-number">2.1.</span> <span class="toc-text">Preconditions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Timestamps"><span class="toc-number">2.2.</span> <span class="toc-text">Timestamps</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Google-TrueTime"><span class="toc-number">2.2.1.</span> <span class="toc-text">Google TrueTime</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Logical-Clocks"><span class="toc-number">3.</span> <span class="toc-text">Logical Clocks</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Ordering-events"><span class="toc-number">3.1.</span> <span class="toc-text">Ordering events</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Causality"><span class="toc-number">3.1.1.</span> <span class="toc-text">Causality</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Happens-before-relation"><span class="toc-number">3.1.2.</span> <span class="toc-text">Happens-before relation</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Concurrent-events"><span class="toc-number">3.1.3.</span> <span class="toc-text">Concurrent events</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Lamport-clocks"><span class="toc-number">3.2.</span> <span class="toc-text">Lamport clocks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Broadcasting"><span class="toc-number">3.3.</span> <span class="toc-text">Broadcasting</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Reliable-broadcast"><span class="toc-number">3.3.1.</span> <span class="toc-text">Reliable broadcast</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Total-order-broadcast"><span class="toc-number">3.3.2.</span> <span class="toc-text">Total order broadcast</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Practical-considerations"><span class="toc-number">3.3.3.</span> <span class="toc-text">Practical considerations</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Vector-clocks"><span class="toc-number">3.4.</span> <span class="toc-text">Vector clocks</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Causal-broadcast"><span class="toc-number">3.4.1.</span> <span class="toc-text">Causal broadcast</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hybrid-Logical-Clocks"><span class="toc-number">4.</span> <span class="toc-text">Hybrid Logical Clocks</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#In-practice-1"><span class="toc-number">4.1.</span> <span class="toc-text">In practice</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Closing-thoughts"><span class="toc-number">5.</span> <span class="toc-text">Closing thoughts</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">6.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Time in Distributed Systems
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-11-22T14:31:54.000Z" itemprop="datePublished">22 Nov 2022</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Distributed-Systems/" rel="tag">Distributed Systems</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>Operating Systems do a pretty good job at keeping track of time. When on the same machine, all running processes have a
+single source of truth: the system clock (also known as the “kernel clock”). This is a software counter based on the timer
+interrupt. On Linux systems, it counts the number of seconds elapsed since Jan 1, 1970 (UTC).
+This can only function while the machine is running, so there’s another clock, the real-time clock
+(<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Real-time_clock">RTC</a>), which keeps track of time while the system is turned off.
+At boot time, the system clock is initialized from the RTC.<br>Keeping track of time is essential for scheduling events, measuring performance, debugging, etc.
+Physical clocks can be used to count seconds, while logical clocks can be used to count events. In a centralized
+system, time is unambiguous. When a process wants to know the time, it simply makes a call to the OS. On the other hand,
+in a distributed system, achieving agreement on time is not trivial. When each machine has its own clock,
+an event that occurred after another event may nevertheless be assigned an earlier time.</p>
+<h2 id="Physical-Clocks"><a href="#Physical-Clocks" class="headerlink" title="Physical Clocks"></a>Physical Clocks</h2><p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/physical-clock.png" alt="Physical Clock"></p>
+<p>These can be found in any computer or mobile phone. The most commonly used type of physical clocks are quartz clocks,
+because they’re really cheap and provide decent accuracy. The timekeeping component of every quartz clock is a <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Quartz_clock#/media/File:Inside_QuartzCrystal-Tuningfork.jpg">quartz
+crystal resonator</a>,
+in the shape of a musician’s tuning fork. Via an electronic circuit, a battery sends electricity to the crystal,
+causing its prongs to vibrate at a certain frequency, generally 32768 Hz, or in other words, 32768 times per second.
+Counting the number of vibration allows us to count the number of seconds elapsed. The electronic circuit itself is
+quite simple, composed of a counter and a holding register. Each oscillation of the crystal decrements the counter by one.
+When the counter gets to 0, an interrupt is generated and the counter is reloaded from the holding register. The interrupt
+represents a clock tick. In this way, it is possible to program a timer to generate a clock tick 60 times per second.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/quartz-crystal-oscillator-circuit.svg" alt="Quartz Crystal Oscillator Circuit"></p>
+<p>When accuracy becomes a problem, people turn to atomic clocks. Atomic clocks are based on the quantum mechanical
+properties of the caesium atom. These high-precision clocks are way more expensive and therefore, not as widespread as
+quartz clocks. To give an idea of the difference in precision, the typical quartz clock drifts about 1 second every 100 years,
+while an atomic clock drifts the same amount of time in 100 million years.
+Using such a clock, we are able to count <a target="_blank" rel="noopener" href="https://www.britannica.com/technology/atomic-second">atomic seconds</a>,
+which are the accepted time unit by the <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/International_System_of_Units">IS</a>.
+An atomic second is a universal constant, just like the speed of light. Try to measure it anywhere in the
+universe, and you would get the same result. If we were to explain our time-measuring equipment to an
+alien civilisation, they would be able to make sense of what exactly an atomic second is, and even try to measure it themselves.  </p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/atom.png" alt="Atom"></p>
+<p>On the other hand, from our perspective here on Earth, a second is the 60<sup>th</sup> part of a minute, the 3600<sup>th</sup> part of an hour,
+the 86400<sup>th</sup> part of a day, and roughly the 31.557.600<sup>th</sup> part of a year. Since the invention of
+mechanical clocks in the 17th century, time has been measured astronomically. We think of a year as the time
+it takes for our planet to complete one revolution around the sun. Every day, the sun appears to rise on the eastern
+horizon, then climbs to a maximum height in the sky, and finally sinks in the west. The event of the sun’s reaching its
+highest apparent point in the sky is called the transit of the sun. The time interval between two consecutive transits of the sun
+is called the solar day. Therefore, a <em>solar second</em> is the 86400<sup>th</sup> part of a solar day. This way of dealing
+with time works great in our day-to-day lives. However, for someone (or something) located on another planet,
+such as Mars, the second looses this link with the planet’s rotation, becoming only a unit of time, just like the meter is
+a unit of length. A computer running on Mars and a computer running on Earth should be able to report the same timestamp,
+when prompted to do so. Problem is, due to tidal friction and atmospheric drag, the period of Earth’s rotation is not constant.
+Geologists believe that 300 million years ago there were about 400 days per year. The time for one trip around the sun
+is not thought to have changed; the day has simply become longer, while Earth got slower. Astronomers measured a large number of days,
+took the average and divided by 86400, obtaining the <em>mean solar second</em>, which in the year of its introduction was
+equal to the time it takes the caesium 133 atom to make exactly 9.192.631.770 transitions. This precise number is indeed a
+universal constant and defines the atomic second. It is used since 1958 to keep track of
+the <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/International_Atomic_Time">International Atomic Time</a>.
+But, because the mean solar day is getting longer, the difference between <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Solar_time">solar time</a>
+and atomic time is always growing. We deal with this by “pretending” to follow the solar time in increments of 1 atomic
+second, occasionally adjusting the last minute of a day to have 61 seconds, so we get back in sync with the
+<a target="_blank" rel="noopener" href="https://www.timeanddate.com/time/earth-rotation.html">solar day</a>.
+<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Coordinated_Universal_Time">Coordinated Universal Time</a>
+(or UTC) is the foundation of all modern civil timekeeping, being based on atomic time, but also including corrections to account for
+variations in Earth’s rotation. <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Leap_second">Such adjustments</a> to UTC complicate software
+that needs to work with time and dates.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/orbit.gif" alt="Planets Orbiting" title="Animation depicting planet orbits (ChongChong He)"></p>
+<h3 id="Network-Time-Protocol"><a href="#Network-Time-Protocol" class="headerlink" title="Network Time Protocol"></a>Network Time Protocol</h3><p>Even though most computers don’t come with atomic clocks, they can periodically retrieve the current time from a server that
+has one. After all, we need a way to propagate UTC to all computers. This implies some means of communication between machines,
+and therefore, in order to correctly adjust the clock, one has to take network latency and processing time into
+account. Just as <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview">HTTP</a> allows computers to fetch resources, such as HTML documents,
+the <a target="_blank" rel="noopener" href="https://datatracker.ietf.org/doc/html/rfc5905">Network Time Protocol</a> (NTP) allows
+computers to fetch the current time. Of course, it is built on top of other protocols.
+Just like HTTP operates over <a target="_blank" rel="noopener" href="https://www.ietf.org/rfc/rfc793.txt">TCP</a>, NTP operates over
+<a target="_blank" rel="noopener" href="https://www.ietf.org/rfc/rfc768.txt">UDP</a>. The port on which a normal NTP server listens for requests is 123.</p>
+<h4 id="Inner-workings"><a href="#Inner-workings" class="headerlink" title="Inner workings"></a>Inner workings</h4><video controls>
+  <source src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/NtpIllustration.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video> 
+
+<p>When the client requests the current time from a server, it passes its own time, <em>t<sub>1</sub></em>, with that request. The server
+records time <em>t<sub>2</sub></em>, the moment when it receives the request. Now, <em>t<sub>2</sub>-t<sub>1</sub></em> will be used
+to represent the network delay of the client-server request. After processing this request (i.e. fetching the current time and serializing it),
+the server records <em>t<sub>3</sub></em> and sends the response back to the client, which can then deduce the processing time
+from <em>t<sub>3</sub>-t<sub>2</sub></em>. Eventually, when the client receives the response, it sets <em>t<sub>4</sub></em> as the response
+time, and therefore knows that this has spent <em>t<sub>4</sub>-t<sub>3</sub></em> time travelling back through the network.<br>Now, the client doesn’t have an immediate answer to the current time in question, but it has these 4 timestamps to work with.
+It has to calculate the difference between its clock and the server’s clock, called the <em>clock skew</em>, denoted by <em>Θ</em> (Greek
+letter Theta). The first step is to estimate the network delay, denoted by <em>Δ</em> (Greek letter Delta). This is easy,
+because it can subtract the processing time from the total round-trip time.</p>
+<p>$$
+\begin{split}
+\Delta = (t_4 - t_1) - (t_3 - t_2)
+\end{split}
+$$</p>
+<p>Sometimes, the request delay can be longer than the response delay, or vice versa. Since we have Δ as the total network
+delay, a fair estimate of the response time would be half of that, <em>Δ/2</em>.<br>The last recorded time on the server is <em>t<sub>3</sub></em>, but it takes <em>Δ/2</em> for the client to receive that information,
+so the current time, when the client receives <em>t<sub>3</sub></em>, can be estimated as <em>t<sub>3</sub>+Δ/2</em>. The client can subtract
+its own version of the current time, <em>t<sub>4</sub></em>, and obtain the clock skew or clock difference, which represents how much the client has to
+adjust its own clock in order to get back in line with the server’s clock.</p>
+<p>$$
+\begin{split}
+\Theta = t_3 + \frac{\Delta}{2} - t_4
+\end{split}
+$$</p>
+<p>Unfortunately, network latency and processing time can vary considerably. For that reason, the client sends several requests to
+the server and applies statistical filters to eliminate outliers. Basically, it takes multiple samples of <em>Θ</em> such that in the
+end, after it has a final estimation of the clock skew, it tries to apply the correction to its own clock. However, if the skew is larger than 1000 seconds,
+it may panic and do nothing, waiting for a human operator to resolve the issue.  </p>
+<h4 id="Layers"><a href="#Layers" class="headerlink" title="Layers"></a>Layers</h4><p>How can this protocol be applied at large scale? There are over 2 billion computers in the world, and only a tiny fraction
+of them are equipped with atomic clocks, out of which an even tinier fraction are being used as NTP servers.
+In order to not flood these few machines with requests, there are multiple layers of servers that maintain the current time. The ones
+in the first layer, called primary servers, receive the timestamp from an authoritative clock source, such as an atomic
+clock or a GPS signal. All other layers, composed of secondary servers, maintain their clock by communicating with
+multiple servers from the layer above, through NTP. In the end, clients can reliably obtain the current time from the servers in the last layer.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/ntp.jpg" alt="NTP Layers"></p>
+<h4 id="In-practice"><a href="#In-practice" class="headerlink" title="In practice"></a>In practice</h4><p><a target="_blank" rel="noopener" href="https://www.ntppool.org/en/">NTP Pool Project</a> and <a target="_blank" rel="noopener" href="https://developers.google.com/time">Google Public NTP</a> are two examples
+of reliable NTP services. The former is being used by hundreds of millions of systems around the world, and it’s the
+default “time-server” for most major Linux distributions.<br>On a Linux machine, the system time and date are controlled through <code>timedatectl</code>. Simply typing the command provides the
+current status of the system clock, including whether network time synchronization is active. For a more compact,
+machine-readable output, run <code>timedatectl show</code>.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Timezone=Europe/Bucharest</span><br><span class="line">LocalRTC=no</span><br><span class="line">CanNTP=yes</span><br><span class="line">NTP=yes</span><br><span class="line">NTPSynchronized=yes</span><br><span class="line">TimeUSec=Sat 2023-01-21 00:27:51 EET</span><br><span class="line">RTCTimeUSec=Sat 2023-01-21 00:27:52 EET</span><br></pre></td></tr></table></figure>
+
+<p>Network time synchronization can be enabled using <code>timedatectl set-ntp 1</code>. To set the time and date from a Google NTP server,
+you can run <code>sudo ntpdate time.google.com</code>. Feel free to fetch the time programmatically from any of these NTP services
+and play around with it.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ntplib <span class="keyword">import</span> NTPClient</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">client = NTPClient()</span><br><span class="line">response = client.request(<span class="string">&#x27;time.google.com&#x27;</span>)</span><br><span class="line"></span><br><span class="line">t1 = response.orig_time</span><br><span class="line">t2 = response.recv_time</span><br><span class="line">t3 = response.tx_time</span><br><span class="line">t4 = response.dest_time</span><br><span class="line">delta = (t4 - t1) - (t3 - t2)</span><br><span class="line">theta = t3 + delta / <span class="number">2</span> - t4</span><br><span class="line">current_clock = datetime.now()</span><br><span class="line">adjusted_clock = datetime.fromtimestamp(datetime.timestamp(current_clock) + theta)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;t1=<span class="subst">&#123;t1&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;t2=<span class="subst">&#123;t2&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;t3=<span class="subst">&#123;t3&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;t1=<span class="subst">&#123;t4&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;delta=<span class="subst">&#123;delta&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;theta=<span class="subst">&#123;theta&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;Current Clock: <span class="subst">&#123;current_clock&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;NTP Adjusted Clock: <span class="subst">&#123;adjusted_clock&#125;</span>&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="The-Berkeley-algorithm"><a href="#The-Berkeley-algorithm" class="headerlink" title="The Berkeley algorithm"></a>The Berkeley algorithm</h3><p>Sometimes, the real atomic time does not matter. For example, in a system that’s not connected to the internet, this would
+be rather impractical to fetch. For many purposes, it is sufficient that all machines agree on the same time. The
+basic idea of this <em>internal clock synchronization algorithm</em> is to configure a time daemon that polls every machine periodically and ask
+what time it is there. Based on the answers, it computes the average time and tells all the other machines to adjust their
+clock accordingly. After the time daemon is initialized, the goal is to get everyone to happily agree on a current
+time, being that UTC or not.</p>
+<h3 id="Monotonic-clocks"><a href="#Monotonic-clocks" class="headerlink" title="Monotonic clocks"></a>Monotonic clocks</h3><p>Real-time clocks, such as the system time displayed by the <code>date</code> command, can be subject to various adjustments, as we’ve seen,
+due to NTP. When trying to get a good measurement of the time difference between events that happened on the same machine,
+such as capturing the execution time of a function, monotonic clocks are much better suited than real-time clocks. These clocks offer
+higher resolution (possibly nanoseconds) and are not affected by NTP. Their timestamp would not make sense across different
+machines, as it’s not relative to a predefined date and can be reset when the computer reboots, but they keep
+track of the time elapsed, from the perspective of the local machine, and most importantly, their value is only ever-increasing (hence the name monotonic).
+Every OS has some way of tracking monotonic time, and programming languages usually provide some abstraction over that.
+In C++, <a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/chrono/steady_clock">std::chrono::steady_clock</a> can be used for measuring such time
+intervals, at high precision. The following example illustrates how the execution time of an arbitrary lambda function could be measured using a
+monotonic clock.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">get_exec_time</span><span class="params">(<span class="keyword">auto</span>&amp;&amp; lambda)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">using</span> <span class="keyword">namespace</span> std::chrono;</span><br><span class="line">    steady_clock::time_point start = steady_clock::<span class="built_in">now</span>();</span><br><span class="line">    <span class="built_in">lambda</span>();</span><br><span class="line">    steady_clock::time_point end = steady_clock::<span class="built_in">now</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">duration_cast</span>&lt;nanoseconds&gt;(end - start).<span class="built_in">count</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Stating-the-problem"><a href="#Stating-the-problem" class="headerlink" title="Stating the problem"></a>Stating the problem</h2><p>Often enough, in a database system, updates made to one database instance are automatically propagated to other instances, called <em>replicas</em>.
+This process is called <em>replication</em>, and its purpose is to improve data availability, increase scalability and provide better disaster
+recovery capabilities. For the sake of simplicity, consider a database cluster composed of just two servers, <em>A</em> and <em>B</em>,
+located in different corners of the world. While both <em>A</em> and <em>B</em> can be accessed by clients and are able to receive updates at all times,
+they have to be kept in sync, meaning that they should store the exact same copies of the data. In order to improve the overall response
+time of the system, a query is always forwarded to the nearest replica. This optimization does not come without a cost, because now
+each update operation has to be carried out at two replicas.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/replicas.jpg" alt="Replicas in different corners of the world"></p>
+<p>Assume that both replicas are perfectly in sync and contain the following document:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  doc<span class="punctuation">:</span> <span class="string">&quot;foo&quot;</span><span class="punctuation">,</span></span><br><span class="line">  value<span class="punctuation">:</span> <span class="number">42</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>At some point, two different clients (we’ll identify them as <em>C<sub>1</sub></em> and <em>C<sub>2</sub></em>) try to update the document’s value,
+each using a different query, as expressed below in <a target="_blank" rel="noopener" href="https://www.arangodb.com/docs/stable/aql/">AQL</a> syntax:</p>
+<p><strong>C<sub>1</sub></strong> tries to add 1</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FOR</span> doc <span class="keyword">IN</span> bar</span><br><span class="line">    <span class="keyword">FILTER</span> doc.name <span class="operator">=</span><span class="operator">=</span> &quot;foo&quot;</span><br><span class="line">    <span class="keyword">UPDATE</span> doc <span class="keyword">WITH</span> &#123;</span><br><span class="line">        <span class="keyword">value</span>: doc.value <span class="operator">+</span> <span class="number">1</span></span><br><span class="line">    &#125; <span class="keyword">IN</span> bar</span><br></pre></td></tr></table></figure>
+
+<p><strong>C<sub>2</sub></strong> tries to multiply by 2 </p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FOR</span> doc <span class="keyword">IN</span> bar</span><br><span class="line">    <span class="keyword">FILTER</span> doc.name <span class="operator">=</span><span class="operator">=</span> &quot;foo&quot;</span><br><span class="line">    <span class="keyword">UPDATE</span> doc <span class="keyword">WITH</span> &#123;</span><br><span class="line">        <span class="keyword">value</span>: doc.value <span class="operator">*</span> <span class="number">2</span></span><br><span class="line">    &#125; <span class="keyword">IN</span> bar</span><br></pre></td></tr></table></figure>
+
+<p>Each server applies the query it receives and immediately sends the update to all other replicas. In case of <em>A</em>, C<sub>1</sub>‘s
+update is performed before C<sub>2</sub>‘s update. In contrast, the database at <em>B</em> will apply C<sub>2</sub>‘s update
+before C<sub>1</sub>‘s. Consequently, the database at <em>A</em> will record <code>&#123;doc: &quot;foo&quot;, value: 86&#125;</code>, whereas the one at <em>B</em> records
+<code>&#123;doc: &quot;foo&quot;, value: 85&#125;</code>. The problem that we are faced with is that the two update operations should have been performed
+in the same order at each copy. Although it makes a difference whether the addition is applied before the multiplication
+or the other way around, which order is followed is not important from a consistency point of view. The important issue
+is that both copies should be exactly the same.</p>
+<video controls>
+  <source src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/OutOfSyncIllustration.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video> 
+
+<h3 id="Preconditions"><a href="#Preconditions" class="headerlink" title="Preconditions"></a>Preconditions</h3><p>Let me start by discussing the most basic approach (in my opinion), at least in terms of implementation. Instead of passing
+raw updates between replicas, we could choose to always send the fully updated document instead. This doesn’t fix the problem
+immediately, because <em>A</em> could end up with 43 and pass that to <em>B</em>, while, in contrast, <em>B</em> applies <em>84</em> and passes it
+to <em>A</em>. The replicas would just confuse one another and get out of sync. What we need is more coordination between them.
+Upon receiving an update, a server (we can call it the <em>sender</em>) does not apply it immediately.
+Instead, it asks all other servers if they can accept the update, by passing a precondition to them.
+A precondition is a condition that must be true before a particular operation can be executed. In our case,
+the precondition is that the current value of the document is 42. If this check succeeds, it means that both the sender and the replica
+have the same copy of the document. Only after all replicas checked true for the precondition, the sender can apply the
+update itself and instruct the others to do the same. However, if the precondition fails for any of the replicas, the sender
+has to abort the query and return an error to the client.</p>
+<video controls>
+  <source src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/PreconditionTrueIllustration.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video> 
+
+<p>What happens when <em>A</em> and <em>B</em> both receive different queries and each sends a precondition at the same time? This situation
+can give rise to a write-write conflict. While trying to update the same key, both send the same precondition to
+each other, which succeeds, since both still hold the initial value of the document.
+Upon receiving confirmation, they apply the update locally and send the new version of the value to each other.
+We need to make sure a server never replies <em>true</em> on a precondition referring to a key that it is trying to change itself.
+This acts as a global lock on the key, rejecting any attempts to update it concurrently.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/PreconditionFalseIllustration.png" alt="Write-Write Conflict"></p>
+<p>Note that this approach does not scale well. Having a global lock can become frustrating for clients, as their usual
+approach is to retry the query in case of failure. The more replicas the system has, the longer it will take to synchronize
+them, which only causes the lock to be held for longer periods of time.
+The more clients there are, as they try to modify the same key, the easier it is for them to block each other with every retry.<br>Previously, we stated that a server needs confirmation from all other replicas, before executing a query. If one of them
+fails, the entire cluster gets blocked in read-only mode until the situation gets fixed. This is a huge disadvantage.<br>Nevertheless, in practice, preconditions are quite useful when a client wants to make sure the update it sends will
+have the desired effect. In other words, assuming the database cluster takes care of replication, the client might
+want to update a document, but only if that document had not changed in the meantime. This way, the client sends its
+current value or hash of the document together with the new value, and the cluster applies the update only if its document
+matches the one sent by the client. This is similar to a <a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/atomic/atomic/compare_exchange">compare_exchange</a>
+operation in C++.</p>
+<h3 id="Timestamps"><a href="#Timestamps" class="headerlink" title="Timestamps"></a>Timestamps</h3><p>Going back to the core problem, what we really want is that all updates are performed by all replicas in the same order.
+Is it possible to achieve this by passing physical timestamps along with the update operations? In this approach, each
+message is always timestamped with the current time of its sender, obtained from a physical clock.
+Let’s simplify the discussion, by assuming that no messages are lost and that messages from the same sender are received
+in the same order they were sent. This is a big assumption, but it allows us to truly focus on the ordering problem.<br>When a node receives a message, it is put into a local queue, ordered according to its timestamp. The receiver broadcasts (sends a message to all other nodes)
+an acknowledgment. A node can deliver a queued message to the application it is running only when
+that message is at the head of the queue and has been acknowledged by each other node.<br>Consider the same scenario as in the example above, involving two nodes, <em>A</em> and <em>B</em>. <em>A</em> sends message <em>m<sub>1</sub></em>, which according
+to <em>A’s</em> clock, occurs at <em>t<sub>1</sub></em>. On the other side, <em>B</em> prepares to send message <em>m<sub>2</sub></em>, timestamped with
+<em>t<sub>2</sub></em>. Assuming <em>t<sub>1</sub> &lt; t<sub>2</sub></em>, after <em>A</em> and <em>B</em> receive each other’s messages,
+their queues will contain <em>[m<sub>1</sub>, m<sub>2</sub>]</em> exactly in this order.
+Regardless of the order in which acknowledgments arrive, <em>m<sub>1</sub></em> is going to be passed to the underlying application before <em>m<sub>2</sub></em>,
+on both nodes. This ensures all nodes agree on a single, coherent view of the shared data, providing consistency.
+However, this approach has a major drawback: it is based on the assumption that all nodes have their physical clocks synchronized.
+What if <em>A’s</em> clock is 1 minute ahead of <em>B’s</em>? For every message sent by <em>A</em>, <em>B</em> has 60 seconds to send as many messages as it wants,
+during which its messages will take priority over <em>A’s</em>, since <em>B’s</em> timestamps are always lower. Apart from the fact that physical clocks may be subject to sudden change,
+clock drift (which is impossible to avoid on the long run), can cause scalability issues.
+The following animation illustrates how this kind of unfairness between the two example nodes, <em>A</em> and <em>B</em>, can occur. Even though <em>A</em> is the first
+to send its message, <em>B’s</em> messages are queued first.</p>
+<video controls>
+  <source src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/UsingTimestampsIllustration.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video> 
+
+<p>The values of the timestamps do not matter in relation to UTC, it’s just that the clocks have to be synchronized. This is
+where the Berkeley algorithm could be put to good use. The downside of that is, the time daemon may become a single point
+of failure in the system.</p>
+<h4 id="Google-TrueTime"><a href="#Google-TrueTime" class="headerlink" title="Google TrueTime"></a>Google TrueTime</h4><p>Turns out, given enough resources, it is actually possible to use physical timestamps in practice. Although infinite
+precision is asking too much, we can come pretty close. <a target="_blank" rel="noopener" href="https://cloud.google.com/spanner/docs/true-time-external-consistency">TrueTime</a>
+is Google’s solution to providing globally consistent timestamps, designed for their <a target="_blank" rel="noopener" href="https://research.google/pubs/pub39966/">Spanner</a>
+database. Back in 2006, when Google was using MySQL at massive scale, the process of re-sharding a cluster took them about two years.
+That’s how Spanner was born, designed to fit Google’s needs for scalability.
+TrueTime represents each timestamp as an interval <em>[T<sub>earliest</sub>, T<sub>latest</sub>]</em>. The service
+essentially provides three operations:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TT.now()</td>
+<td>time interval <em>[T<sub>earliest</sub>, T<sub>latest</sub>]</em></td>
+</tr>
+<tr>
+<td>TT.after(t)</td>
+<td>true if timestamp t has definitely passed</td>
+</tr>
+<tr>
+<td>TT.before(t)</td>
+<td>true if timestamp t has definitely not arrived</td>
+</tr>
+</tbody></table>
+<p>The most important aspect is that <em>T<sub>earliest</sub></em> and <em>T<sub>latest</sub></em> are guaranteed bounds. However, if
+the difference between them would be 60 seconds, we could end up with the same scalability issues as above. Remarkably, the
+engineers at Google have reduced it to just 6ms. To achieve that, several time-master machines, equipped with accurate GPS
+receivers or atomic clocks, are installed in each data center. All running nodes regularly poll a variety of masters and
+apply statistical filters to reject outliers and promote the best candidate time. Meanwhile, the performance of the system
+is continuously monitored and “bad” machines are removed. In this way, Spanner synchronizes and maintains the same time
+across all nodes globally spread across multiple data centers.<br>There’s lots of cool things to discuss about Google Spanner. It was the first system to distribute data at global scale and
+support externally-consistent distributed transactions. In simpler terms, it ensures that transactions occurring
+on different systems appear as if they were executed in a single, global order to external observers.
+Achieving externally consistent distributed transactions is no easy feat, as it typically involves coordination protocols,
+such as <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Two-phase_commit_protocol">two-phase commit (2PC)</a>, and timestamp ordering mechanisms.
+To learn more about the inner workings of Google Spanner, check out the original
+<a target="_blank" rel="noopener" href="https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf">paper</a>.</p>
+<h2 id="Logical-Clocks"><a href="#Logical-Clocks" class="headerlink" title="Logical Clocks"></a>Logical Clocks</h2><p>Not everyone has the resources to build a system like TrueTime. Luckily, there are simpler ways to reason about the ordering
+of events in a cluster. <a target="_blank" rel="noopener" href="https://lamport.org/">Leslie Lamport</a> pointed out that nodes don’t have to agree on what time it is,
+but rather on the order in which events occur, and these are two different problems. Previously, when we discussed
+the naive approach of using physical timestamps, we actually came pretty close to logical clocks. It’s only that, for
+the physical ones, we use an external device to increment it, while logical clocks are incremented with the occurrence of
+every event. An event is something happening at one node: sending or receiving a message, or a local execution step.</p>
+<h3 id="Ordering-events"><a href="#Ordering-events" class="headerlink" title="Ordering events"></a>Ordering events</h3><p>Before we can discuss how logical clocks work, we need to understand the criteria on which events may be ordered. We
+won’t be relying on physical clocks, but rather on the relation between different events. What does it mean for an event
+<em>A</em> to happen before another event <em>B</em>? Are we able to tell that an event was caused by another?</p>
+<h4 id="Causality"><a href="#Causality" class="headerlink" title="Causality"></a>Causality</h4><p>In one of his lectures, <a target="_blank" rel="noopener" href="https://martin.kleppmann.com/">Dr. Martin Kleppmann</a> beautifully defined the concepts presented here.
+<em>Causality considers whether information could have flowed from one event to another, and thus whether one event may have
+influenced another.</em> Given two events, <em>A</em> and <em>B</em>, when can we say that <em>A</em> causes (or influences) <em>B</em>?</p>
+<ul>
+<li>When <em>A</em> <strong>happens before</strong> <em>B</em>, we can say <em>A</em> <strong>might have caused</strong> <em>B</em></li>
+<li>When <em>A</em> and <em>B</em> are <strong>concurrent</strong>, we can say that <em>A</em> <strong>cannot have caused</strong> <em>B</em></li>
+</ul>
+<p>Although this is probably not what one would expect from the description of causality, essentially, it allows us to rule out the
+existence of causality between two events. However, we cannot confirm it.</p>
+<h4 id="Happens-before-relation"><a href="#Happens-before-relation" class="headerlink" title="Happens-before relation"></a>Happens-before relation</h4><p>In his <a target="_blank" rel="noopener" href="https://lamport.azurewebsites.net/pubs/time-clocks.pdf">Time, Clocks, and the Ordering of Events in a Distributed System</a> paper,
+Lamport introduced the <em>happens-before</em> relation, which essentially defines partial ordering of events in a distributed
+system. He made some fundamental observations on top of which Lamport Clocks can be built.<br>Given two events, <em>A</em> and <em>B</em>, can we check that <em>A</em> happened before <em>B</em> (noted <em>A &rarr; B</em>)? <em>A happens before B</em>
+means that all nodes agree that first event <em>A</em> occurs, then afterward, even <em>B</em> occurs. Unlike with the relation of causality,
+there’s a few ways to confirm this one for sure.</p>
+<ol>
+<li>If the events occurred on the same node, we could use a monotonic clock to compare their times of occurrence. For example,
+the event of the web browser being started on your machine has clearly occurred before you have accessed this website.</li>
+<li>If <em>A</em> is the sending of some message and <em>B</em> is the receipt of it, then <em>A</em> must-have occurred before <em>B</em>,
+because a message cannot be received unless it is sent in the first place. This one is fairly simple. Your web browser
+first sends a request to the server hosting this website, and only then the server is able to receive and process it.</li>
+<li>If there’s another event <em>C</em> such that <em>A</em> happens before <em>C</em> and <em>C</em> happens before <em>B</em>, then <em>A</em> happens before <em>B</em>.
+Using the mathematical notation, from <em>A &rarr; C</em> and <em>C &rarr; B</em>, we can infer that <em>A &rarr; B</em>. Following along
+on the example above, the web browser is first started - that’s event <em>A</em>. Then, in order to access this website, a
+request is made to the host, that’s <em>B</em>. Event <em>C</em> occurs when the host receives the request. The event of starting
+the web browser must’ve happened before the host of this website received the request.</li>
+</ol>
+<p>Note that this is a <a target="_blank" rel="noopener" href="https://mathworld.wolfram.com/PartialOrder.html">partial order</a> relation. Not all elements in a
+partially ordered set need to be directly comparable, which distinguishes it from total order.</p>
+<h4 id="Concurrent-events"><a href="#Concurrent-events" class="headerlink" title="Concurrent events"></a>Concurrent events</h4><p>When reasoning about the order of two events, <em>A</em> and <em>B</em>, we may arrive at one of the following conclusions:</p>
+<ol>
+<li><em>A</em> happens before <em>B</em>: <em>A &rarr; B</em></li>
+<li><em>B</em> happens before <em>A</em>: <em>B &rarr; A</em></li>
+<li>None of the above, which means that <em>A</em> and <em>B</em> are concurrent: <em>A || B</em></li>
+</ol>
+<p>Looking back at how we defined causality, two concurrent events are independent; they could not have caused each other.</p>
+<h3 id="Lamport-clocks"><a href="#Lamport-clocks" class="headerlink" title="Lamport clocks"></a>Lamport clocks</h3><p>Each node assigns a (logical) timestamp <em>T</em> to every event. Lamport clocks are, in fact, event counters.
+These timestamps have the property that if event <em>A</em> happens before event <em>B</em>, then <em>T<sub>A</sub> &lt; T<sub>B</sub></em>.
+The “clock” on each node can be a simple software counter, incremented every time a new event occurs.
+The value by which the counter is incremented is not relevant and can even differ per node, what really matters is that it always goes forward.<br>Consider three nodes, <em>A</em>, <em>B</em> and <em>C</em>, each having its clock incremented by 6, 8 and 10 units respectively. At time 6,
+node <em>A</em> sends message <em>m<sub>1</sub></em> to node <em>B</em>. When this message arrives, the logical clock in node <em>B</em> is incremented and reads 16.
+At time 60, <em>C</em> sends <em>m<sub>3</sub></em> to <em>B</em>. Although it leaves the node at time 60, it arrives at time 56, according to <em>B’s</em> clock.
+Following the happens-before relation, since <em>m<sub>3</sub></em> left at 60, it must arrive at 61 or later. Therefore, each
+message carries a sending time according to the sender’s clock. When a message arrives and the receiver’s clocks shows a
+value prior to the time the message was sent, the receiver fast-forwards its clock to be one more than the sending time, since
+the act of sending the message happens before receiving it. In practice, it is usually required that no two events happen at the same time,
+in other words, each logical timestamp must be unique. To address this problem, we could use tuples containing the node’s
+unique identifier and its logical counter value. For example, if we have two events <em>(61, A)</em> and <em>(61, B)</em>, then
+<em>(61, A) &lt; (61, B)</em>.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/lamport-clock.svg" alt="Lamport Clock"></p>
+<p>As for the implementation, the logical clock lives in the middleware layer, between the application network layers.
+The counter on each node is initialized to 0. Then, the algorithm is as follows:</p>
+<ol>
+<li>Before executing an internal event, a node increments its counter by 1.</li>
+<li>Before sending a message, a node increments its counter first, so all previously occurring events have a lower timestamp. The message’s timestamp is set to the incremented counter value and the message is sent over the network.</li>
+<li>Upon receiving a message, a node first adjusts its local counter to be the maximum between its current value and the timestamp of the message. After that, the counter is incremented, in order to establish a happens-before relation between the sending and the receipt.</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Node</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.counter = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">execute_event</span>(<span class="params">e: Event</span>):</span><br><span class="line">        self.counter += <span class="number">1</span></span><br><span class="line">        e.execute()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">send_message</span>(<span class="params">m: Message</span>):</span><br><span class="line">        self.counter += <span class="number">1</span></span><br><span class="line">        m.timestamp = counter</span><br><span class="line">        m.send()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">receive_message</span>(<span class="params">m: Message</span>):</span><br><span class="line">        self.counter = <span class="built_in">max</span>(counter, m.timestamp)</span><br><span class="line">        self.counter += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>When a node receives a message, it is put into a local queue (a priority queue, to be more precise), ordered according to its <em>(id, timestamp)</em> tuple.
+The receiver broadcasts an acknowledgment to the other nodes.
+A node can deliver a queued message to the application layer only when that message is at the head of the queue, and
+it has received an acknowledgment from all other nodes. The nodes eventually iterate through the same copy of the local queue,
+which means that all messages are delivered in the same order everywhere.<br>Click the <em>Play</em> button below for a live simulation of Lamport Clocks, or interact with the “servers” yourself,
+by clicking <em>exec</em> or <em>send</em> on each circle. Use the slider to control the animation speed.</p>
+<div style="display: flex;align-content: center;justify-content: center; padding:0; margin:0;" >
+  <style>
+    #lamport-clock-game {
+      width: 100%;
+      height: 50vh;
+      position: relative;
+    }
+  </style>
+    <script src="/javascript/p5-1.6.0.min.js" type="text/javascript"></script>
+    <script src="/javascript/time-in-distributed-systems/lamport.js" type="text/javascript"></script>
+    <div id="lamport-clock-game" style="position: relative"></div>
+    <script>
+LamportClocksGame.gameEnv("lamport-clock-game");
+let lamportClocksGame = new p5(LamportClocksGame.newGame, "lamport-clock-game");
+    </script>
+</div>
+
+<h3 id="Broadcasting"><a href="#Broadcasting" class="headerlink" title="Broadcasting"></a>Broadcasting</h3><p>In order to keep things simple, the above explanation was based on two assumptions:</p>
+<ul>
+<li>The network is reliable, meaning that messages are never lost.</li>
+<li>The network is ordered, meaning that messages are delivered in the same order they were sent.</li>
+</ul>
+<p>In reality, these assumptions are not always true.</p>
+<h4 id="Reliable-broadcast"><a href="#Reliable-broadcast" class="headerlink" title="Reliable broadcast"></a>Reliable broadcast</h4><p>When a node wants to broadcast a message, it individually sends that message to every other node in the cluster. However, it could happen that
+a message is dropped, and the sender crashes before retransmitting it. In this case, some nodes never get the message.
+We can enlist the help of the other nodes to make the system more reliable. The first time a node receives a message, it
+forwards it to everyone else. This way, if some nodes crash, all the remaining ones are guaranteed to receive every message.
+Unfortunately, this approach comes with a whopping <em>O(n<sup>2</sup>)</em> complexity, as each node will receive every message <em>n - 1</em> times.
+For a small distributed system, this is not a problem, but for a large one, this is a huge overhead.<br>We can choose to sacrifice some reliability in favor of efficiency. The protocol can be tweaked such that when a node wishes to broadcast
+a message, it sends it only to a subset of nodes, chosen at random. Likewise, on receiving a message for the first time, a node
+forwards it to fixed number of random nodes. This is called a <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Gossip_protocol">gossip protocol</a>,
+and in practice, if the parameters of the algorithm are chosen carefully, the probability of a message being lost can be very small.
+Notice how similar this looks to a breadth-first search in a graph.</p>
+<video controls>
+  <source src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/GossipIllustration.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video> 
+
+<h4 id="Total-order-broadcast"><a href="#Total-order-broadcast" class="headerlink" title="Total order broadcast"></a>Total order broadcast</h4><p>If we attach a Lamport timestamp to every message, each node maintains a priority queue and delivers the messages in the total order of their
+timestamp. The question is, when a node receives a message with timestamp <em>T</em>, how does it know if it has seen all messages with timestamp less than <em>T</em>?
+As the timestamp can be increased by an arbitrary amount, due to local events on each node, there is no way of telling whether
+some messages are missing, or there’s been a burst of local events. What we want is a guarantee that messages sent by the same
+node are delivered in the same order they were sent. This includes a node’s deliveries to itself, as its own messages are also
+part of the priority queue.<br>The solution is to keep a vector (could also be a map) of size <em>N</em> at each node, where <em>N</em> is the number of nodes in the cluster. Each element of the vector is a counter,
+representing the number of messages delivered by a particular node. Also, nodes maintain a counter of the number of messages they sent themselves.
+A node holds back a message until it receives the next message in sequence from the same sender. Only then, it considers delivering
+the previous message to the application and increments the counter corresponding to the sender. This approach is
+called <abbr title="First-In-First-Out">FIFO</abbr> broadcast, and combined with Lamport timestamps and reliable broadcasting, it establishes total order broadcasting.  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Node</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.<span class="built_in">id</span> = generate_id()</span><br><span class="line">        self.counter = <span class="number">0</span>  <span class="comment"># Lamport clock</span></span><br><span class="line">        self.vector = [<span class="number">0</span>] * N  <span class="comment"># vector[i] is the number of messages delivered from node i</span></span><br><span class="line">        self.sent = <span class="number">0</span>  <span class="comment"># number of messages sent by this node</span></span><br><span class="line">        self.queue = PriorityQueue()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">execute_event</span>(<span class="params">e: Event</span>):</span><br><span class="line">        self.counter += <span class="number">1</span></span><br><span class="line">        e.execute()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">send_message</span>(<span class="params">m: Message</span>):</span><br><span class="line">        <span class="comment"># conceptually, the node also sends the message to itself</span></span><br><span class="line">        self.counter += <span class="number">1</span></span><br><span class="line">        self.sent += <span class="number">1</span></span><br><span class="line">        m.timestamp = counter</span><br><span class="line">        m.sent = sent  <span class="comment"># the message carries the number of messages sent by this node so far</span></span><br><span class="line">        m.sender_id = self.<span class="built_in">id</span></span><br><span class="line">        m.send()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">receive_message</span>(<span class="params">m: Message</span>):</span><br><span class="line">        <span class="comment"># adjust the logical clock</span></span><br><span class="line">        self.counter = <span class="built_in">max</span>(counter, m.timestamp[<span class="number">0</span>])</span><br><span class="line">        self.counter += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        self.queue.append(m)</span><br><span class="line">        top = self.queue[<span class="number">0</span>]</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">not</span> is_ack(top)):</span><br><span class="line">            <span class="comment"># don&#x27;t do anything unless the message has been acknowledged by all nodes</span></span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (top.sent == self.vector[top.sender_id] + <span class="number">1</span>):</span><br><span class="line">            <span class="comment"># this is indeed the next message to be delivered from that sender</span></span><br><span class="line">            self.queue.pop()</span><br><span class="line">            top.deliver()</span><br><span class="line">            self.vector[top.sender_id] += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>You may have noticed that the code above is missing some details, such as the <code>PriorityQueue</code> implementation. It is only meant to illustrate
+the idea behind broadcasting. However, I would like to touch upon the <code>is_ack</code> function, as it deserves a paragraph of its own.
+A simple way to implement acknowledgements is to have each node broadcast an acknowledgement for every message it receives, containing the ID
+of the message it wants to acknowledge. This way, for every message in the queue, a node maintains a counter, <code>msg.ack_count</code>, which gets
+incremented every time it receives an acknowledgement for that message. A message is fully acknowledged when <code>msg.ack_count == N</code>.
+Note that sending an explicit acknowledgement message is not necessary. As every node broadcasts each message to all other nodes,
+the broadcast itself could serve as an acknowledgement, since it’s a clear indication that the node has received the message,
+otherwise it would not have broadcast it.<br>I also wrote a complete implementation of the above algorithm, which you can find <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/tree/master/source/_posts/time-in-distributed-systems/code/broadcasting">here</a>.</p>
+<h4 id="Practical-considerations"><a href="#Practical-considerations" class="headerlink" title="Practical considerations"></a>Practical considerations</h4><p>Total order broadcasting is an important vehicle for replicated services, where the replicas are kept consistent by letting them execute
+the same operations in the same order everywhere. As the replicas essentially follow the same transitions in the same finite state machine,
+it is also known as <a target="_blank" rel="noopener" href="https://www.cs.cornell.edu/fbs/publications/ibmFault.sm.pdf">state machine replication</a>.<br>The approach described above is not <em>fault-tolerant</em>: the crash of a single node can stop all other nodes from being able
+to deliver messages. If a node crashes or is partitioned from the rest of the cluster, the other nodes need a way to detect that, in order to recover.
+We can achieve this by making the nodes periodically send <em>heartbeat</em> messages to each other. If a node doesn’t receive heartbeats
+from another node for a long time, it can assume that the other node has crashed. In that case, all messages which came from it
+can be discarded, thus unblocking the queue, and the node can be removed from the cluster. When a node comes back online and
+notices that it is not part of the cluster, it rejoins the cluster as a “fresh” node and obtains a
+<em>snapshot</em> of the current state from the other nodes (easier said than done).<br>Often times, a particular node is designated as <em>leader</em>. To broadcast a message, a node has to send it to the leader,
+which then forwards it to all other nodes via <em>FIFO</em> broadcast. However, we are faced with the same
+problem as before: if the leader crashes, no more messages can be delivered. Eventually, the other nodes can detect that the leader
+is no longer available, but changing the leader safely is not trivial. In order for this article not to become exceedingly complex, we won’t go
+into that rabbit hole. Just be aware that in this article we discuss <em>leaderless algorithms</em>, but other approaches exist.</p>
+<h3 id="Vector-clocks"><a href="#Vector-clocks" class="headerlink" title="Vector clocks"></a>Vector clocks</h3><p>Going back to the happens-before relation, recall that Lamport clocks have the following property: if <em>A</em> happens before <em>B</em>,
+then <em>A</em> has a smaller timestamp than <em>B</em>. However, the converse is not true: if <em>A</em> has a smaller timestamp than <em>B</em>,
+it doesn’t necessarily mean that <em>A</em> happened before <em>B</em>. In other words, we cannot use Lamport timestamps to determine
+causality between events, since in order to do that, we would need to infer the happens-before relation from the timestamps.
+We are looking for a different algorithm, one that can yield causality information from timestamps.<br>The idea behind vector clocks is very similar to the one behind Lamport clocks. In a way, vector clocks are just an extension
+of Lamport clocks. Instead of having a single counter, each node has a vector of counters, one for each node in the cluster.
+When a node sends a message, it increments its own counter and copies the vector of counters from its local state.
+When a node receives a message, it increments its own counter and updates its vector of counters by taking the maximum
+value between its own vector and the vector in the received message. To formalize this a bit, the vector clock at each
+node has the following properties:</p>
+<ul>
+<li><em>V<sub>i</sub>[i]</em> is the number of events that have occurred so far at node <em>i</em>, sort of like its own logical clock</li>
+<li><em>V<sub>i</sub>[j]</em>, for every <em>j</em> different from <em>i</em>, is the number of events that have occurred so far at node <em>j</em> as seen by node <em>i</em>, in other words, it is <em>i’s</em> knowledge of the local time at <em>j</em></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Node</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, idx</span>):</span><br><span class="line">        self.index = idx  <span class="comment"># the index of this node in the cluster</span></span><br><span class="line">        self.vector = [<span class="number">0</span>] * N  <span class="comment"># all counters are initialized to 0</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">execute_event</span>(<span class="params">e: Event</span>):</span><br><span class="line">        self.vector[self.index] += <span class="number">1</span></span><br><span class="line">        e.execute()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">send_message</span>(<span class="params">m: Message</span>):</span><br><span class="line">        self.vector[self.index] += <span class="number">1</span></span><br><span class="line">        m.timestamp = self.vector  <span class="comment"># send the entire vector together with the message</span></span><br><span class="line">        m.send()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">receive_message</span>(<span class="params">m: Message</span>):</span><br><span class="line">        <span class="keyword">for</span> idx <span class="keyword">in</span> <span class="built_in">range</span>(N):</span><br><span class="line">            self.vector[idx] = <span class="built_in">max</span>(self.vector[idx], m.timestamp[idx])</span><br><span class="line">        self.vector[self.index] += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>By examining two vector clocks, we can derive their causal order - whether one happened before the other or they are concurrent.
+If timestamp <em>t<sub>1</sub></em> is smaller than timestamp <em>t<sub>2</sub></em>, then <em>t<sub>1</sub></em> happened before <em>t<sub>2</sub></em>.
+We say a vector is smaller than another if all its components compare less than or equal to the corresponding components
+of the other vector, and there is at least one component that is strictly less than its corresponding component of the other vector.
+In Python, the condition could be written as <code>all(t1[i] &lt;= t2[i] for i in range(N)) and any(t1[i] &lt; t2[i] for i in range(N))</code>.<br>To give some examples, consider the following vector clocks:</p>
+<ul>
+<li>Happens-before: (2, 1, 0) -&gt; (3, 3, 2)</li>
+<li>Concurrent: (2, 3, 2) || (1, 2, 4)</li>
+</ul>
+<p>Below is an animation of the vector clock algorithm in action. At the end, you’ll find an image showing all transitions
+from a different perspective.</p>
+<video controls>
+  <source src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/VectorClocksIllustration.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+
+<p>Needless to say, the causality relation that can be derived from vector clocks is purely theoretical. In practice,
+without knowing the actual information contained in messages, it is not possible to state with certainty that there is
+indeed a causal relation.</p>
+<h4 id="Causal-broadcast"><a href="#Causal-broadcast" class="headerlink" title="Causal broadcast"></a>Causal broadcast</h4><p>Using vector clocks, it is possible to ensure that a message is delivered to the application only if all messages that
+causally precede it have been delivered as well. Hence, we say the messages are delivered in causal order. The algorithm
+is similar to the one used for FIFO broadcast. The vectors themselves contain the same information: <em>V[i]</em> is the
+number of messages that have been delivered to the application, sent from node <em>i</em>.
+When a node wants to broadcast a message, it attaches a copy of its own
+vector clock to that message, adjusting with an increment the counter at its corresponding index, thus ensuring that each message
+broadcast by this node has a causal dependency on the previous message broadcast by the same node. Upon receiving a message,
+the node adds it to a queue, only updating its internal clock when messages are delivered to the application. Keep in mind
+that the vector elements don’t count events, but rather the number of messages that have been delivered from each sender.<br>Suppose <em>V</em> is the vector clock at <em>A</em>. In order for node <em>A</em> to deliver a message <em>m</em> with timestamp <em>t</em>, sent by node <em>B</em>,
+the following conditions must be met:</p>
+<ul>
+<li><em>t[B] = V[B] + 1</em>, meaning that <em>m</em> is the next message that <em>A</em> expects from <em>B</em>. This is the same condition as for FIFO total order broadcast.</li>
+<li><em>t[i] &lt;= V[i]</em>, for every <em>i</em> different from <em>B</em>. This means that <em>A</em> has already delivered all messages that <em>B</em> has delivered before it sent <em>m</em>.
+  This is what differentiates causal broadcast from FIFO total order broadcast. This condition ensures that all messages that may have caused <em>m</em> are
+  delivered before <em>m</em>.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Node</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, idx</span>):</span><br><span class="line">        self.index = idx  <span class="comment">#  the index of this node in the cluster</span></span><br><span class="line">        self.vector = [<span class="number">0</span>] * N  <span class="comment"># all counters are initialized to 0</span></span><br><span class="line">        self.sent = <span class="number">0</span>  <span class="comment">#  the number of messages sent so far by this node</span></span><br><span class="line">        self.queue = []  <span class="comment"># the queue of messages received but not yet delivered</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">send_message</span>(<span class="params">m: Message</span>):</span><br><span class="line">        m.timestamp = self.vector.copy()  <span class="comment"># send the entire vector together with the message</span></span><br><span class="line">        m.timestamp[self.index] = self.sent + <span class="number">1</span></span><br><span class="line">        m.index = self.index</span><br><span class="line">        m.send()</span><br><span class="line">        self.sent += <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">should_deliver</span>(<span class="params">m: Message</span>):</span><br><span class="line">        t = m.timestamp</span><br><span class="line">        condition1 = t[m.index] == self.vector[m.index] + <span class="number">1</span></span><br><span class="line">        condition2 = <span class="built_in">all</span>(t[i] &lt;= self.vector[i] <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(N) <span class="keyword">if</span> i != m.index)</span><br><span class="line">        <span class="keyword">return</span> condition1 <span class="keyword">and</span> condition2</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">receive_message</span>(<span class="params">m: Message</span>):</span><br><span class="line">        self.queue.append(m)</span><br><span class="line">        delivering = <span class="literal">True</span></span><br><span class="line">        <span class="keyword">while</span> delivering:</span><br><span class="line">            delivering = <span class="literal">None</span></span><br><span class="line">            <span class="keyword">for</span> msg <span class="keyword">in</span> self.queue:</span><br><span class="line">                t = msg.timestamp</span><br><span class="line">                <span class="keyword">if</span> self.should_deliver(msg):</span><br><span class="line">                    delivering = msg</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">            <span class="keyword">if</span> delivering:</span><br><span class="line">                self.queue.remove(delivering)</span><br><span class="line">                delivering.deliver()</span><br><span class="line">                self.vector = [<span class="built_in">max</span>(self.vector[i], delivering.timestamp[i]) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(N)]</span><br></pre></td></tr></table></figure>
+
+<p>When node <em>A</em> sends its message with timestamp <em>(1, 0, 0)</em>, it arrives at <em>B</em> after 1 second, but due to network latency,
+it takes 6 seconds for <em>C</em> to get the message. Therefore, when <em>B</em> sends its message with timestamp <em>(1, 1, 0)</em>,
+it arrives at <em>C</em> ahead of <em>(1, 0, 0)</em>. This is what the causal broadcast algorithm tries to correct. <em>C</em> notices that
+it’s missing a message from <em>A</em> and waits for that to be delivered first.</p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/CausalBroadcastIllustration.png" alt="Causal broadcast"></p>
+<p>It is important to note that <strong>causal broadcast is weaker than total order broadcast</strong>. Specifically, if two messages
+are not related in any way to each other, they may be delivered in different order at different locations.</p>
+<h2 id="Hybrid-Logical-Clocks"><a href="#Hybrid-Logical-Clocks" class="headerlink" title="Hybrid Logical Clocks"></a>Hybrid Logical Clocks</h2><p>We can combine both physical clocks and logical clocks into what’s called a hybrid logical clock. The resulting algorithm
+consists of two components:</p>
+<ul>
+<li>a physical component, usually synchronized to NTP, used to represent the actual wall-clock time</li>
+<li>a logical component, incremented whenever there are events happening whiting the same physical time</li>
+</ul>
+<p>Therefore, a <abbr title="Hybrid Logical Clock">HLC’s</abbr> timestamp is a tuple <em>(t, c)</em>,
+where <em>t</em> is the physical time and <em>c</em> is the logical time. The physical component is compared first, and in case of
+equality, the logical component is used. HCLs preserve the properties of Lamport clocks: if <em>A</em> happens before <em>B</em>, then <em>HLC(A) &lt; HLC(B)</em>.
+As they maintain a bounded divergence from physical time, they are useful for applications that require a certain degree
+of real-life synchronization. One important aspect of HLCs is that they are always monotonically increasing, unlike simple
+physical clocks.
+Another great thing about them is that their implementation can be of constant space complexity,
+as opposed to vector clocks.  </p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/hlc.svg" alt="HCL"></p>
+<p>ArangoDB uses 64-bit integers to represent such hybrid timestamps, out of which 44 bits are used by the physical component
+and the remaining 20 bits by the logical component. A C++ implementation can be found in <a target="_blank" rel="noopener" href="https://github.com/arangodb/arangodb/blob/devel/lib/Basics/HybridLogicalClock.h">HybridLogicalClock.h</a>
+and <a target="_blank" rel="noopener" href="https://github.com/arangodb/arangodb/blob/devel/lib/Basics/HybridLogicalClock.cpp">HybridLogicalClock.cpp</a>.
+If you’re familiar with Go, you can also check out
+<a target="_blank" rel="noopener" href="https://github.com/cockroachdb/cockroach/blob/master/pkg/util/hlc/hlc.go">CockroachDB’s implementation</a>. Below,
+I will summarize the algorithm and give a simple Python implementation inspired by the one in ArangoDB.<br>Whenever we want to generate a new timestamp, we first fetch the current physical time from the system. As with logical counters, we
+always update the clock to the maximum value encountered across nodes. If the current physical time is less than or equal to
+the last known physical time in our HLC instance, we keep the physical component as is and increment the logical component.
+Otherwise, if the current physical time is greater, we update the physical component and reset the logical component to 0.
+This way, we ensure that the newly generated timestamp is always greater than the last one.<br>Whenever we receive a timestamp from another node, we proceed to updating our own clock. For the physical component, we always
+take the maximum between the current system time, the last known physical time and the physical component extracted from the received message.
+As for the logical component, we adjust it according to which of these three options has yielded the maximum value, making sure the newly
+generated timestamp always goes forward.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> namedtuple</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Timestamp = namedtuple(<span class="string">&#x27;Timestamp&#x27;</span>, [<span class="string">&#x27;physical&#x27;</span>, <span class="string">&#x27;logical&#x27;</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">HLC</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    Hybrid Logical Clock</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self._last_timestamp = Timestamp(<span class="number">0</span>, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_physical_time</span>():</span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        Retrieve the current physical time.</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">return</span> datetime.now().timestamp()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_timestamp</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        Generate a new timestamp.</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        physical = self.get_physical_time()</span><br><span class="line">        <span class="keyword">if</span> physical &lt;= self._last_timestamp.physical:</span><br><span class="line">            <span class="comment"># Physical time stays the same,</span></span><br><span class="line">            <span class="comment"># but the logical component gets updated.</span></span><br><span class="line">            physical = self._last_timestamp.physical</span><br><span class="line">            logical = self._last_timestamp.logical + <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            logical = <span class="number">0</span></span><br><span class="line">        self._last_timestamp = Timestamp(physical, logical)</span><br><span class="line">        <span class="keyword">return</span> self._last_timestamp</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_timestamp_and_adjust</span>(<span class="params">self, received: Timestamp</span>):</span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        Adjust the local clock based on a received timestamp and return a new timestamp.</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        physical = <span class="built_in">max</span>(self.get_physical_time(),</span><br><span class="line">                       self._last_timestamp.physical,</span><br><span class="line">                       received.physical)</span><br><span class="line">        <span class="keyword">if</span> physical == self._last_timestamp.physical:</span><br><span class="line">            <span class="keyword">if</span> physical == received.physical:</span><br><span class="line">                <span class="comment"># The last recorded timestamp and the received timestamp</span></span><br><span class="line">                <span class="comment"># have the same physical time, greater than the current physical time.</span></span><br><span class="line">                logical = <span class="built_in">max</span>(self._last_timestamp.logical, received.logical) + <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># The last recorded timestamp has a higher physical time</span></span><br><span class="line">                <span class="comment"># than the received timestamp.</span></span><br><span class="line">                logical = self._last_timestamp.logical + <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> physical == received.physical:</span><br><span class="line">                <span class="comment"># The received timestamp has a higher physical time</span></span><br><span class="line">                <span class="comment"># than the last recorded timestamp.</span></span><br><span class="line">                logical = received.logical + <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># The current physical time is higher than</span></span><br><span class="line">                <span class="comment"># both the last recorded timestamp and the received timestamp.</span></span><br><span class="line">                logical = <span class="number">0</span></span><br><span class="line">        self._last_timestamp = Timestamp(physical, logical)</span><br><span class="line">        <span class="keyword">return</span> self._last_timestamp</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="In-practice-1"><a href="#In-practice-1" class="headerlink" title="In practice"></a>In practice</h3><p>There are various usages for HLCs in modern databases, apart from maintaining causality across nodes.
+I referred to <a target="_blank" rel="noopener" href="https://www.arangodb.com/">ArangoDB</a> multiple times in this article, but other databases make use of them as well.
+For example, <a target="_blank" rel="noopener" href="https://www.cockroachlabs.com/">CockroachDB</a> relies on them in order to provide their transactional
+isolation guarantees. Another example is <a target="_blank" rel="noopener" href="https://www.mongodb.com/">MongoDB</a>, using them in their
+<abbr title="Multi-Version Concurrency Control">MVCC</abbr> storage implementation.
+<a target="_blank" rel="noopener" href="https://www.postgresql.org/docs/7.1/mvcc.html">MVCC</a> is a database technique that allows multiple transactions
+to access and modify shared data concurrently without conflicts. </p>
+<p><img src="https://raw.githubusercontent.com/apetenchea/cdroot/master/source/_posts/time-in-distributed-systems/media/hybrid-clock.png" alt="Hybrid Clock Artist Concept"></p>
+<h2 id="Closing-thoughts"><a href="#Closing-thoughts" class="headerlink" title="Closing thoughts"></a>Closing thoughts</h2><p>We discussed various ways in which time is represented in distributed systems and what are their challenges.
+In the end, I would like to leave you with the words of <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Anthony_Oettinger">Anthony G. Oettinger</a>:</p>
+<blockquote>
+<p>Time flies like an arrow; fruit flies like a banana. </p>
+</blockquote>
+<h2 id="References-and-Further-Reading"><a href="#References-and-Further-Reading" class="headerlink" title="References and Further Reading"></a>References and Further Reading</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.distributed-systems.net/index.php/books/ds3/">M. van Steen and A.S. Tanenbaum, Distributed Systems, 3rd ed., distributed-systems.net, 2017.</a></li>
+<li><a target="_blank" rel="noopener" href="https://tldp.org/HOWTO/Clock-2.html">tldp.org</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.chelseaclock.com/blog/how-do-quartz-clocks-work">chelseaclock.com</a></li>
+<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Quartz_clock">wikipedia.org/wiki/Quartz_clock</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cl.cam.ac.uk/teaching/2122/ConcDisSys/materials.html">Distributed Systems Lectures by Dr Martin Kleppmann</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.pngwing.com/">pngwing.com</a></li>
+<li><a target="_blank" rel="noopener" href="https://labs.apnic.net/index.php/2014/03/10/protocol-basics-the-network-time-protocol/">APNIC</a></li>
+<li><a target="_blank" rel="noopener" href="https://news.ucr.edu/articles/2020/09/30/venus-might-be-habitable-today-if-not-jupiter">news.ucr.edu</a></li>
+<li><a target="_blank" rel="noopener" href="https://sookocheff.com/post/time/truetime/">Kevin Sookocheff</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.searce.com/internals-of-google-cloud-spanner-5927e4b83b36">Internals of Google Cloud Spanner</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/geekculture/all-things-clock-time-and-order-in-distributed-systems-physical-time-in-depth-3c0a4389a838">All Things Clock, Time and Order in Distributed Systems</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cockroachlabs.com/docs/stable/architecture/transaction-layer.html">Cockroach Labs</a></li>
+</ul>
+<script id="MathJax-script" async src="/javascript/mathjax/tex-chtml.js"></script>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Physical-Clocks"><span class="toc-number">1.</span> <span class="toc-text">Physical Clocks</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Network-Time-Protocol"><span class="toc-number">1.1.</span> <span class="toc-text">Network Time Protocol</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Inner-workings"><span class="toc-number">1.1.1.</span> <span class="toc-text">Inner workings</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Layers"><span class="toc-number">1.1.2.</span> <span class="toc-text">Layers</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#In-practice"><span class="toc-number">1.1.3.</span> <span class="toc-text">In practice</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The-Berkeley-algorithm"><span class="toc-number">1.2.</span> <span class="toc-text">The Berkeley algorithm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Monotonic-clocks"><span class="toc-number">1.3.</span> <span class="toc-text">Monotonic clocks</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Stating-the-problem"><span class="toc-number">2.</span> <span class="toc-text">Stating the problem</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Preconditions"><span class="toc-number">2.1.</span> <span class="toc-text">Preconditions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Timestamps"><span class="toc-number">2.2.</span> <span class="toc-text">Timestamps</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Google-TrueTime"><span class="toc-number">2.2.1.</span> <span class="toc-text">Google TrueTime</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Logical-Clocks"><span class="toc-number">3.</span> <span class="toc-text">Logical Clocks</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Ordering-events"><span class="toc-number">3.1.</span> <span class="toc-text">Ordering events</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Causality"><span class="toc-number">3.1.1.</span> <span class="toc-text">Causality</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Happens-before-relation"><span class="toc-number">3.1.2.</span> <span class="toc-text">Happens-before relation</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Concurrent-events"><span class="toc-number">3.1.3.</span> <span class="toc-text">Concurrent events</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Lamport-clocks"><span class="toc-number">3.2.</span> <span class="toc-text">Lamport clocks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Broadcasting"><span class="toc-number">3.3.</span> <span class="toc-text">Broadcasting</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Reliable-broadcast"><span class="toc-number">3.3.1.</span> <span class="toc-text">Reliable broadcast</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Total-order-broadcast"><span class="toc-number">3.3.2.</span> <span class="toc-text">Total order broadcast</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Practical-considerations"><span class="toc-number">3.3.3.</span> <span class="toc-text">Practical considerations</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Vector-clocks"><span class="toc-number">3.4.</span> <span class="toc-text">Vector clocks</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Causal-broadcast"><span class="toc-number">3.4.1.</span> <span class="toc-text">Causal broadcast</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hybrid-Logical-Clocks"><span class="toc-number">4.</span> <span class="toc-text">Hybrid Logical Clocks</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#In-practice-1"><span class="toc-number">4.1.</span> <span class="toc-text">In practice</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Closing-thoughts"><span class="toc-number">5.</span> <span class="toc-text">Closing thoughts</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">6.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&text=Time in Distributed Systems"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&title=Time in Distributed Systems"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&is_video=false&description=Time in Distributed Systems"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Time in Distributed Systems&body=Check out this article: https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&title=Time in Distributed Systems"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&title=Time in Distributed Systems"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&title=Time in Distributed Systems"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&title=Time in Distributed Systems"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&name=Time in Distributed Systems&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2022/11/22/time-in-distributed-systems/&t=Time in Distributed Systems"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
