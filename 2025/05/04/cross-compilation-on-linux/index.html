@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Sometimes I need to compile code for various CPU architectures. I have a pretty unusual reason for that, which is testing IDA Pro’s processor modules. While working on a processor module, I must make">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cross Compiling on Linux">
+<meta property="og:url" content="https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="Sometimes I need to compile code for various CPU architectures. I have a pretty unusual reason for that, which is testing IDA Pro’s processor modules. While working on a processor module, I must make">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-04T06:49:38.000Z">
+<meta property="article:modified_time" content="2025-05-04T15:29:56.493Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Programming">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Cross Compiling on Linux</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/03/perf/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&text=Cross Compiling on Linux"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&title=Cross Compiling on Linux"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&is_video=false&description=Cross Compiling on Linux"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Cross Compiling on Linux&body=Check out this article: https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&title=Cross Compiling on Linux"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&title=Cross Compiling on Linux"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&title=Cross Compiling on Linux"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&title=Cross Compiling on Linux"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&name=Cross Compiling on Linux&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&t=Cross Compiling on Linux"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Building"><span class="toc-number">1.</span> <span class="toc-text">Building</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Using-Docker"><span class="toc-number">1.1.</span> <span class="toc-text">Using Docker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Installing-the-toolchain"><span class="toc-number">1.2.</span> <span class="toc-text">Installing the toolchain</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Build-the-toolchain-from-source"><span class="toc-number">1.3.</span> <span class="toc-text">Build the toolchain from source</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Running-programs-for-other-architectures"><span class="toc-number">2.</span> <span class="toc-text">Running programs for other architectures</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Cross Compiling on Linux
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-04T06:49:38.000Z" itemprop="datePublished">04 May 2025</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Linux/" rel="tag">Linux</a>, <a class="tag-link-link" href="/tags/Programming/" rel="tag">Programming</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>Sometimes I need to compile code for various CPU architectures. I have a pretty unusual reason for that, which is testing
+<a target="_blank" rel="noopener" href="https://hex-rays.com/ida-pro">IDA Pro’s</a> processor modules. While working on a processor module, I must make sure
+that the newly added instructions are correctly disassembled, and the best way to do that is to feed the disassembler
+with binary code generated from a compiler. The instructions presented here are the same for most architectures,
+but I will focus on RISC-V as an example.</p>
+<h2 id="Building"><a href="#Building" class="headerlink" title="Building"></a>Building</h2><p>The first step is to get your cross-compilation toolchain ready. I generally prefer using Docker, because it does not
+pollute my system with additional packages.</p>
+<h3 id="Using-Docker"><a href="#Using-Docker" class="headerlink" title="Using Docker"></a>Using Docker</h3><p>Fortunately for us, the <a target="_blank" rel="noopener" href="https://github.com/dockcross/dockcross">dockcross</a> contains lots of cross-compilation toolchains
+wrapped in Docker images.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/dockcross/dockcross.git</span><br><span class="line"><span class="built_in">cd</span> dockcross</span><br><span class="line">docker run --<span class="built_in">rm</span> dockcross/linux-riscv64 &gt; ./dockcross-linux-riscv64</span><br><span class="line"><span class="built_in">chmod</span> +x ./dockcross-linux-riscv64</span><br></pre></td></tr></table></figure>
+
+<p>I usually invoke the shell and work from there. The coolest thing is that commands in the container run as the
+calling user, so any created files have the expected ownership, (i.e. not root).</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./dockcross-linux-riscv64 bash</span><br><span class="line">[username:/work] master ± <span class="variable">$CC</span> -o hello <span class="built_in">test</span>/C/hello.c </span><br></pre></td></tr></table></figure>
+
+<p>In the same container, running <code>readelf -h hello</code> will show you the architecture of the compiled binary:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Machine: RISC-V</span><br></pre></td></tr></table></figure>
+
+<p>Note that it might help to add the <code>-static</code> flag to the compilation command. This will create a statically linked
+binary, which is easier to run in an emulator.</p>
+<h3 id="Installing-the-toolchain"><a href="#Installing-the-toolchain" class="headerlink" title="Installing the toolchain"></a>Installing the toolchain</h3><p>If you want to install the toolchain on your system, you can do that by running the following commands:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install \</span><br><span class="line">  gcc-riscv64-linux-gnu \</span><br><span class="line">  g++-riscv64-linux-gnu \</span><br><span class="line">  binutils-riscv64-linux-gnu</span><br></pre></td></tr></table></figure>
+
+<p>If you only care about one particular architecture, this approach might feel more stable than using Docker.
+Once installed locally, use it like:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">riscv64-linux-gnu-gcc -o hello hello.c</span><br></pre></td></tr></table></figure>
+
+<p>What if you want to compile using clang? Then, you need to tell clang where to find the C libraries
+and include files. I had to do this once, because I wanted to try some exotic RISC-V instructions which were not
+supported by GCC at that time (e.g. <code>amocas</code>).</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">clang \</span><br><span class="line">  -menable-experimental-extensions \</span><br><span class="line">  --target=riscv64 \</span><br><span class="line">  -march=rv64imafdc_zicsr_zifencei_zacas1p0 \</span><br><span class="line">  -c hello.c \</span><br><span class="line">  --gcc-toolchain=/usr/riscv64-linux-gnu-</span><br></pre></td></tr></table></figure>
+
+<p>If you’re using the Docker image, you can always install clang inside the container. You can find the path to the
+toolchain by running <code>which $CC</code> and see where the compiler is located. In <code>dockross</code>, the toolchain is installed in
+<code>/usr/xcc/riscv64-unknown-linux-gnu/</code>.  </p>
+<p>Depending on what you want to do, it might get tricky to find the right include files. For C++, with <code>riscv64-linux-gnu</code>
+toolchain installed locally on my system, I once had to run something like this:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">clang++ \</span><br><span class="line">  -std=c++14 \</span><br><span class="line">  -O2 \</span><br><span class="line">  --target=riscv64 \</span><br><span class="line">  -march=rv64imafdc_zicsr_zifencei_zacas1p0 \</span><br><span class="line">  --gcc-toolchain=/usr/riscv64-linux-gnu/ \</span><br><span class="line">  -I/usr/riscv64-linux-gnu/include/c++/14 \</span><br><span class="line">  -I/usr/riscv64-linux-gnu/include/c++/14/riscv64-linux-gnu/ \</span><br><span class="line">  -isystem /usr/riscv64-linux-gnu/include \</span><br><span class="line">  -menable-experimental-extensions \</span><br><span class="line">  -c hello.cpp</span><br></pre></td></tr></table></figure>
+
+<p>Don’t get discouraged though, it’s easy once you figure out how to do it once.</p>
+<h3 id="Build-the-toolchain-from-source"><a href="#Build-the-toolchain-from-source" class="headerlink" title="Build the toolchain from source"></a>Build the toolchain from source</h3><p>Sometimes you’re looking into a new and exotic architecture, when you realize that the toolchain is not readily available. You
+might have to compile it yourself, but don’t worry, it’s actually not that hard. Take for example the
+<a target="_blank" rel="noopener" href="https://github.com/XUANTIE-RV/xuantie-gnu-toolchain">xuantie-gnu-toolchain</a>. First, go to their <code>README.md</code> and make
+sure the required dependencies are installed on your system.</p>
+<p>Then, clone the repository and build the toolchain:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/XUANTIE-RV/xuantie-gnu-toolchain</span><br><span class="line"><span class="built_in">cd</span> xuantie-gnu-toolchain</span><br><span class="line">./configure --prefix=/path/to/xuantie-gnu-toolchain</span><br><span class="line">make -j$(<span class="built_in">nproc</span>)</span><br></pre></td></tr></table></figure>
+
+<p>This will create a <code>bin</code> directory inside <code>xuantie-gnu-toolchain</code> with the cross-compilation toolchain. All the tools will
+be there. Run <code>git status</code> to inspect what else has been created.</p>
+<p>Have fun using the <code>theadc</code> extension:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./bin/riscv64-unknown-elf-gcc -march=rv64gcxtheadc -o example example.c</span><br></pre></td></tr></table></figure>
+
+<h2 id="Running-programs-for-other-architectures"><a href="#Running-programs-for-other-architectures" class="headerlink" title="Running programs for other architectures"></a>Running programs for other architectures</h2><p>Sometimes you need to run (or debug) your cross-compiled code. This is easy, you can configure <code>multiarch/qemu-user-static</code>
+to run non-native Docker images.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --<span class="built_in">rm</span> --privileged multiarch/qemu-user-static --reset -p <span class="built_in">yes</span></span><br></pre></td></tr></table></figure>
+
+<p>This registers all <code>qemu-*-static</code> interpreters under <code>/proc/sys/fs/binfmt_misc</code>. Now any RISC-V ELF you 
+execute or even debug outside of Docker will automatically be interpreted by <code>qemu-riscv64-static</code>.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./hello </span><br><span class="line">Hello cross-compilation world!</span><br></pre></td></tr></table></figure>
+
+<p>Works like magic! You can also try <code>gdb hello</code> if you want to debug it.<br>If you need a full-fledged container, here’s how you can get a RISC-V Debian “sid” up and running:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker run \</span><br><span class="line">  --<span class="built_in">rm</span> \</span><br><span class="line">  -it \</span><br><span class="line">  --platform=linux/riscv64 \</span><br><span class="line">  -v <span class="string">&quot;<span class="variable">$PWD</span>&quot;</span>:/work \</span><br><span class="line">  --workdir /work \</span><br><span class="line">  riscv64/debian:sid \</span><br><span class="line">  /bin/bash</span><br></pre></td></tr></table></figure>
+
+<p>You end up with a temporary, RISC-V-emulated Debian “sid” container, running Bash as root, with your host’s current
+directory mounted at /work. When you exit the shell, the container is automatically destroyed. This lets you install
+packages, compile or run RISC-V binaries, and edit files in your host directory — all inside a genuine RISC-V
+user-mode environment on your x86_64 machine.</p>
+<p>Enjoy!</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Building"><span class="toc-number">1.</span> <span class="toc-text">Building</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Using-Docker"><span class="toc-number">1.1.</span> <span class="toc-text">Using Docker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Installing-the-toolchain"><span class="toc-number">1.2.</span> <span class="toc-text">Installing the toolchain</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Build-the-toolchain-from-source"><span class="toc-number">1.3.</span> <span class="toc-text">Build the toolchain from source</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Running-programs-for-other-architectures"><span class="toc-number">2.</span> <span class="toc-text">Running programs for other architectures</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&text=Cross Compiling on Linux"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&title=Cross Compiling on Linux"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&is_video=false&description=Cross Compiling on Linux"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Cross Compiling on Linux&body=Check out this article: https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&title=Cross Compiling on Linux"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&title=Cross Compiling on Linux"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&title=Cross Compiling on Linux"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&title=Cross Compiling on Linux"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&name=Cross Compiling on Linux&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2025/05/04/cross-compilation-on-linux/&t=Cross Compiling on Linux"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
