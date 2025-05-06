@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="I am running Debian “sid” on my laptop, but sometimes I need to test something on Windows. I don’t want to dual boot, so I decided to run Windows in a KVM virtual machine. This is me documenting the p">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Running Windows in KVM">
+<meta property="og:url" content="https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/index.html">
+<meta property="og:site_name" content="cd &#x2F;root">
+<meta property="og:description" content="I am running Debian “sid” on my laptop, but sometimes I need to test something on Windows. I don’t want to dual boot, so I decided to run Windows in a KVM virtual machine. This is me documenting the p">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-04T15:45:37.000Z">
+<meta property="article:modified_time" content="2025-05-06T16:19:46.882Z">
+<meta property="article:author" content="Alexandru Petenchea">
+<meta property="article:tag" content="Windows">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favico.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Running Windows in KVM</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/04/cross-compilation-on-linux/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&text=Running Windows in KVM"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&title=Running Windows in KVM"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&is_video=false&description=Running Windows in KVM"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Running Windows in KVM&body=Check out this article: https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&title=Running Windows in KVM"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&title=Running Windows in KVM"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&title=Running Windows in KVM"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&title=Running Windows in KVM"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&name=Running Windows in KVM&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&t=Running Windows in KVM"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Requirements"><span class="toc-number">1.</span> <span class="toc-text">Requirements</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Virtualization-support"><span class="toc-number">1.1.</span> <span class="toc-text">Virtualization support</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Install-KVM"><span class="toc-number">1.2.</span> <span class="toc-text">Install KVM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Get-VirtIO-drivers"><span class="toc-number">1.3.</span> <span class="toc-text">Get VirtIO drivers</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Enable-libvirt-service"><span class="toc-number">1.4.</span> <span class="toc-text">Enable libvirt service</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reboot"><span class="toc-number">1.5.</span> <span class="toc-text">Reboot</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Optimize-the-host"><span class="toc-number">1.6.</span> <span class="toc-text">Optimize the host</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Enable-internet"><span class="toc-number">1.7.</span> <span class="toc-text">Enable internet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Update-your-user-permissions"><span class="toc-number">1.8.</span> <span class="toc-text">Update your user permissions</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Give-your-user-access-to-libvirt"><span class="toc-number">1.8.1.</span> <span class="toc-text">Give your user access to libvirt</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Give-your-user-access-to-the-images-directory"><span class="toc-number">1.8.2.</span> <span class="toc-text">Give your user access to the images directory</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Download-Windows"><span class="toc-number">1.9.</span> <span class="toc-text">Download Windows</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Configure-Virtual-Hardware"><span class="toc-number">2.</span> <span class="toc-text">Configure Virtual Hardware</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Using-virt-manager"><span class="toc-number">2.1.</span> <span class="toc-text">Using virt-manager</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Install-Windows"><span class="toc-number">2.2.</span> <span class="toc-text">Install Windows</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Optimize-the-installation"><span class="toc-number">2.3.</span> <span class="toc-text">Optimize the installation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Install-the-virtio-fs-shared-file-system"><span class="toc-number">2.4.</span> <span class="toc-text">Install the virtio-fs shared file system</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Conclusion"><span class="toc-number">3.</span> <span class="toc-text">Conclusion</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Running Windows in KVM
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alexandru Petenchea</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-04T15:45:37.000Z" itemprop="datePublished">04 May 2025</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Windows/" rel="tag">Windows</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>I am running Debian “sid” on my laptop, but sometimes I need to test something on Windows. I don’t want to dual boot,
+so I decided to run Windows in a KVM virtual machine. This is me documenting the process.</p>
+<h2 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h2><h3 id="Virtualization-support"><a href="#Virtualization-support" class="headerlink" title="Virtualization support"></a>Virtualization support</h3><p>I am using an Intel CPU with VT-x support. Most probably you have it too, but you can check it with the following command:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lscpu | grep Virtualization</span><br></pre></td></tr></table></figure>
+
+<p>On Intel you should get something like <code>Virtualization: VT-x</code> and on AMD you should get <code>Virtualization: AMD-V</code>.</p>
+<p>Check that your kernel includes KVM modules:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zgrep CONFIG_KVM /boot/config-$(<span class="built_in">uname</span> -r)</span><br></pre></td></tr></table></figure>
+
+<p>If you get a bunch of <code>CONFIG_KVM_*</code> lines with <code>=y</code> or <code>=m</code>, you are good to go.</p>
+<h3 id="Install-KVM"><a href="#Install-KVM" class="headerlink" title="Install KVM"></a>Install KVM</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install \</span><br><span class="line">    qemu-system-x86 \</span><br><span class="line">    libvirt-daemon-system \</span><br><span class="line">    virtinst \</span><br><span class="line">    virt-manager \</span><br><span class="line">    virt-viewer \</span><br><span class="line">    ovmf \</span><br><span class="line">    swtpm \</span><br><span class="line">    qemu-utils \</span><br><span class="line">    guestfs-tools \</span><br><span class="line">    libosinfo-bin \</span><br><span class="line">    tuned</span><br></pre></td></tr></table></figure>
+
+<p><strong>What you really need</strong></p>
+<ul>
+<li><code>qemu-system-x86</code>, <code>libvirt-daemon-system</code>, <code>qemu-utils</code>: core virtualization.</li>
+<li><code>ovmf</code>: mandatory for Win11 UEFI.</li>
+<li><code>virtinst</code> (or another install method) and <code>virt-manager</code> (or another GUI): to create/manage the VM.</li>
+</ul>
+<p><strong>What you can skip or add later</strong></p>
+<ul>
+<li><code>virt-viewer</code>: only if you want a standalone SPICE/VNC client.</li>
+<li><code>swtpm</code>: only if you plan to turn on Secure Boot or virtual TPM 2.0 inside the VM.</li>
+<li><code>guestfs-tools</code> / <code>libosinfo-bin</code>: handy for advanced image tweaks or smoother GUI installs, but not strictly required.</li>
+<li><code>tuned</code>: gives system-wide tuning profiles (e.g. “virtual-guest”) for latency or throughput, but you can tune manually without it.</li>
+</ul>
+<h3 id="Get-VirtIO-drivers"><a href="#Get-VirtIO-drivers" class="headerlink" title="Get VirtIO drivers"></a>Get VirtIO drivers</h3><p>These drivers enable direct (paravirtualized) access to devices and peripherals for virtual machines using them, instead
+of slower, emulated ones. Go to <a target="_blank" rel="noopener" href="https://pve.proxmox.com/wiki/Windows_VirtIO_Drivers">pve.proxmox.com</a> or run:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso</span><br></pre></td></tr></table></figure>
+
+<h3 id="Enable-libvirt-service"><a href="#Enable-libvirt-service" class="headerlink" title="Enable libvirt service"></a>Enable libvirt service</h3><p>The <code>libvirtd.service</code> is the system-wide daemon for <code>libvirt</code>, the management layer you’re using to run and control
+your VMs under KVM (and other hypervisors). Basically, <code>libvirtd</code> is the background service that actually does the work
+of orchestrating your virtual machines.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl <span class="built_in">enable</span> libvirtd.service</span><br></pre></td></tr></table></figure>
+
+<h3 id="Reboot"><a href="#Reboot" class="headerlink" title="Reboot"></a>Reboot</h3><p>Reboot your system to make sure everything is loaded correctly.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo reboot</span><br></pre></td></tr></table></figure>
+
+<h3 id="Optimize-the-host"><a href="#Optimize-the-host" class="headerlink" title="Optimize the host"></a>Optimize the host</h3><p>You can use the <code>tuned</code> package to optimize your host for virtualization. It is a Linux daemon that dynamically adjusts
+system settings to match your current workload, helping you squeeze out more performance or save power without manual
+tweaking. </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl <span class="built_in">enable</span> --now tuned</span><br></pre></td></tr></table></figure>
+
+<p>You can check the current profile. It usually defaults to “balanced”.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tuned-adm active</span><br></pre></td></tr></table></figure>
+
+<p>You can check the available profiles with:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tuned-adm list</span><br></pre></td></tr></table></figure>
+
+<p>If you want to optimize for running KVM guests, you can set the profile to “virtual-guest”:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tuned-adm profile virtual-host</span><br></pre></td></tr></table></figure>
+
+<h3 id="Enable-internet"><a href="#Enable-internet" class="headerlink" title="Enable internet"></a>Enable internet</h3><p>Check the state of your default libvirt network:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo virsh net-list --all</span><br></pre></td></tr></table></figure>
+
+<p>If you leave the default network inactive, your new Windows VM will have no guests-side NIC to get an IP or route out
+through your host. In that state it won’t see the Internet at all. To get internet, do the following:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo virsh net-start default     <span class="comment"># start the default NAT network now</span></span><br><span class="line">sudo virsh net-autostart default <span class="comment"># enable it on boot</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Update-your-user-permissions"><a href="#Update-your-user-permissions" class="headerlink" title="Update your user permissions"></a>Update your user permissions</h3><h4 id="Give-your-user-access-to-libvirt"><a href="#Give-your-user-access-to-libvirt" class="headerlink" title="Give your user access to libvirt"></a>Give your user access to libvirt</h4><p>If you want to be able to use <code>virsh</code> and <code>virt-manager</code> without <code>sudo</code>, you need to add your user to the <code>libvirt</code> group:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo usermod -aG libvirt <span class="variable">$USER</span></span><br><span class="line">sudo usermod -aG libvirt-qemu <span class="variable">$USER</span></span><br></pre></td></tr></table></figure>
+
+<p>Also, add the following line to your <code>~/.bashrc</code> file:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> LIBVIRT_DEFAULT_URI=<span class="string">&quot;qemu:///system&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>If you’re using a virtual Python environment and starting <code>virt-manager</code> gives you package-related errors, but works
+when being ran with <code>sudo</code>, make sure that your system packages are visible to the virtual environment. You can do this
+by editing the <code>&lt;path-to-venv&gt;/pyvenv.cfg</code> file and then re-activate the virtual environment.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">include-system-site-packages = true</span><br></pre></td></tr></table></figure>
+
+<h4 id="Give-your-user-access-to-the-images-directory"><a href="#Give-your-user-access-to-the-images-directory" class="headerlink" title="Give your user access to the images directory"></a>Give your user access to the images directory</h4><p>By default, virtual machine disk images are stored in the <code>/var/lib/libvirt/images</code> directory. Only the root user has
+access to this directory.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo setfacl -R -b /var/lib/libvirt/images             <span class="comment"># remove all existing ACLs</span></span><br><span class="line">sudo setfacl -R -m u:<span class="variable">$USER</span>:rwX /var/lib/libvirt/images <span class="comment"># give your user read/write/execute access</span></span><br><span class="line">sudo setfacl -m d:u:<span class="variable">$USER</span>:rwx /var/lib/libvirt/images  <span class="comment"># give your user default read/write/execute access</span></span><br><span class="line">getfacl /var/lib/libvirt/images                        <span class="comment"># check the ACLs</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Download-Windows"><a href="#Download-Windows" class="headerlink" title="Download Windows"></a>Download Windows</h3><p>I downloaded the Windows 11 ISO from <a target="_blank" rel="noopener" href="https://www.microsoft.com/en-us/software-download/windows11">microsoft.com</a>.</p>
+<h2 id="Configure-Virtual-Hardware"><a href="#Configure-Virtual-Hardware" class="headerlink" title="Configure Virtual Hardware"></a>Configure Virtual Hardware</h2><h3 id="Using-virt-manager"><a href="#Using-virt-manager" class="headerlink" title="Using virt-manager"></a>Using virt-manager</h3><ol>
+<li>Open <code>virt-manager</code> and check <em>Edit</em> -&gt; <em>Preferences</em> -&gt; <em>Enable XML editing</em>.</li>
+<li>Then <em>File</em> -&gt; <em>New Virtual Machine</em>.</li>
+<li>Load the Windows ISO you downloaded.</li>
+<li>Choose memory and CPU settings.</li>
+<li>Choose the disk size.</li>
+<li>Choose the image name and check <em>Customize configuration before install</em>.</li>
+<li>In the <em>Overview</em> section, make sure the chipset is set to Q35 and the firmware is set to UEFI.</li>
+<li>Enable Hyper-V Enlightenment. In particular, pay attention to <code>&lt;hyperv&gt;</code> and <code>&lt;clock&gt;</code>. <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">hyperv</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">relaxed</span> <span class="attr">state</span>=<span class="string">&quot;on&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">vapic</span> <span class="attr">state</span>=<span class="string">&quot;on&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">spinlocks</span> <span class="attr">state</span>=<span class="string">&quot;on&quot;</span> <span class="attr">retries</span>=<span class="string">&quot;8191&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">vpindex</span> <span class="attr">state</span>=<span class="string">&quot;on&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">runtime</span> <span class="attr">state</span>=<span class="string">&quot;on&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">synic</span> <span class="attr">state</span>=<span class="string">&quot;on&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">stimer</span> <span class="attr">state</span>=<span class="string">&quot;on&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">frequencies</span> <span class="attr">state</span>=<span class="string">&quot;on&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">tlbflush</span> <span class="attr">state</span>=<span class="string">&quot;on&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">ipi</span> <span class="attr">state</span>=<span class="string">&quot;on&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">evmcs</span> <span class="attr">state</span>=<span class="string">&quot;on&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">avic</span> <span class="attr">state</span>=<span class="string">&quot;on&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">hyperv</span>&gt;</span></span><br></pre></td></tr></table></figure>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">clock</span> <span class="attr">offset</span>=<span class="string">&quot;localtime&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">&quot;rtc&quot;</span> <span class="attr">tickpolicy</span>=<span class="string">&quot;catchup&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">&quot;pit&quot;</span> <span class="attr">tickpolicy</span>=<span class="string">&quot;delay&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">&quot;hpet&quot;</span> <span class="attr">present</span>=<span class="string">&quot;no&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">timer</span> <span class="attr">name</span>=<span class="string">&quot;hypervclock&quot;</span> <span class="attr">present</span>=<span class="string">&quot;yes&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">clock</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li>In the <em>CPU</em> section, set the CPU model to <em>host-passthrough</em>.</li>
+<li>For using <em>virtio-fs</em>, check <em>Enable shared memory</em> in the <em>Memory</em> section.</li>
+<li>In the <em>SATA Disk 1</em> section, set the <em>Disk Bus</em> to <em>VirtIO</em>, <em>Cache mode</em> to <em>none</em> and <em>Discard mode</em> to <em>unmap</em>.</li>
+<li>Mount the VirtIO ISO from <em>Add Hardware</em> -&gt; <em>Storage</em> -&gt; <em>Select or create custom storage</em>. Make sure <em>Device Type</em>
+is set to <em>CDROM</em> and <em>Device Bus</em> is set to <em>SATA</em>.</li>
+<li>In the <em>NIC</em> section, set the <em>Device model</em> to <em>virtio</em>.</li>
+<li>Remove the <em>Tablet</em> device (for efficiency).</li>
+<li>Add a communication channel. <em>Add Hardware</em> -&gt; <em>Channel</em> and from the drop-down list, select <em>org.qemu.guest_agent.0</em> as the <em>Name</em>.</li>
+<li>For Windows 11, make sure <em>TPM</em> -&gt; <em>Version</em> is set to <em>2.0</em>.</li>
+</ol>
+<h3 id="Install-Windows"><a href="#Install-Windows" class="headerlink" title="Install Windows"></a>Install Windows</h3><ol>
+<li>Begin Installation. If possible, I recommend Windows 11 Pro N (it comes with less bloatware).</li>
+<li>When you get to “Where do you want to install Windows?”, select <em>Load Driver</em>, choose <em>E:/viostor/w11/amd64</em> and install
+ the VirtIO driver.</li>
+<li>Before continuing with the installation, repeat the process for <em>E:/NetKVM/w11/amd64</em> and install the network driver.</li>
+<li>Continue with the installation.</li>
+<li>Launch Windows Explorer, navigate to the <em>CD Drive (E:)</em>, and double-click the <em>virtio-win-guest-tools</em> package to install it.</li>
+<li><em>View</em> -&gt; <em>Scale Display</em> -&gt; <em>Auto resize VM to window</em>.</li>
+<li>Unmount the <em>virtio-win.iso</em> image and then remove the second CDROM drive.</li>
+<li>Unmount the ISO image of the Windows 11 installer from the first CDROM drive as well.</li>
+</ol>
+<h3 id="Optimize-the-installation"><a href="#Optimize-the-installation" class="headerlink" title="Optimize the installation"></a>Optimize the installation</h3><ol>
+<li>Disable <em>SuperFetch</em> by launching <em>services</em> from the search bar and disabling the <em>SysMain</em> service.</li>
+<li>Disable <em>Windows Web Search</em> by launching <em>regedit</em> and create the key <code>Computer\HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Explorer</code>.
+Inside this key, add a new DWORD <code>DisableSearchBoxSuggestions</code> and set it to <code>1</code>.</li>
+<li>Run <code>bcdedit /set useplatformclock No</code> as Administrator to disable the platform clock.</li>
+<li>Run PowerShell as Administrator and execute <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code>.</li>
+<li>In order to trim down any unnecessary services and tasks, you can run the <a target="_blank" rel="noopener" href="https://github.com/apetenchea/cdroot/blob/master/source/_posts/running-windows-in-kvm/code/trimwin11.ps1">trimwin11.ps1 script</a>
+as administrator. Some tasks may be disabled and some may not, but don’t worry, it is meant to iterate through them and disable whatever it has permission to.</li>
+<li>Disable unnecessary startup programs: <em>Settings</em> -&gt; <em>Apps</em> &gt; <em>Startup</em>.</li>
+<li>Enable <em>Developer Mode</em> in <em>System Settings</em>.</li>
+<li>In search, <em>Adjust the appearance and performance of Windows</em> and set <em>Adjust for best performance</em>.</li>
+<li>Disable whatever else you don’t need in <em>Settings</em>, including <em>Windows Defender</em>, especially if you plan to use the
+ VM for malware analysis.</li>
+<li>Disable hibernation file by running <code>powercfg /h off</code> in an elevated command prompt.</li>
+<li>Restart for the changes to take effect.</li>
+</ol>
+<p>This would be a very good time to take a snapshot. On that note, I had some issues with deleting snapshots, so what worked
+for me was:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">virsh snapshot-delete &lt;machine-name&gt; &lt;snapshot-name&gt; --metadata</span><br><span class="line"><span class="built_in">rm</span> /var/lib/libvirt/images/&lt;machine-name&gt;&lt;snapshot-name&gt; </span><br></pre></td></tr></table></figure>
+
+<h3 id="Install-the-virtio-fs-shared-file-system"><a href="#Install-the-virtio-fs-shared-file-system" class="headerlink" title="Install the virtio-fs shared file system"></a>Install the virtio-fs shared file system</h3><p>Virtiofs is a shared file system that lets virtual machines access a directory tree on the host.</p>
+<ol>
+<li><p>Install <a target="_blank" rel="noopener" href="https://github.com/winfsp/winfsp">winfsp</a> inside your guest VM and then reboot.</p>
+</li>
+<li><p>Install <code>virtiofsd</code> on host.</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install virtiofsd</span><br><span class="line">sudo systemctl restart libvirtd</span><br></pre></td></tr></table></figure></li>
+<li><p>Add a new filesystem to the VM. In <code>virt-manager</code>, go to <em>Add Hardware</em> -&gt; <em>Filesystem</em> and select the directory
+you want to share, making sure the driver type is <code>virtiofs</code>. Basically, your libvirt XML configuration should contain
+something like this:</p>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">domain</span>&gt;</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="tag">&lt;<span class="name">memoryBacking</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">source</span> <span class="attr">type</span>=<span class="string">&#x27;memfd&#x27;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">access</span> <span class="attr">mode</span>=<span class="string">&#x27;shared&#x27;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">memoryBacking</span>&gt;</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="tag">&lt;<span class="name">devices</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filesystem</span> <span class="attr">type</span>=<span class="string">&quot;mount&quot;</span> <span class="attr">accessmode</span>=<span class="string">&quot;passthrough&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">driver</span> <span class="attr">type</span>=<span class="string">&quot;virtiofs&quot;</span> <span class="attr">queue</span>=<span class="string">&quot;1024&quot;</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">source</span> <span class="attr">dir</span>=<span class="string">&quot;/home/user/viofs&quot;</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">target</span> <span class="attr">dir</span>=<span class="string">&quot;mount_tag&quot;</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">address</span> <span class="attr">type</span>=<span class="string">&quot;pci&quot;</span> <span class="attr">domain</span>=<span class="string">&quot;0x0000&quot;</span> <span class="attr">bus</span>=<span class="string">&quot;0x06&quot;</span> <span class="attr">slot</span>=<span class="string">&quot;0x00&quot;</span> <span class="attr">function</span>=<span class="string">&quot;0x0&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">filesystem</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">devices</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">domain</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>Make sure the <code>virtiofs</code> driver in installed on the guest VM and the service is running.
+I found mine in <em>Device Manger</em> -&gt; <em>System Devices</em> -&gt; <em>VirtIO FS Device</em>. You can find the driver
+in the <em>virtio-win.iso</em> image, which you can add as a CDROM device in <code>virt-manager</code> and then load the driver from there.</p>
+</li>
+<li><p>Start the service: <code>sc.exe create VirtioFsSvc binpath=&quot;(your binary location)\virtiofs.exe&quot; start=auto depend=&quot;WinFsp.Launcher/VirtioFsDrv&quot; DisplayName=&quot;Virtio FS Service&quot;</code>
+and then run <code>sc.exe start VirtioFsSvc</code>. In case the service was already created, use <code>config</code> instead of <code>create</code>.</p>
+</li>
+<li><p>If you want it to start automatically, run <code>sc.exe config VirtioFsSvc start= auto</code>.</p>
+</li>
+</ol>
+<p>Symlinks don’t work, but you can always mount another directory in your shared directory. For example, on the host I have
+my <code>windows</code> directory in <code>~/windows</code> but I also want to make the <code>~/src</code> directory available in the VM. I can do this
+by running the following command:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p ~/windows/src</span><br><span class="line">sudo mount --<span class="built_in">bind</span> ~/src ~/windows/src</span><br></pre></td></tr></table></figure>
+
+<p>Or you can make it persistent by adding the following line to your <code>/etc/fstab</code> file:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/home/&lt;user&gt;/src        /home/&lt;user&gt;/windows/src      none      bind      0      0</span><br></pre></td></tr></table></figure>
+
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>It took me a while to get everything working, but now I have a fully functional Windows 11 VM running on KVM with
+virtio-fs shared file system. The performance is surprisingly good!</p>
+<p>A big thanks to <a target="_blank" rel="noopener" href="https://sysguides.com/install-a-windows-11-virtual-machine-on-kvm">Madhu Desai</a> for taking
+the time to write a detailed guide, which helped me a lot in the process.</p>
+<h2 id="References-and-Further-Reading"><a href="#References-and-Further-Reading" class="headerlink" title="References and Further Reading"></a>References and Further Reading</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://sysguides.com/install-a-windows-11-virtual-machine-on-kvm">Madhu Desai, How to Properly Install a Windows 11 Virtual Machine on KVM</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jochendelabie.com/2020/05/15/hyper-v-enlightenments-with-libvirt/">Jochen Delabie, Hyper-V Enlightenments with Libvirt</a></li>
+<li><a target="_blank" rel="noopener" href="https://virtio-fs.gitlab.io/howto-windows.html">How to install virtiofs drivers on Windows</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/virtio-win/kvm-guest-drivers-windows/wiki/Virtiofs:-Shared-file-system">Viktor Prutyanov, Virtiofs: Shared file system</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Requirements"><span class="toc-number">1.</span> <span class="toc-text">Requirements</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Virtualization-support"><span class="toc-number">1.1.</span> <span class="toc-text">Virtualization support</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Install-KVM"><span class="toc-number">1.2.</span> <span class="toc-text">Install KVM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Get-VirtIO-drivers"><span class="toc-number">1.3.</span> <span class="toc-text">Get VirtIO drivers</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Enable-libvirt-service"><span class="toc-number">1.4.</span> <span class="toc-text">Enable libvirt service</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reboot"><span class="toc-number">1.5.</span> <span class="toc-text">Reboot</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Optimize-the-host"><span class="toc-number">1.6.</span> <span class="toc-text">Optimize the host</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Enable-internet"><span class="toc-number">1.7.</span> <span class="toc-text">Enable internet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Update-your-user-permissions"><span class="toc-number">1.8.</span> <span class="toc-text">Update your user permissions</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Give-your-user-access-to-libvirt"><span class="toc-number">1.8.1.</span> <span class="toc-text">Give your user access to libvirt</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Give-your-user-access-to-the-images-directory"><span class="toc-number">1.8.2.</span> <span class="toc-text">Give your user access to the images directory</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Download-Windows"><span class="toc-number">1.9.</span> <span class="toc-text">Download Windows</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Configure-Virtual-Hardware"><span class="toc-number">2.</span> <span class="toc-text">Configure Virtual Hardware</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Using-virt-manager"><span class="toc-number">2.1.</span> <span class="toc-text">Using virt-manager</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Install-Windows"><span class="toc-number">2.2.</span> <span class="toc-text">Install Windows</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Optimize-the-installation"><span class="toc-number">2.3.</span> <span class="toc-text">Optimize the installation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Install-the-virtio-fs-shared-file-system"><span class="toc-number">2.4.</span> <span class="toc-text">Install the virtio-fs shared file system</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Conclusion"><span class="toc-number">3.</span> <span class="toc-text">Conclusion</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References-and-Further-Reading"><span class="toc-number">4.</span> <span class="toc-text">References and Further Reading</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&text=Running Windows in KVM"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&title=Running Windows in KVM"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&is_video=false&description=Running Windows in KVM"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Running Windows in KVM&body=Check out this article: https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&title=Running Windows in KVM"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&title=Running Windows in KVM"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&title=Running Windows in KVM"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&title=Running Windows in KVM"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&name=Running Windows in KVM&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://apetenchea.github.io/2025/05/04/running-windows-in-kvm/&t=Running Windows in KVM"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Alexandru Petenchea
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -14,7 +14,7 @@
 <meta property="og:description" content="Sometimes I need to compile code for various CPU architectures. I have a pretty unusual reason for that, which is testing IDA Pro’s processor modules. While working on a processor module, I must make">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2025-05-04T06:49:38.000Z">
-<meta property="article:modified_time" content="2025-05-04T15:51:37.947Z">
+<meta property="article:modified_time" content="2025-05-04T18:46:15.396Z">
 <meta property="article:author" content="Alexandru Petenchea">
 <meta property="article:tag" content="Programming">
 <meta property="article:tag" content="Linux">
@@ -73,6 +73,8 @@
     <br/>
     <span id="actions">
       <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/04/running-windows-in-kvm/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
         
         
         <li><a class="icon" aria-label="Next post" href="/2025/05/03/perf/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
@@ -202,7 +204,7 @@ be there. Run <code>git status</code> to inspect what else has been created.</p>
 <p>Have fun using the <code>theadc</code> extension:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./bin/riscv64-unknown-elf-gcc -march=rv64gcxtheadc -o example example.c</span><br></pre></td></tr></table></figure>
 
-<h2 id="Running-programs-for-other-architectures"><a href="#Running-programs-for-other-architectures" class="headerlink" title="Running programs for other architectures"></a>Running programs for other architectures</h2><p>Sometimes you need to run (or debug) your cross-compiled code. This is easy, you can configure <code>multiarch/qemu-user-static</code>
+<h2 id="Running-programs-for-other-architectures"><a href="#Running-programs-for-other-architectures" class="headerlink" title="Running programs for other architectures"></a>Running programs for other architectures</h2><p>Sometimes you need to run (or debug) your cross-compiled code. This is easy, you can configure <a target="_blank" rel="noopener" href="https://github.com/multiarch/qemu-user-static">qemu-user-static</a>
 to run non-native Docker images.</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --<span class="built_in">rm</span> --privileged multiarch/qemu-user-static --reset -p <span class="built_in">yes</span></span><br></pre></td></tr></table></figure>
 
